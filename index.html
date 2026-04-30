@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dedicated Unit & Invoice Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .sidebar-item { cursor: pointer; transition: all 0.2s; }
+        .sidebar-item:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .sidebar-active { background-color: #2563eb !important; color: white !important; }
+        .table-sticky-header th { position: sticky; top: 0; z-index: 10; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        .sub-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 11px; color: #94a3b8; }
+        
+        /* Smooth transitions for mobile sidebar */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden transition-opacity"></div>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity px-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black text-slate-800">Otorisasi Diperlukan</h3>
+                <button onclick="closePasswordModal()" class="text-slate-400 hover:text-slate-600 focus:outline-none">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4 font-medium">Silakan masukkan User dan Password untuk mengakses menu INVOICES.</p>
+            
+            <div class="space-y-3 mb-2">
+                <input type="text" id="invoice-user-input" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium shadow-sm" placeholder="Masukkan User (Contoh: 100-257)">
+                <input type="password" id="invoice-password-input" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium shadow-sm" placeholder="Masukkan Password...">
+            </div>
+            
+            <p id="password-error" class="text-xs text-red-600 font-bold mt-2 mb-4 hidden">User atau Password salah. Silakan coba lagi.</p>
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closePasswordModal()" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+                <button id="verify-pw-btn" onclick="verifyPassword()" class="px-4 py-2 text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2 shadow-sm">Verifikasi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0f172a] text-slate-400 flex flex-col flex-shrink-0 shadow-2xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
+        <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex justify-between items-center">
+            <span>Dedicated AAM</span>
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-1 text-sm font-medium overflow-y-auto custom-scrollbar pb-6">
+            <!-- Section Mobil -->
+            <div>
+                <div onclick="switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg sidebar-active" id="menu-mobil">
+                    <i data-lucide="car" class="w-4 h-4"></i> Unit Mobil
+                </div>
+                <div class="ml-9 mt-1 space-y-1 border-l border-slate-800">
+                    <div onclick="switchSheet('BBM', 'UNIT BBM', 'fuel', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="fuel" class="w-3 h-3"></i> Mobil BBM
+                    </div>
+                    <div onclick="switchSheet('Listrik', 'UNIT LISTRIK', 'zap', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="zap" class="w-3 h-3 text-yellow-500"></i> Mobil Listrik
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Motor -->
+            <div class="mt-4">
+                <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg" id="menu-motor">
+                    <i data-lucide="bike" class="w-4 h-4"></i> Unit Motor
+                </div>
+                <div class="ml-9 mt-1 space-y-1 border-l border-slate-800">
+                    <div onclick="switchSheet('Konvensional', 'UNIT MOTOR KONVENSIONAL', 'fuel', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="fuel" class="w-3 h-3 text-slate-500"></i> Motor Konvensional
+                    </div>
+                    <div onclick="switchSheet('Listrik', 'UNIT MOTOR LISTRIK', 'zap', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="zap" class="w-3 h-3 text-yellow-500"></i> Motor Listrik
+                    </div>
+                    <div onclick="switchSheet('all', 'Motor Backup', 'archive', '1107508733', 'MOTOR_BACKUP', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="archive" class="w-3 h-3 text-slate-500"></i> Motor Backup
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 mt-4 space-y-1">
+                <!-- Menu SDM -->
+                <div onclick="switchSheet('all', 'SDM', 'users', '666929758', 'SDM', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                    <i data-lucide="users" class="w-4 h-4"></i> SDM
+                </div>
+                <!-- Menu Battery -->
+                <div onclick="switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                    <i data-lucide="battery-charging" class="w-4 h-4"></i> Battery
+                </div>
+
+                <!-- Menu Detail -->
+                <div onclick="showDetail(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-detail">
+                    <i data-lucide="list" class="w-4 h-4"></i> Detail
+                </div>
+                
+                <!-- Menu Invoices -->
+                <div onclick="handleInvoiceClick(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-invoices">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Invoices
+                    <i data-lucide="lock" id="invoice-lock-icon" class="w-3 h-3 ml-auto text-slate-500"></i>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <header class="h-16 bg-white border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 shadow-sm z-10">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-md lg:hidden text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-wide truncate">AAM Dashboard</h2>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div id="sync-indicator" class="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> <span class="hidden md:inline">Live Syncing</span><span class="md:hidden">Live</span>
+                </div>
+                <button onclick="exportToExcel()" class="p-2 sm:px-4 sm:py-2 bg-green-50 text-green-700 border border-green-200 rounded-md text-sm font-bold hover:bg-green-100 flex items-center gap-2">
+                   <i data-lucide="download" class="w-4 h-4 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Excel</span>
+                </button>
+                <button onclick="fetchData()" class="p-2 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md">
+                    <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+            <!-- Filter & Search Bar -->
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4 mb-6">
+                <div class="relative flex-1 w-full">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Cari data..." 
+                           class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm shadow-sm font-medium">
+                </div>
+
+                <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full lg:w-auto">
+                    <!-- Dropdown Pemilik -->
+                    <select id="pemilikFilter" onchange="applyFilters()" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 cursor-pointer uppercase tracking-wide truncate">
+                        <option value="all">Semua Pemilik</option>
+                    </select>
+
+                    <!-- Dropdown Usia Unit -->
+                    <select id="usiaFilter" onchange="applyFilters()" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 cursor-pointer uppercase tracking-wide">
+                        <option value="all">Semua Usia</option>
+                    </select>
+
+                    <!-- Dropdown Invoice Sheet -->
+                    <select id="invoiceSheetFilter" onchange="switchInvoiceSheet(this.value)" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer uppercase tracking-wide truncate">
+                        <option value="244973041">INVOICE MOBIL</option>
+                        <option value="1582353030">INVOICE MOTOR</option>
+                        <option value="1588810041">INVOICE BATTERY</option>
+                        <option value="1418045402">INVOICE SDM</option>
+                    </select>
+
+                    <!-- Dropdown Bulan -->
+                    <select id="bulanFilter" onchange="onBulanChange(this)" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-xs font-black shadow-sm text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer uppercase tracking-wide truncate">
+                        <option value="all">Semua Bulan</option>
+                        <option value="januari">Januari</option>
+                        <option value="februari">Februari</option>
+                        <option value="maret">Maret</option>
+                        <option value="april">April</option>
+                        <option value="mei">Mei</option>
+                        <option value="juni">Juni</option>
+                        <option value="juli">Juli</option>
+                        <option value="agustus">Agustus</option>
+                        <option value="september">September</option>
+                        <option value="oktober">Oktober</option>
+                        <option value="november">November</option>
+                        <option value="desember">Desember</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Filter Container -->
+                <div id="filter-container" class="flex flex-wrap sm:flex-nowrap bg-white p-1 rounded-lg border border-slate-200 shadow-sm w-full lg:w-auto overflow-x-auto custom-scrollbar">
+                    <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Semua</button>
+                    <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
+                    <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
+                </div>
+
+                <div class="hidden xl:flex bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 leading-none">Last Sync</p>
+                        <p id="timer" class="text-sm font-mono font-black text-slate-700">00.00.00</p>
+                    </div>
+                    <i data-lucide="database" class="w-5 h-5 text-green-500"></i>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Sheet Sumber</p>
+                    <h3 id="stat-sheet" class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tighter text-blue-600 truncate">MOBIL</h3>
+                </div>
+                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <p id="stat-count-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Unit Terfilter</p>
+                    <h3 id="stat-count" class="text-xl sm:text-2xl font-black text-blue-600 tracking-tighter truncate">0</h3>
+                </div>
+                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Kategori Aktif</p>
+                    <h3 id="stat-category" class="text-xs sm:text-sm font-black text-slate-700 uppercase mt-1 sm:mt-2 truncate">Semua Unit</h3>
+                </div>
+                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm text-center flex flex-col justify-center">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Periode</p>
+                    <h3 id="stat-periode" class="text-xl sm:text-2xl font-black text-slate-800 tracking-tighter">2026</h3>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                <div class="bg-[#4a72b2] text-white px-4 sm:px-5 py-3 flex justify-between items-center">
+                    <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                        <i id="table-header-icon" data-lucide="layers" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"></i>
+                        <span id="table-header-title" class="text-xs sm:text-sm font-black uppercase tracking-widest truncate">Database Unit Mobil</span>
+                    </div>
+                    <span id="row-count-badge" class="bg-white/20 px-2 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-widest uppercase flex-shrink-0">0 BARIS</span>
+                </div>
+                
+                <div class="overflow-x-auto overflow-y-auto max-h-[65vh] custom-scrollbar bg-slate-50 w-full relative">
+                    <table id="mainTable" class="w-full text-left border-collapse min-w-[900px] lg:min-w-[1200px]">
+                        <thead class="text-[#475569] text-[10px] sm:text-[11px] font-black uppercase tracking-widest border-b-2 border-slate-200 table-sticky-header">
+                            <tr id="tableHead"></tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-slate-100 text-[10px] sm:text-[11px] font-medium text-slate-600">
+                            <tr><td colspan="15" class="p-10 sm:p-20 text-center text-slate-400 font-bold uppercase tracking-widest">Memuat Data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // MENGGUNAKAN ID PUBLIKASI (2PACX) -> ANTI CORS BLOCK, BISA DIBUKA DI KOMPUTER LOKAL
+        const sheetId = '2PACX-1vS1nuc1LUOgAwrWd1h06uGSPRwWh3LiO-eVYmnd_bCG7TS5lGGOj0PZOYmdQaqs8lfAVAMN3Ss5XQ8K';
+        let currentGid = '289536394'; 
+        let currentSheetType = 'UNIT'; 
+        let currentSheetMonth = ''; 
+        let isWaitingForGoogleSync = false;
+
+        // Kamus penerjemah bulan
+        const engToIndoMonth = {
+            'january': 'januari', 'february': 'februari', 'march': 'maret',
+            'april': 'april', 'may': 'mei', 'mai': 'mei', 'june': 'juni',
+            'july': 'juli', 'august': 'agustus', 'september': 'september',
+            'october': 'oktober', 'november': 'november', 'december': 'desember'
+        };
+
+        // URL GOOGLE APPS SCRIPT ANDA
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws9WFsIJaDBkEDYiGKdvLZVRZIqsuyUPOsOElgeNkCJ-zLjeaRNiMtZe9y8OSXMib-bw/exec"; 
+
+        let isInvoiceUnlocked = false;
+        let pendingInvoiceElement = null;
+
+        const standardFiltersHTML = `
+            <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Semua</button>
+            <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
+            <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
+        `;
+
+        const detailFiltersHTML = `
+            <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Mobil</button>
+            <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
+        `;
+
+        const COLUMN_CONFIGS = {
+            'UNIT': [
+                { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
+                { label: "NOPOL", keys: ["NO POL", "NOPOL", "No POL"] },
+                { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN", "MERK TIPE", "TIPE"] }, 
+                { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
+                { label: "PEMILIK", keys: ["PEMILIK", "OWNER"] },
+                { label: "SISA AKHIR SEWA", keys: ["SISA AKHIR SEWA"] },
+                { label: "JENIS SEWA VENDOR", keys: ["JENIS SEWA VENDOR", "JENIS SEWA"] }
+            ],
+            'MOTOR_BACKUP': [
+                { label: "CABANG", keys: ["ID Cabang", "CABANG"] },
+                { label: "NOPOL", keys: ["No POL", "NOPOL", "No Polisi"] },
+                { label: "THN PEMBUATAN", keys: ["THN PEMBUATAN", "TAHUN PEMBUATAN"] },
+                { label: "USIA UNIT", keys: ["USIA UNIT"] },
+                { label: "MERK TIPE", keys: ["Merk TIPE", "MERK TIPE", "TIPE"] },
+                { label: "NOMER MESIN", keys: ["NOMOR MESIN", "NO MESIN"] },
+                { label: "NO CHASIS", keys: ["NO CHASIS", "NOMOR RANGKA"] },
+                { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN"] }
+            ],
+            'DETAIL_UNIT': [
+                { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
+                { label: "NOPOL", keys: ["NO POL", "NOPOL", "No POL"] },
+                { label: "THN PEMBUATAN", keys: ["THN PEMBUATAN", "TAHUN PEMBUATAN"] },
+                { label: "USIA UNIT", keys: ["USIA UNIT"] },
+                { label: "MERK TIPE", keys: ["MERK TIPE", "MERK/TIPE", "TIPE"] },
+                { label: "NOMOR MESIN", keys: ["NOMOR MESIN", "NO MESIN"] },
+                { label: "NO CHASIS", keys: ["NO CHASIS", "NOMOR RANGKA"] },
+                { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN"] } 
+            ],
+            'SDM': [
+                { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
+                { label: "NAMA", keys: ["NAMA", "NAMA LENGKAP"] },
+                { label: "JABATAN", keys: ["JABATAN", "POSISI"] },
+                { label: "JENIS SEWA", keys: ["JENIS SEWA", "JENIS SEWA VENDOR"] },
+                { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
+                { label: "SISA AKHIR SEWA", keys: ["SISA AKHIR SEWA"] }
+            ],
+            'BATTERY': [
+                { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
+                { label: "JML", keys: ["JML", "JUMLAH"] },
+                { label: "MERK TIPE", keys: ["MERK TIPE", "TIPE", "JENIS KENDARAAN"] },
+                { label: "JENIS SEWA", keys: ["JENIS SEWA", "SEWA"] },
+                { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
+                { label: "SISA AKHIR SEWA", keys: ["SISA AKHIR SEWA"] }
+            ],
+            'INVOICE_MOBIL': [
+                { label: "No", keys: ["No", "NO"] },
+                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
+                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
+                { label: "Jenis Kendaraan", keys: ["Jenis Kendaraan", "JENIS KENDARAAN"] },
+                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
+                { label: "No Polisi", keys: ["No Polisi", "NO POLISI", "NOPOL", "NO POL"] },
+                { label: "Unit", keys: ["unit", "UNIT"] },
+                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
+                { label: "Biaya parkir", keys: ["Biaya parkir", "BIAYA PARKIR"] },
+                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
+                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
+                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+            ],
+            'INVOICE_MOTOR': [
+                { label: "No", keys: ["No", "NO"] },
+                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
+                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
+                { label: "Jenis Kendaraan", keys: ["Jenis Kendaraan", "JENIS KENDARAAN"] },
+                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
+                { label: "No Polisi", keys: ["No Polisi", "NO POLISI", "NOPOL", "NO POL"] },
+                { label: "Unit", keys: ["unit", "UNIT"] },
+                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
+                { label: "Insentif", keys: ["Insentif", "INSENTIF"] },
+                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
+                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
+                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+            ],
+            'INVOICE_BATTERY': [
+                { label: "No", keys: ["No", "NO"] },
+                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
+                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
+                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
+                { label: "Jml Unit", keys: ["Jml Unit", "JML UNIT", "unit", "UNIT"] },
+                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
+                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
+                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
+                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+            ],
+            'INVOICE_SDM': [
+                { label: "No", keys: ["No", "NO"] },
+                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
+                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
+                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
+                { label: "Nama", keys: ["Nama", "NAMA", "NAMA LENGKAP"] },
+                { label: "Jml Unit", keys: ["Jml Unit", "JML UNIT", "unit", "UNIT"] },
+                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
+                { label: "Insentif", keys: ["Insentif", "INSENTIF"] },
+                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
+                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
+                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+            ]
+        };
+
+        const INVOICE_GIDS = {
+            '244973041': 'INVOICE_MOBIL',
+            '1582353030': 'INVOICE_MOTOR',
+            '1588810041': 'INVOICE_BATTERY',
+            '1418045402': 'INVOICE_SDM'
+        };
+
+        let originalData = [];
+        let activeCategory = 'all';
+        let leaseStatusFilter = 'all';
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        async function fetchData() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            refreshIcon?.classList.add('animate-spin');
+            
+            // JALUR PUBLIKASI (Bebas Blokir Keamanan Browser)
+            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${currentGid}&single=true&output=csv&t=${new Date().getTime()}`;
+
+            Papa.parse(csvUrl, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    const rows = results.data;
+
+                    if (rows.length > 0 && (String(rows[0][0]).toLowerCase().includes("<!doctype") || String(rows[0][0]).toLowerCase().includes("<html"))) {
+                        const tableBody = document.getElementById('tableBody');
+                        tableBody.innerHTML = `<tr><td colspan="15" class="p-10 text-center text-red-600 font-black uppercase tracking-widest text-sm">DATA SEDANG DISIAPKAN GOOGLE<br><span class="text-xs text-slate-500 tracking-normal normal-case block mt-2">Karena ini adalah link publikasi baru, Google sedang menyiapkan datanya (biasanya butuh waktu 1-3 menit pertama kali).<br>Silakan klik tombol <b>Refresh biru</b> di pojok kanan atas beberapa saat lagi.</span></td></tr>`;
+                        document.getElementById('row-count-badge').innerText = `TUNGGU`;
+                        refreshIcon?.classList.remove('animate-spin');
+                        isWaitingForGoogleSync = false;
+                        return;
+                    }
+
+                    if (rows.length < 2) {
+                        originalData = [];
+                        isWaitingForGoogleSync = false;
+                        applyFilters();
+                        refreshIcon?.classList.remove('animate-spin');
+                        return;
+                    }
+
+                    // EKSTRAK BULAN 
+                    currentSheetMonth = '';
+                    if (currentSheetType.startsWith('INVOICE')) {
+                        for (let i = 0; i < Math.min(15, rows.length); i++) {
+                            const rowArr = rows[i];
+                            const monthIdx = rowArr.findIndex(cell => String(cell).trim().toLowerCase() === 'month' || String(cell).trim().toLowerCase() === 'bulan');
+                            if (monthIdx !== -1) {
+                                for (let j = monthIdx + 1; j < Math.min(monthIdx + 3, rowArr.length); j++) {
+                                    const rawVal = String(rowArr[j]).trim();
+                                    const cleanVal = rawVal.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                                    if (cleanVal.length > 2) {
+                                        currentSheetMonth = cleanVal;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                        if (currentSheetMonth) {
+                            const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
+                            const bulanFilter = document.getElementById('bulanFilter');
+                            if (bulanFilter && !isWaitingForGoogleSync) {
+                                bulanFilter.value = mappedIndoMonth;
+                            }
+                        }
+                    }
+
+                    // PENCARIAN BARIS HEADER CERDAS
+                    let headerIndex = rows.findIndex(row => {
+                        const rowStr = row.join(" ").toUpperCase();
+                        return rowStr.includes("CABANG") || rowStr.includes("NOPOL") || rowStr.includes("NO POL") || 
+                               rowStr.includes("JENIS KENDARAAN") || rowStr.includes("JENIS SEWA") || 
+                               rowStr.includes("NAMA LENGKAP") || rowStr.includes("NILAI INVOICE") || 
+                               rowStr.includes("SISA AKHIR SEWA");
+                    });
+                    
+                    if (headerIndex === -1) headerIndex = 1;
+
+                    const headers = rows[headerIndex].map(h => String(h).trim());
+                    const dataRows = rows.slice(headerIndex + 1);
+
+                    originalData = dataRows.map(row => {
+                        let obj = {};
+                        headers.forEach((header, i) => {
+                            obj[header] = row[i];
+                        });
+                        return obj;
+                    });
+
+                    isWaitingForGoogleSync = false;
+                    updateSheetLabel();
+                    updateDynamicFilters(); 
+                    applyFilters();
+                    refreshIcon?.classList.remove('animate-spin');
+                },
+                error: function(err) {
+                    refreshIcon?.classList.remove('animate-spin');
+                    originalData = [];
+                    isWaitingForGoogleSync = false;
+                    
+                    const tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = `<tr><td colspan="15" class="p-10 sm:p-20 text-center text-red-600 font-black uppercase tracking-widest text-xs sm:text-sm leading-relaxed">
+                        KONEKSI TERPUTUS<br>
+                        <span class="text-[10px] font-medium mt-2 block text-slate-500 normal-case tracking-wide">
+                            Browser Anda gagal menghubungi server Google.<br><br>
+                            Pastikan Anda terhubung ke internet dan tidak ada ekstensi pemblokir iklan (AdBlocker) yang menahan skrip.
+                        </span>
+                    </td></tr>`;
+                    document.getElementById('row-count-badge').innerText = `ERROR`;
+                }
+            });
+        }
+
+        function updateSheetLabel() {
+            let label = 'MOBIL';
+            let periodeLabel = '2026';
+
+            if(currentSheetType.startsWith('INVOICE')) {
+                const selectEl = document.getElementById('invoiceSheetFilter');
+                if (selectEl && selectEl.options.length > 0) {
+                    label = selectEl.options[selectEl.selectedIndex].text;
+                } else {
+                    label = 'INVOICES';
+                }
+                
+                const bulanFilter = document.getElementById('bulanFilter');
+                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
+                    periodeLabel = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
+                } else if (currentSheetMonth) {
+                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
+                    periodeLabel = mappedIndoMonth.toUpperCase() + ' 2026';
+                }
+            }
+            else if(currentGid === '1495287037') label = 'MOTOR';
+            else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
+            else if(currentSheetType === 'SDM') label = 'SDM';
+            else if(currentSheetType === 'BATTERY') label = 'BATTERY';
+            else if(currentSheetType === 'DETAIL_UNIT') {
+                label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
+            }
+            
+            document.getElementById('stat-sheet').innerText = label;
+            document.getElementById('stat-periode').innerText = periodeLabel;
+        }
+
+        async function onBulanChange(selectElement) {
+            const selectedBulan = selectElement.value;
+
+            updateSheetLabel();
+
+            if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === "") {
+                applyFilters();
+                return;
+            }
+
+            if (selectedBulan === 'all') {
+                applyFilters();
+                return;
+            }
+
+            const monthMap = {
+                'januari': 'January', 'februari': 'Februari', 'maret': 'Maret',
+                'april': 'April', 'mei': 'Mei', 'juni': 'Juni',
+                'juli': 'Juli', 'agustus': 'Agustus', 'september': 'September',
+                'oktober': 'Oktober', 'november': 'November', 'desember': 'Desember'
+            };
+            const targetMonth = monthMap[selectedBulan] || selectedBulan;
+
+            isWaitingForGoogleSync = true;
+            const refreshIcon = document.getElementById('refresh-icon');
+            const rowBadge = document.getElementById('row-count-badge');
+            const tableBody = document.getElementById('tableBody');
+            const head = document.getElementById('tableHead');
+            const config = COLUMN_CONFIGS[currentSheetType] || COLUMN_CONFIGS['UNIT'];
+
+            head.innerHTML = config.map(col => `
+                <th class="px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest">
+                    ${col.label}
+                </th>
+            `).join('');
+            
+            refreshIcon?.classList.add('animate-spin');
+            rowBadge.innerText = 'SINKRONISASI GOOGLE...';
+            tableBody.innerHTML = `<tr><td colspan="${config.length}" class="p-10 sm:p-20 text-center text-blue-600 font-black tracking-widest text-xs sm:text-sm"><i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-3"></i> MENGIRIM PERINTAH KE GOOGLE...<br><span class="text-[10px] text-slate-500 font-medium block mt-2">Menarik data real-time langsung dari Google Sheet.</span></td></tr>`;
+            lucide.createIcons();
+
+            try {
+                await fetch(`${GOOGLE_APPS_SCRIPT_URL}?bulan=${targetMonth}&gid=${currentGid}`, {
+                    method: 'GET',
+                    mode: 'no-cors' 
+                });
+
+                setTimeout(() => {
+                    fetchData();
+                }, 3000);
+
+            } catch (error) {
+                console.error("Gagal memanggil script:", error);
+                isWaitingForGoogleSync = false;
+                applyFilters(); 
+            }
+        }
+
+        function updateDynamicFilters() {
+            populateUsiaFilter();
+            populatePemilikFilter();
+        }
+
+        function populateUsiaFilter() {
+            const usiaFilter = document.getElementById('usiaFilter');
+            if (!usiaFilter) return;
+
+            if (currentSheetType !== 'DETAIL_UNIT' || originalData.length === 0) {
+                usiaFilter.style.display = 'none';
+                usiaFilter.value = 'all'; 
+                return;
+            }
+
+            const keys = Object.keys(originalData[0]);
+            const usiaKey = keys.find(k => k.toUpperCase().includes("USIA UNIT"));
+
+            if (!usiaKey) {
+                usiaFilter.style.display = 'none';
+                return;
+            }
+
+            usiaFilter.style.display = 'block';
+
+            const uniqueUsia = new Set();
+            originalData.forEach(row => {
+                let val = String(row[usiaKey] || "").trim().toUpperCase();
+                if (val && val !== '-' && val !== 'UNDEFINED' && val !== 'NULL') {
+                    uniqueUsia.add(val);
+                }
+            });
+
+            const sortedUsia = Array.from(uniqueUsia).sort((a, b) => {
+                const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                return numA - numB;
+            });
+
+            const currentSelection = usiaFilter.value;
+            let optionsHTML = `<option value="all">SEMUA USIA</option>`;
+            sortedUsia.forEach(usia => {
+                optionsHTML += `<option value="${usia}">${usia}</option>`;
+            });
+
+            usiaFilter.innerHTML = optionsHTML;
+            if (sortedUsia.includes(currentSelection)) usiaFilter.value = currentSelection;
+            else usiaFilter.value = 'all';
+        }
+
+        function populatePemilikFilter() {
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            if (!pemilikFilter || originalData.length === 0) return;
+
+            const keys = Object.keys(originalData[0]);
+            const pemilikKey = keys.find(k => k.toUpperCase() === "PEMILIK" || k.toUpperCase() === "OWNER");
+
+            if (!pemilikKey || currentSheetType.startsWith('INVOICE')) {
+                pemilikFilter.style.display = 'none';
+                pemilikFilter.value = 'all';
+                return;
+            }
+
+            pemilikFilter.style.display = 'block';
+
+            const uniquePemilik = new Set();
+            originalData.forEach(row => {
+                let val = String(row[pemilikKey] || "").trim().toUpperCase();
+                if (val && val !== '-' && val !== 'UNDEFINED' && val !== 'NULL') {
+                    uniquePemilik.add(val);
+                }
+            });
+
+            const sortedPemilik = Array.from(uniquePemilik).sort();
+            const currentSelection = pemilikFilter.value;
+
+            let optionsHTML = `<option value="all">SEMUA PEMILIK</option>`;
+            sortedPemilik.forEach(pemilik => {
+                optionsHTML += `<option value="${pemilik}">${pemilik}</option>`;
+            });
+
+            pemilikFilter.innerHTML = optionsHTML;
+            if (sortedPemilik.includes(currentSelection)) pemilikFilter.value = currentSelection;
+            else pemilikFilter.value = 'all';
+        }
+
+        function switchSheet(category, title, icon, gid, type, element) {
+            document.getElementById('filter-container').style.display = 'flex';
+            document.getElementById('filter-container').innerHTML = standardFiltersHTML;
+            document.getElementById('invoiceSheetFilter').style.display = 'none';
+            document.getElementById('bulanFilter').style.display = 'none';
+            
+            const isDifferentSheet = (currentGid !== gid);
+            currentGid = gid;
+            currentSheetType = type; 
+            activeCategory = category;
+
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
+            if(element) element.classList.add('sidebar-active');
+            
+            document.getElementById('table-header-title').innerText = `DATABASE ${title}`;
+            document.getElementById('table-header-icon').setAttribute('data-lucide', icon);
+            document.getElementById('stat-category').innerText = title;
+
+            updateSheetLabel();
+
+            lucide.createIcons();
+            setStatusFilter('all'); 
+            
+            if (isDifferentSheet) {
+                fetchData();
+            } else {
+                updateDynamicFilters();
+                applyFilters();
+            }
+
+            if (window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        }
+
+        function showDetail(element) {
+            activeCategory = 'all';
+            leaseStatusFilter = 'all';
+            currentSheetType = 'DETAIL_UNIT'; 
+
+            document.getElementById('filter-container').style.display = 'flex';
+            document.getElementById('filter-container').innerHTML = detailFiltersHTML;
+            document.getElementById('invoiceSheetFilter').style.display = 'none';
+            document.getElementById('bulanFilter').style.display = 'none';
+
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
+            if(element) element.classList.add('sidebar-active');
+            
+            document.getElementById('table-header-icon').setAttribute('data-lucide', 'list');
+            document.getElementById('stat-category').innerText = 'DETAIL VIEW';
+
+            lucide.createIcons();
+            switchDetailView('mobil');
+
+            if (window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        }
+
+        function switchDetailView(type) {
+            const btnMobil = document.getElementById('detail-mobil');
+            const btnMotor = document.getElementById('detail-motor');
+            
+            if(btnMobil) btnMobil.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap " + (type === 'mobil' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
+            if(btnMotor) btnMotor.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap " + (type === 'motor' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
+
+            const targetGid = type === 'mobil' ? '289536394' : '1495287037';
+            const title = type === 'mobil' ? 'DATABASE DETAIL MOBIL' : 'DATABASE DETAIL MOTOR';
+
+            document.getElementById('table-header-title').innerText = title;
+
+            if (currentGid !== targetGid) {
+                currentGid = targetGid;
+                fetchData(); 
+            } else {
+                updateSheetLabel();
+                updateDynamicFilters();
+                applyFilters(); 
+            }
+        }
+
+        function handleInvoiceClick(element) {
+            if (isInvoiceUnlocked) {
+                showInvoiceView(element);
+            } else {
+                pendingInvoiceElement = element;
+                document.getElementById('password-modal').classList.remove('hidden');
+                document.getElementById('password-error').classList.add('hidden');
+                document.getElementById('invoice-user-input').value = '';
+                document.getElementById('invoice-password-input').value = '';
+                setTimeout(() => document.getElementById('invoice-user-input').focus(), 100);
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+            pendingInvoiceElement = null;
+        }
+
+        document.getElementById('invoice-user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') document.getElementById('invoice-password-input').focus();
+        });
+
+        document.getElementById('invoice-password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verifyPassword();
+        });
+
+        async function verifyPassword() {
+            const inputUser = document.getElementById('invoice-user-input').value.trim();
+            const inputPw = document.getElementById('invoice-password-input').value.trim();
+            const btn = document.getElementById('verify-pw-btn');
+            const errorMsg = document.getElementById('password-error');
+            
+            if(!inputUser || !inputPw) return;
+
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memeriksa...';
+            errorMsg.classList.add('hidden');
+            lucide.createIcons();
+
+            // MENGGUNAKAN JALUR PUBLIKASI (Bebas Blokir Keamanan Browser)
+            const pwUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=1225873376&single=true&output=csv&t=${new Date().getTime()}`;
+
+            Papa.parse(pwUrl, {
+                download: true,
+                header: true, 
+                complete: function(results) {
+                    
+                    if (results.data.length > 0 && Object.keys(results.data[0]).some(k => k.toLowerCase().includes("<html"))) {
+                        errorMsg.innerHTML = "Gagal memverifikasi. Pastikan Share Google Sheet adalah 'Anyone with link' DAN Publikasikan ke Web.";
+                        errorMsg.classList.remove('hidden');
+                        btn.innerHTML = 'Verifikasi';
+                        return;
+                    }
+
+                    const data = results.data;
+                    let isValid = false;
+
+                    for (let row of data) {
+                        const userKey = Object.keys(row).find(k => k.trim().toUpperCase() === 'USER');
+                        const pwKey = Object.keys(row).find(k => k.trim().toUpperCase() === 'PASSWORD');
+                        
+                        if (userKey && pwKey) {
+                            if (String(row[userKey]).trim() === inputUser && String(row[pwKey]).trim() === inputPw) {
+                                isValid = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isValid) {
+                        isInvoiceUnlocked = true;
+                        closePasswordModal();
+                        
+                        const lockIcon = document.getElementById('invoice-lock-icon');
+                        if (lockIcon) lockIcon.remove();
+
+                        showInvoiceView(pendingInvoiceElement);
+                    } else {
+                        errorMsg.innerText = "User atau Password salah. Silakan coba lagi.";
+                        errorMsg.classList.remove('hidden');
+                    }
+                    btn.innerHTML = 'Verifikasi';
+                },
+                error: function() {
+                    errorMsg.innerText = "Gagal memuat sistem keamanan.";
+                    errorMsg.classList.remove('hidden');
+                    btn.innerHTML = 'Verifikasi';
+                }
+            });
+        }
+
+        function showInvoiceView(element) {
+            activeCategory = 'all';
+            leaseStatusFilter = 'all';
+            
+            document.getElementById('filter-container').style.display = 'none';
+            document.getElementById('usiaFilter').style.display = 'none';
+            document.getElementById('pemilikFilter').style.display = 'none';
+            
+            document.getElementById('invoiceSheetFilter').style.display = 'block';
+            document.getElementById('bulanFilter').style.display = 'block';
+
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
+            if(element) element.classList.add('sidebar-active');
+
+            document.getElementById('table-header-icon').setAttribute('data-lucide', 'file-text');
+
+            lucide.createIcons();
+
+            const invoiceSelect = document.getElementById('invoiceSheetFilter');
+            switchInvoiceSheet(invoiceSelect.value);
+
+            if (window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        }
+
+        function switchInvoiceSheet(gid) {
+            currentGid = gid;
+            currentSheetType = INVOICE_GIDS[gid] || 'INVOICE_MOBIL';
+            
+            const selectEl = document.getElementById('invoiceSheetFilter');
+            const title = selectEl.options[selectEl.selectedIndex].text;
+
+            document.getElementById('table-header-title').innerText = `DATABASE ${title}`;
+            document.getElementById('table-header-icon').setAttribute('data-lucide', 'file-text');
+            document.getElementById('stat-category').innerText = 'INVOICE VIEW';
+
+            lucide.createIcons();
+            fetchData();
+        }
+
+        function setStatusFilter(status) {
+            leaseStatusFilter = status;
+            const btns = ['all', 'aktif', 'habis'];
+            btns.forEach(b => {
+                const btn = document.getElementById(`status-${b}`);
+                if (btn) {
+                    if (b === status) {
+                        btn.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap bg-blue-600 text-white";
+                    } else {
+                        btn.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap text-slate-500 hover:bg-slate-50";
+                    }
+                }
+            });
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const usiaFilter = document.getElementById('usiaFilter');
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            
+            const selectedUsia = (usiaFilter && usiaFilter.style.display !== 'none') ? usiaFilter.value : 'all';
+            const selectedPemilik = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value : 'all';
+            
+            if (isWaitingForGoogleSync) return;
+
+            const filtered = originalData.filter(row => {
+
+                // UNTUK INVOICE
+                if (currentSheetType.startsWith('INVOICE')) {
+                    const matchesGlobal = Object.values(row).some(val => String(val).toLowerCase().includes(query));
+                    return matchesGlobal;
+                }
+
+                // UNTUK TAB LAIN
+                const keys = Object.keys(row);
+                
+                // 1. Kategori (GLOBAL SEARCH)
+                let matchesCategory = activeCategory === 'all';
+                if (!matchesCategory) {
+                    matchesCategory = Object.values(row).some(val => String(val).toLowerCase().includes(activeCategory.toLowerCase()));
+                }
+
+                // 2. Status Sewa
+                const sisaSewaKey = keys.find(k => k.toUpperCase().includes("SISA AKHIR SEWA"));
+                let matchesStatus = true;
+                if (sisaSewaKey) {
+                    const sisaSewaValue = String(row[sisaSewaKey] || "").toUpperCase();
+                    if (leaseStatusFilter === 'aktif') matchesStatus = !sisaSewaValue.includes("MASA SEWA HABIS") && sisaSewaValue.trim() !== "";
+                    else if (leaseStatusFilter === 'habis') matchesStatus = sisaSewaValue.includes("MASA SEWA HABIS");
+                }
+
+                // 3. Filter Usia Unit
+                let matchesUsia = true;
+                if (selectedUsia !== 'all') {
+                    const usiaKey = keys.find(k => k.toUpperCase().includes("USIA UNIT"));
+                    if (usiaKey) {
+                        const usiaValue = String(row[usiaKey] || "").toUpperCase().trim();
+                        matchesUsia = (usiaValue === selectedUsia);
+                    }
+                }
+
+                // 4. Filter Pemilik
+                let matchesPemilik = true;
+                if (selectedPemilik !== 'all') {
+                    const pemilikKey = keys.find(k => k.toUpperCase() === "PEMILIK" || k.toUpperCase() === "OWNER");
+                    if (pemilikKey) {
+                        const pemilikValue = String(row[pemilikKey] || "").toUpperCase().trim();
+                        matchesPemilik = (pemilikValue === selectedPemilik);
+                    }
+                }
+
+                // 5. Filter Pencarian Global
+                const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
+
+                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesSearch;
+            });
+
+            renderTable(filtered);
+            updateStats(filtered);
+        }
+
+        function updateStats(filtered) {
+            let displayCount = filtered.length;
+            let countLabel = "Data Terfilter";
+            
+            if (currentSheetType === 'BATTERY') {
+                const keys = Object.keys(filtered[0] || {});
+                const jmlKey = keys.find(k => k.toUpperCase() === "JML" || k.toUpperCase() === "JUMLAH");
+                if (jmlKey) {
+                    const totalJml = filtered.reduce((sum, row) => {
+                        const val = parseInt(String(row[jmlKey]).replace(/[^0-9]/g, '')) || 0;
+                        return sum + val;
+                    }, 0);
+                    displayCount = totalJml;
+                    countLabel = "JUMLAH BATTERY";
+                }
+            } else if (currentSheetType === 'SDM') {
+                countLabel = "TOTAL PERSONEL";
+            } else if (currentSheetType.startsWith('INVOICE')) {
+                countLabel = "ITEM INVOICE";
+                if (filtered.length > 0) {
+                    const keys = Object.keys(filtered[0] || {});
+                    const noKey = keys.find(k => k.trim().toUpperCase() === "NO");
+                    if (noKey) {
+                        displayCount = filtered.filter(row => {
+                            const val = String(row[noKey]).trim();
+                            return val !== '' && !isNaN(val);
+                        }).length;
+                    } else {
+                        displayCount = filtered.filter(row => Object.values(row).join('').trim() !== '').length;
+                    }
+                } else {
+                    displayCount = 0;
+                }
+            } else {
+                countLabel = "UNIT TERFILTER";
+            }
+
+            document.getElementById('stat-count-label').innerText = countLabel;
+            document.getElementById('stat-count').innerText = displayCount;
+        }
+
+        function renderTable(data) {
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            const rowCountBadge = document.getElementById('row-count-badge');
+            const config = COLUMN_CONFIGS[currentSheetType] || COLUMN_CONFIGS['UNIT'];
+
+            head.innerHTML = config.map(col => `
+                <th class="px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest">
+                    ${col.label}
+                </th>
+            `).join('');
+
+            const validData = data.filter(row => Object.values(row).join('').trim() !== '');
+
+            if (validData.length === 0) {
+                let emptyMsg = "Data Tidak Dijumpai";
+                
+                body.innerHTML = `<tr><td colspan="${config.length}" class="p-10 sm:p-20 text-center text-slate-400 font-bold tracking-widest text-xs sm:text-sm leading-relaxed">${emptyMsg}</td></tr>`;
+                rowCountBadge.innerText = `0 BARIS`;
+                return;
+            }
+
+            // Data Rows dinamis
+            body.innerHTML = validData.map(row => {
+                const cells = config.map(col => {
+                    let actualKey = undefined;
+                    for (const searchKey of col.keys) {
+                        actualKey = Object.keys(row).find(k => k.trim().toUpperCase() === searchKey.toUpperCase());
+                        if (actualKey) break;
+                    }
+                    const val = actualKey ? row[actualKey] : "-";
+                    
+                    let cellClass = "px-4 sm:px-5 py-3 sm:py-3.5 border-r border-slate-50 truncate max-w-[200px] sm:max-w-[250px]";
+                    
+                    const upperVal = String(val).toUpperCase();
+                    if (upperVal.includes("MASA SEWA HABIS") || (val.toString().trim() === '-' && col.label === "SISA AKHIR SEWA")) {
+                        cellClass += " text-red-600 font-bold bg-red-50/20";
+                    }
+                    
+                    if (currentSheetType.startsWith('INVOICE') && (col.label.includes("Harga Sewa") || col.label.includes("Nilai") || col.label.includes("TKBM") || col.label.includes("Biaya") || col.label.includes("Insentif"))) {
+                        cellClass += " text-right font-mono";
+                    }
+
+                    return `<td class="${cellClass}" title="${val}">${val}</td>`;
+                }).join('');
+                
+                return `<tr class="hover:bg-blue-50/50 transition-all border-b border-slate-50 text-slate-700 font-medium">${cells}</tr>`;
+            }).join('');
+
+            rowCountBadge.innerText = `${validData.length} BARIS`;
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById("mainTable");
+            const html = table.outerHTML;
+            const url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            const link = document.createElement("a");
+            
+            let exportName = document.getElementById('stat-sheet').innerText;
+            if(currentSheetType.startsWith('INVOICE')){
+                const bulan = document.getElementById('bulanFilter').value;
+                if(bulan !== 'all') exportName += `_${bulan}`;
+            }
+
+            link.download = `Dedicated_AAM_${exportName}.xls`;
+            link.href = url;
+            link.click();
+        }
+
+        function startTimer() {
+            let seconds = 0;
+            setInterval(() => {
+                seconds++;
+                let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                let s = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `00.${m}.${s}`;
+            }, 1000);
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+
+            // PENDETEKSI JIKA FILE DIBUKA LOKAL DI KOMPUTER
+            if (window.location.protocol === 'file:') {
+                const tableBody = document.getElementById('tableBody');
+                if (tableBody) {
+                    tableBody.innerHTML = `<tr><td colspan="15" class="p-10 sm:p-20 text-center text-red-600 font-black uppercase tracking-widest text-xs sm:text-sm leading-relaxed">
+                        BLOKIR KEAMANAN BROWSER (FILE LOKAL)<br>
+                        <span class="text-[10px] font-medium mt-2 block text-slate-500 normal-case tracking-wide">
+                            Google Chrome melarang file yang dibuka langsung dari komputer (<b>C:/...</b>) untuk menarik data dari internet demi keamanan.<br><br>
+                            <b>Solusi:</b> Silakan lanjutkan proses <b>Upload file index.html ini ke GitHub Pages</b>. Setelah website Anda online dan diakses melalui link <b>https://...</b>, dashboard dan sistem password ini akan berfungsi 100% normal!
+                        </span>
+                    </td></tr>`;
+                    document.getElementById('row-count-badge').innerText = `DIBLOKIR BROWSER`;
+                }
+                
+                // Mengambil alih tombol verifikasi jika dijalankan lokal
+                const verifyBtn = document.getElementById('verify-pw-btn');
+                if (verifyBtn) {
+                    verifyBtn.onclick = function() {
+                        const errorMsg = document.getElementById('password-error');
+                        errorMsg.innerHTML = "<b>Blokir Browser!</b><br>Sistem password tidak bisa berjalan jika file dibuka secara offline dari <b>C:/</b>. Silakan upload file index.html ini ke GitHub Pages terlebih dahulu.";
+                        errorMsg.classList.remove('hidden');
+                    };
+                }
+                return; // Menghentikan penarikan data agar tidak error
+            }
+
+            fetchData();
+            startTimer();
+            setInterval(fetchData, 300000);
+        };
+    </script>
+</body>
+</html>
