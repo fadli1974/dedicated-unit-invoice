@@ -372,12 +372,12 @@
                 { label: "SISA AKHIR SEWA", keys: ["SISA AKHIR SEWA"] }
             ],
             'BATTERY': [
-                { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
-                { label: "JML", keys: ["JML", "JUMLAH"] },
-                { label: "MERK TIPE", keys: ["MERK TIPE", "TIPE", "JENIS KENDARAAN"] },
-                { label: "JENIS SEWA", keys: ["JENIS SEWA", "SEWA"] },
-                { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
-                { label: "SISA AKHIR SEWA", keys: ["SISA AKHIR SEWA"] }
+                { label: "CABANG", rawIdx: 2 },
+                { label: "JML", rawIdx: 4 },
+                { label: "MERK TIPE", rawIdx: 9 },
+                { label: "JENIS SEWA", rawIdx: 13 },
+                { label: "NO. SPK", rawIdx: 12 },
+                { label: "SISA AKHIR SEWA", rawIdx: 17 }
             ],
             'PENAMBAHAN': [
                 { label: "PROJECT", keys: ["PROJECT"] },
@@ -1378,16 +1378,12 @@
             let countLabel = "Data Terfilter";
             
             if (currentSheetType === 'BATTERY') {
-                const keys = Object.keys(filtered[0] || {});
-                const jmlKey = keys.find(k => k.toUpperCase() === "JML" || k.toUpperCase() === "JUMLAH");
-                if (jmlKey) {
-                    const totalJml = filtered.reduce((sum, row) => {
-                        const val = parseInt(String(row[jmlKey]).replace(/[^0-9]/g, '')) || 0;
-                        return sum + val;
-                    }, 0);
-                    displayCount = totalJml;
-                    countLabel = "JUMLAH BATTERY";
-                }
+                const totalJml = filtered.reduce((sum, row) => {
+                    const val = parseInt(String(row._rawRow && row._rawRow[4] !== undefined ? row._rawRow[4] : 0).replace(/[^0-9]/g, '')) || 0;
+                    return sum + val;
+                }, 0);
+                displayCount = totalJml;
+                countLabel = "JUMLAH BATTERY";
             } else if (currentSheetType === 'SDM') {
                 countLabel = "TOTAL PERSONEL";
             } else if (currentSheetType.startsWith('INVOICE')) {
@@ -1428,6 +1424,7 @@
             const isInvoiceMobil = currentSheetType === 'INVOICE_MOBIL';
             const isInvoiceMotor = currentSheetType === 'INVOICE_MOTOR';
             const isInvoiceSDM = currentSheetType === 'INVOICE_SDM';
+            const isBattery = currentSheetType === 'BATTERY';
 
             head.innerHTML = config.map(col => `
                 <th class="px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest">
@@ -1484,7 +1481,7 @@
                 const cells = config.map(col => {
                     let val = "-";
                     
-                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM) && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
+                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery) && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
                         if (col.isIndex) {
                             val = idx + 1;
                         } else if (col.rawIdx !== undefined) {
