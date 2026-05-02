@@ -179,10 +179,10 @@
 
                     <!-- Dropdown Invoice Sheet -->
                     <select id="invoiceSheetFilter" onchange="switchInvoiceSheet(this.value)" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer uppercase tracking-wide truncate">
-                        <option value="244973041">INVOICE MOBIL</option>
-                        <option value="1582353030">INVOICE MOTOR</option>
+                        <option value="INVOICE_MOBIL_289536394">INVOICE MOBIL</option>
+                        <option value="INVOICE_MOTOR_1495287037">INVOICE MOTOR</option>
                         <option value="1588810041">INVOICE BATTERY</option>
-                        <option value="1418045402">INVOICE SDM</option>
+                        <option value="INVOICE_SDM_666929758">INVOICE SDM</option>
                     </select>
 
                     <!-- Dropdown Bulan -->
@@ -386,8 +386,9 @@
                 { label: "JENIS SERVICE", keys: ["Jenis Service", "JENIS"] },
                 { label: "JENIS SEWA VENDOR", keys: ["Jenis Sewa Vendor", "JENIS SEWA"] },
                 { label: "JUMLAH", keys: ["Jumlah", "JUMLAH", "JML"] },
-                { label: "TGL PERMINTAAN", keys: ["Tgl Permintaa", "TGL PERMINTAAN", "TANGGAL PERMINTAAN"] },
+                { label: "TGL PERMINTAAN", keys: ["Tgl PermintaaN", "Tgl Permintaa", "TGL PERMINTAAN", "TANGGAL PERMINTAAN"] },
                 { label: "TGL PEMENUHAN", keys: ["Tanggal Pemenuhan", "TGL PEMENUHAN"] },
+                { label: "SLA PEMENUHAN", keys: ["SLA Pemenuhan", "SLA PEMENUHAN", "SLA"] },
                 { label: "ACHIEVED", keys: ["Achieved", "ACHIEVED"] },
                 { label: "KETERANGAN / CASE", keys: ["Keterangan / Case", "KETERANGAN", "CASE"] },
                 { label: "NO. SPK", keys: ["No.SPK", "NO. SPK", "SPK"] },
@@ -395,32 +396,32 @@
                 { label: "TGL BERAKHIR SEWA", keys: ["Tanggal Berakhir Sewa", "TGL BERAKHIR"] }
             ],
             'INVOICE_MOBIL': [
-                { label: "No", keys: ["No", "NO"] },
-                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
-                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
-                { label: "Jenis Kendaraan", keys: ["Jenis Kendaraan", "JENIS KENDARAAN"] },
-                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
-                { label: "No Polisi", keys: ["No Polisi", "NO POLISI", "NOPOL", "NO POL"] },
-                { label: "Unit", keys: ["unit", "UNIT"] },
-                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
-                { label: "Biaya parkir", keys: ["Biaya parkir", "BIAYA PARKIR"] },
-                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
-                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
-                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+                { label: "NO", isIndex: true },
+                { label: "CABANG AAM", rawIdx: 2 },
+                { label: "JENIS SERVICE", rawIdx: 13 },
+                { label: "JENIS KENDARAAN", rawIdx: 12 },
+                { label: "JENIS SEWA", rawIdx: 23 },
+                { label: "NO POLISI", rawIdx: 4 },
+                { label: "UNIT", rawIdx: 14 },
+                { label: "HARGA SEWA", rawIdx: 20, isCurr: true },
+                { label: "BIAYA PARKIR", isDynamicMonth: true, isCurr: true },
+                { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
+                { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
+                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
             ],
             'INVOICE_MOTOR': [
-                { label: "No", keys: ["No", "NO"] },
-                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
-                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
-                { label: "Jenis Kendaraan", keys: ["Jenis Kendaraan", "JENIS KENDARAAN"] },
-                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
-                { label: "No Polisi", keys: ["No Polisi", "NO POLISI", "NOPOL", "NO POL"] },
-                { label: "Unit", keys: ["unit", "UNIT"] },
-                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
-                { label: "Insentif", keys: ["Insentif", "INSENTIF"] },
-                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
-                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
-                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+                { label: "NO", isIndex: true },
+                { label: "CABANG AAM", rawIdx: 2 },
+                { label: "JENIS SERVICE", rawIdx: 14 },
+                { label: "JENIS KENDARAAN", rawIdx: 11 },
+                { label: "JENIS SEWA", rawIdx: 22 },
+                { label: "NO POLISI", rawIdx: 4 },
+                { label: "UNIT", rawIdx: 12 },
+                { label: "HARGA SEWA", rawIdx: 19, isCurr: true },
+                { label: "INSENTIF", isDynamicMonthMotor: true, isCurr: true },
+                { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
+                { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
+                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
             ],
             'INVOICE_BATTERY': [
                 { label: "No", keys: ["No", "NO"] },
@@ -434,25 +435,22 @@
                 { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
             ],
             'INVOICE_SDM': [
-                { label: "No", keys: ["No", "NO"] },
-                { label: "Cabang AAM", keys: ["Cabang AAM", "CABANG AAM", "CABANG"] },
-                { label: "Jenis Service", keys: ["Jenis Service", "JENIS SERVICE"] },
-                { label: "Jenis Sewa", keys: ["Jenis Sewa", "JENIS SEWA"] },
-                { label: "Nama", keys: ["Nama", "NAMA", "NAMA LENGKAP"] },
-                { label: "Jml Unit", keys: ["Jml Unit", "JML UNIT", "unit", "UNIT"] },
-                { label: "Harga Sewa", keys: ["Harga Sewa", "HARGA SEWA"] },
-                { label: "Insentif", keys: ["Insentif", "INSENTIF"] },
-                { label: "Nilai Invoice", keys: ["Nilai Invoice", "NILAI INVOICE"] },
-                { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
-                { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
+                { label: "NO", isIndex: true },
+                { label: "CABANG AAM", rawIdx: 2 },
+                { label: "JENIS SERVICE", rawIdx: 6 },
+                { label: "JENIS SEWA", rawIdx: 16 },
+                { label: "NAMA", rawIdx: 4 },
+                { label: "JML UNIT", rawIdx: 7 },
+                { label: "HARGA SEWA", rawIdx: 13, isCurr: true },
+                { label: "INSENTIF", isDynamicMonthSDM: true, isCurr: true },
+                { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
+                { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
+                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
             ]
         };
 
         const INVOICE_GIDS = {
-            '244973041': 'INVOICE_MOBIL',
-            '1582353030': 'INVOICE_MOTOR',
-            '1588810041': 'INVOICE_BATTERY',
-            '1418045402': 'INVOICE_SDM'
+            '1588810041': 'INVOICE_BATTERY'
         };
 
         let originalData = [];
@@ -1253,8 +1251,19 @@
         }
 
         function switchInvoiceSheet(gid) {
-            currentGid = gid;
-            currentSheetType = INVOICE_GIDS[gid] || 'INVOICE_MOBIL';
+            if (gid === 'INVOICE_MOBIL_289536394') {
+                currentGid = '289536394';
+                currentSheetType = 'INVOICE_MOBIL';
+            } else if (gid === 'INVOICE_MOTOR_1495287037') {
+                currentGid = '1495287037';
+                currentSheetType = 'INVOICE_MOTOR';
+            } else if (gid === 'INVOICE_SDM_666929758') {
+                currentGid = '666929758';
+                currentSheetType = 'INVOICE_SDM';
+            } else {
+                currentGid = gid;
+                currentSheetType = INVOICE_GIDS[gid] || 'INVOICE_BATTERY';
+            }
             
             const selectEl = document.getElementById('invoiceSheetFilter');
             let title = 'INVOICES';
@@ -1416,6 +1425,9 @@
             if(!head || !body) return;
 
             const config = COLUMN_CONFIGS[currentSheetType] || COLUMN_CONFIGS['UNIT'];
+            const isInvoiceMobil = currentSheetType === 'INVOICE_MOBIL';
+            const isInvoiceMotor = currentSheetType === 'INVOICE_MOTOR';
+            const isInvoiceSDM = currentSheetType === 'INVOICE_SDM';
 
             head.innerHTML = config.map(col => `
                 <th class="px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest">
@@ -1433,25 +1445,112 @@
                 return;
             }
 
-            body.innerHTML = validData.map(row => {
+            const parseRp = (str) => {
+                if (!str || str === '-' || str === '') return 0;
+                return parseFloat(String(str).replace(/[Rp\s\.]/g, '').replace(',', '.')) || 0;
+            };
+
+            const getBulanIdx = () => {
+                const bulanFilter = document.getElementById('bulanFilter');
+                let m = bulanFilter ? bulanFilter.value : 'all';
+                if (m === 'all' || !m) {
+                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+                }
+                const map = {'januari': 27, 'februari': 28, 'maret': 29, 'april': 30, 'mei': 31, 'juni': 32, 'juli': 33, 'agustus': 34, 'september': 35, 'oktober': 36, 'november': 37, 'desember': 38};
+                return map[m] || 27;
+            };
+
+            const getBulanIdxMotor = () => {
+                const bulanFilter = document.getElementById('bulanFilter');
+                let m = bulanFilter ? bulanFilter.value : 'all';
+                if (m === 'all' || !m) {
+                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+                }
+                const map = {'januari': 25, 'februari': 26, 'maret': 27, 'april': 28, 'mei': 29, 'juni': 30, 'juli': 31, 'agustus': 32, 'september': 33, 'oktober': 34, 'november': 35, 'desember': 36};
+                return map[m] || 25;
+            };
+
+            const getBulanIdxSDM = () => {
+                const bulanFilter = document.getElementById('bulanFilter');
+                let m = bulanFilter ? bulanFilter.value : 'all';
+                if (m === 'all' || !m) {
+                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+                }
+                const map = {'januari': 20, 'februari': 21, 'maret': 22, 'april': 23, 'mei': 24, 'juni': 25, 'juli': 26, 'agustus': 27, 'september': 28, 'oktober': 29, 'november': 30, 'desember': 31};
+                return map[m] || 20;
+            };
+
+            body.innerHTML = validData.map((row, idx) => {
                 const cells = config.map(col => {
-                    let actualKey = undefined;
-                    for (const searchKey of col.keys) {
-                        actualKey = Object.keys(row).find(k => k.trim().toUpperCase() === searchKey.toUpperCase());
-                        if (actualKey) break;
+                    let val = "-";
+                    
+                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM) && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
+                        if (col.isIndex) {
+                            val = idx + 1;
+                        } else if (col.rawIdx !== undefined) {
+                            val = row._rawRow && row._rawRow[col.rawIdx] !== undefined && String(row._rawRow[col.rawIdx]).trim() !== "" ? row._rawRow[col.rawIdx] : "-";
+                        } else if (col.isDynamicMonth) {
+                            let mIdx = getBulanIdx();
+                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                        } else if (col.isDynamicMonthMotor) {
+                            let mIdx = getBulanIdxMotor();
+                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                        } else if (col.isDynamicMonthSDM) {
+                            let mIdx = getBulanIdxSDM();
+                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                        } else if (col.isCalcInv || col.isCalcPpn || col.isCalcTotal) {
+                            let hargaIdx = isInvoiceMobil ? 20 : (isInvoiceMotor ? 19 : 13);
+                            let hargaSewa = row._rawRow && row._rawRow[hargaIdx] !== undefined ? parseRp(row._rawRow[hargaIdx]) : 0;
+                            let mIdx = isInvoiceMobil ? getBulanIdx() : (isInvoiceMotor ? getBulanIdxMotor() : getBulanIdxSDM());
+                            let tambahanBiaya = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                            
+                            let inv = hargaSewa + tambahanBiaya;
+                            let ppn = inv * 0.11;
+                            let tot = inv + ppn;
+                            
+                            if (col.isCalcInv) val = inv;
+                            if (col.isCalcPpn) val = ppn;
+                            if (col.isCalcTotal) val = tot;
+                        }
+
+                        if (col.isCurr && typeof val === 'number') {
+                            val = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+                        }
+                    } else {
+                        let actualKey = undefined;
+                        for (const searchKey of (col.keys || [])) {
+                            actualKey = Object.keys(row).find(k => k.trim().toUpperCase() === searchKey.toUpperCase());
+                            if (actualKey) break;
+                        }
+                        val = actualKey !== undefined ? row[actualKey] : "-";
                     }
-                    const val = actualKey ? row[actualKey] : "-";
                     
                     let cellClass = "px-4 sm:px-5 py-3 sm:py-3.5 border-r border-slate-50 truncate max-w-[200px] sm:max-w-[250px]";
                     
                     const upperVal = String(val).toUpperCase();
-                    if (upperVal.includes("MASA SEWA HABIS") || (val.toString().trim() === '-' && col.label === "SISA AKHIR SEWA")) {
+                    if (upperVal.includes("MASA SEWA HABIS") || (String(val).trim() === '-' && col.label && col.label.toUpperCase() === "SISA AKHIR SEWA")) {
                         cellClass += " text-red-600 font-bold bg-red-50/20";
                     }
                     
-                    if (currentSheetType.startsWith('INVOICE') && (col.label.includes("Harga Sewa") || col.label.includes("Nilai") || col.label.includes("TKBM") || col.label.includes("Biaya") || col.label.includes("Insentif"))) {
+                    if (currentSheetType.startsWith('INVOICE') && col.label && (col.label.includes("HARGA") || col.label.includes("NILAI") || col.label.includes("BIAYA") || col.label.includes("INSENTIF") || col.label.includes("Harga Sewa") || col.label.includes("Nilai") || col.label.includes("Insentif"))) {
                         cellClass += " text-right font-mono";
                     }
+
+                    // --- TAMBAHAN LOGIKA PEWARNAAN KOLOM ACHIEVED ---
+                    if (currentSheetType === 'PENAMBAHAN' && col.label === "ACHIEVED") {
+                        let slaKey = Object.keys(row).find(k => k.trim().toUpperCase().includes("SLA"));
+                        let slaVal = slaKey ? parseFloat(row[slaKey]) : NaN;
+                        let achVal = parseFloat(val);
+
+                        if (!isNaN(slaVal) && !isNaN(achVal)) {
+                            if (achVal <= slaVal) {
+                                cellClass += " text-green-700 font-black bg-green-50"; // Hijau jika memenuhi SLA atau di bawahnya
+                            } else {
+                                cellClass += " text-red-600 font-black bg-red-50"; // Merah jika melewati SLA
+                            }
+                        }
+                    }
+                    // ------------------------------------------------
 
                     return `<td class="${cellClass}" title="${val}">${val}</td>`;
                 }).join('');
