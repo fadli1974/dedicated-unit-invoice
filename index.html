@@ -113,8 +113,13 @@
                 <div onclick="switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="battery-charging" class="w-4 h-4"></i> Battery
                 </div>
+                <!-- Menu Penambahan Unit -->
                 <div onclick="switchSheet('all', 'Penambahan Unit/SDM', 'plus-circle', '1066270407', 'PENAMBAHAN', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="plus-circle" class="w-4 h-4 text-green-500"></i> Penambahan Unit/SDM
+                </div>
+                <!-- Menu TimeLine -->
+                <div onclick="switchSheet('all', 'TimeLine', 'calendar-days', '421262394', 'TIMELINE', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                    <i data-lucide="calendar-days" class="w-4 h-4 text-purple-500"></i> TimeLine
                 </div>
 
                 <!-- Menu Detail -->
@@ -132,14 +137,23 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <header class="h-16 bg-white border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 shadow-sm z-10">
-            <div class="flex items-center gap-2 sm:gap-4">
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 shadow-sm z-10 gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                 <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-100 rounded-md lg:hidden text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
-                <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-wide truncate">AAM Dashboard</h2>
+                <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-wide truncate hidden sm:block">AAM Dashboard</h2>
             </div>
-            <div class="flex items-center gap-2 sm:gap-4">
+            
+            <!-- Kotak Pencarian Dipindah ke Header -->
+            <div id="searchContainer" class="flex-1 max-w-xl relative group mx-2 sm:mx-4 transition-all duration-300">
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors duration-300"></i>
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Cari unit, nopol, cabang..." 
+                       class="w-full pl-10 pr-4 py-2 bg-slate-100 border-transparent focus:bg-white border focus:border-blue-500 rounded-xl text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-inner hover:bg-slate-200 focus:hover:bg-white transition-all duration-300">
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                 <div id="sync-indicator" class="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
                     <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> <span class="hidden md:inline">Live Syncing</span><span class="md:hidden">Live</span>
                 </div>
@@ -153,32 +167,39 @@
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-slate-50">
-            <!-- Filter & Search Bar -->
-            <div id="filter-area" class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4 mb-6">
-                <div class="relative flex-1 w-full">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Cari data..." 
-                           class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm shadow-sm font-medium">
-                </div>
-
-                <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full lg:w-auto">
+            <!-- Filter Area -->
+            <div id="filter-area" class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4 mb-6">
+                
+                <!-- BAGIAN KIRI: Kumpulan Filter Dropdown -->
+                <div class="flex flex-wrap items-center gap-2 lg:gap-3 w-full xl:w-auto flex-1">
                     <!-- Dropdown Jenis Kendaraan (Khusus Diagram) -->
-                    <select id="jenisFilter" onchange="applyFilters()" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 cursor-pointer uppercase tracking-wide truncate">
+                    <select id="jenisFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Jenis</option>
                     </select>
 
+                    <!-- Dropdown GPS -->
+                    <select id="gpsFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                        <option value="all">Semua GPS</option>
+                    </select>
+
                     <!-- Dropdown Pemilik -->
-                    <select id="pemilikFilter" onchange="applyFilters()" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 cursor-pointer uppercase tracking-wide truncate">
+                    <select id="pemilikFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Pemilik</option>
                     </select>
 
-                    <!-- Dropdown Usia Unit -->
-                    <select id="usiaFilter" onchange="applyFilters()" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 cursor-pointer uppercase tracking-wide">
-                        <option value="all">Semua Usia</option>
-                    </select>
+                    <!-- RENTANG USIA (MIN - MAX) -->
+                    <div id="usiaFilterContainer" style="display: none;" class="flex-1 sm:flex-none flex items-center gap-1 sm:gap-2">
+                        <select id="usiaMinFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                            <option value="all">MIN USIA</option>
+                        </select>
+                        <span class="text-slate-400 font-bold text-xs">-</span>
+                        <select id="usiaMaxFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                            <option value="all">MAX USIA</option>
+                        </select>
+                    </div>
 
                     <!-- Dropdown Invoice Sheet -->
-                    <select id="invoiceSheetFilter" onchange="switchInvoiceSheet(this.value)" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs font-black shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer uppercase tracking-wide truncate">
+                    <select id="invoiceSheetFilter" onchange="switchInvoiceSheet(this.value)" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="INVOICE_MOBIL_289536394">INVOICE MOBIL</option>
                         <option value="INVOICE_MOTOR_1495287037">INVOICE MOTOR</option>
                         <option value="1588810041">INVOICE BATTERY</option>
@@ -186,7 +207,7 @@
                     </select>
 
                     <!-- Dropdown Bulan -->
-                    <select id="bulanFilter" onchange="onBulanChange(this)" style="display: none;" class="flex-1 lg:flex-none px-3 py-2.5 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-xs font-black shadow-sm text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer uppercase tracking-wide truncate">
+                    <select id="bulanFilter" onchange="onBulanChange(this)" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none text-xs font-black shadow-sm text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Bulan</option>
                         <option value="januari">Januari</option>
                         <option value="februari">Februari</option>
@@ -203,48 +224,58 @@
                     </select>
                 </div>
 
-                <!-- Dynamic Filter Container -->
-                <div id="filter-container" class="flex flex-wrap sm:flex-nowrap bg-white p-1 rounded-lg border border-slate-200 shadow-sm w-full lg:w-auto overflow-x-auto custom-scrollbar">
-                    <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Semua</button>
-                    <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
-                    <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-3 py-2 text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
-                </div>
-
-                <div class="hidden xl:flex bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 leading-none">Last Sync</p>
-                        <p id="timer" class="text-sm font-mono font-black text-slate-700">00.00.00</p>
+                <!-- BAGIAN KANAN: Tombol Status, Last Sync & Live GPS -->
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto justify-start xl:justify-end flex-shrink-0">
+                    <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar">
+                        <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap shadow-sm">Semua</button>
+                        <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
+                        <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
                     </div>
-                    <i data-lucide="database" class="w-5 h-5 text-green-500"></i>
+
+                    <!-- Kotak Last Sync -->
+                    <div class="flex bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm items-center gap-3 sm:gap-4 flex-shrink-0 ml-auto sm:ml-0">
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 leading-none">Last Sync</p>
+                            <p id="timer" class="text-sm font-mono font-black text-slate-700">00.00.00</p>
+                        </div>
+                        <i data-lucide="database" class="w-4 h-4 sm:w-5 sm:h-5 text-green-500"></i>
+                    </div>
+
+                    <!-- TOMBOL LIVE GPS -->
+                    <button id="liveGpsBtn" onclick="openGPS()" class="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-200 transition-all group focus:outline-none focus:ring-2 focus:ring-red-500/20 flex-shrink-0 cursor-pointer" title="Buka Live GPS sesuai Pemilik Unit">
+                        <i data-lucide="map-pinned" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] sm:text-xs font-black text-slate-700 group-hover:text-red-700 uppercase tracking-widest hidden sm:block">Live GPS</span>
+                    </button>
                 </div>
+                
             </div>
 
             <!-- KOTAK STATISTIK BERSIH -->
             <div id="statsStandard" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Sheet Sumber</p>
-                    <h3 id="stat-sheet-val" class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tighter text-blue-600 truncate">MOBIL</h3>
+                    <h3 id="stat-sheet-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">MOBIL</h3>
                 </div>
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p id="stat-count-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Unit Terfilter</p>
-                    <h3 id="stat-count-standard" class="text-xl sm:text-2xl font-black text-blue-600 tracking-tighter truncate">0</h3>
+                    <h3 id="stat-count-standard" class="text-lg sm:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
                 </div>
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Kategori Aktif</p>
-                    <h3 id="stat-category-val" class="text-xs sm:text-sm font-black text-slate-700 uppercase mt-1 sm:mt-2 truncate">SEMUA UNIT</h3>
+                    <h3 id="stat-category-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">SEMUA UNIT</h3>
                 </div>
-                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm text-center flex flex-col justify-center stat-card">
-                    <p id="stat-periode-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">DATA UNIT</p>
-                    <h3 id="stat-periode-val" class="text-xl sm:text-2xl font-black text-slate-800 tracking-tighter">CL</h3>
+                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
+                    <p id="stat-periode-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">DATA UNIT</p>
+                    <h3 id="stat-periode-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">CL</h3>
                 </div>
             </div>
 
-            <!-- Stats Card (Diagram Mode) - Hidden by default -->
+            <!-- Stats Card (Diagram Mode) -->
             <div id="statsDiagram" class="hidden grid gap-3 sm:gap-4 mb-6">
                 <!-- Data will be injected here via JS -->
             </div>
 
-            <!-- Chart Section - Hidden by default -->
+            <!-- Chart Section -->
             <div id="chartSection" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 id="chartTitle" class="text-sm font-black uppercase tracking-widest text-slate-700">Analisis Distribusi Unit per Cabang</h3>
@@ -323,20 +354,21 @@
         let pendingInvoiceElement = null;
 
         const standardFiltersHTML = `
-            <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Semua</button>
-            <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
-            <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
+            <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap shadow-sm">Semua</button>
+            <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
+            <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
         `;
 
         const detailFiltersHTML = `
-            <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md bg-blue-600 text-white whitespace-nowrap">Mobil</button>
-            <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
+            <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap">Mobil</button>
+            <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
         `;
 
         const COLUMN_CONFIGS = {
             'UNIT': [
                 { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
                 { label: "NOPOL", keys: ["NO POL", "NOPOL", "No POL"] },
+                { label: "GPS", keys: ["GPS"] },
                 { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN", "MERK TIPE", "TIPE"] }, 
                 { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
                 { label: "PEMILIK", keys: ["PEMILIK", "OWNER"] },
@@ -356,6 +388,7 @@
             'DETAIL_UNIT': [
                 { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
                 { label: "NOPOL", keys: ["NO POL", "NOPOL", "No POL"] },
+                { label: "GPS", keys: ["GPS"] },
                 { label: "THN PEMBUATAN", keys: ["THN PEMBUATAN", "TAHUN PEMBUATAN"] },
                 { label: "USIA UNIT", keys: ["USIA UNIT"] },
                 { label: "MERK TIPE", keys: ["MERK TIPE", "MERK/TIPE", "TIPE"] },
@@ -394,6 +427,13 @@
                 { label: "NO. SPK", keys: ["No.SPK", "NO. SPK", "SPK"] },
                 { label: "TGL AWAL SEWA", keys: ["Tanggal Awal Sewa", "TGL AWAL"] },
                 { label: "TGL BERAKHIR SEWA", keys: ["Tanggal Berakhir Sewa", "TGL BERAKHIR"] }
+            ],
+            'TIMELINE': [
+                { label: "TASK ID", keys: ["Task ID", "Task_ID", "ID"] },
+                { label: "TASK DETAIL", keys: ["Task Detail", "Detail"] },
+                { label: "DURATION", keys: ["Duration", "Durasi"] },
+                { label: "START DATE", keys: ["Start Date", "Mulai"] },
+                { label: "END DATE", keys: ["End Date", "Selesai"] }
             ],
             'INVOICE_MOBIL': [
                 { label: "NO", isIndex: true },
@@ -456,6 +496,18 @@
         let originalData = [];
         let activeCategory = 'all';
         let leaseStatusFilter = 'all';
+        let gpsLinksConfig = { mobil: {}, motor: {} }; // Konfigurasi GPS Pintar Baru
+
+        // Variabel penampung data unik TIMELINE
+        let timelineProjectName = '';
+        let timelineDuration = '';
+        let timelineStartDate = '';
+        let timelineEndDate = '';
+        
+        // Variabel penampung Raw Data untuk Export Excel Sempurna
+        let currentFilteredData = [];
+        let rawCsvData = [];
+        let currentHeaderIndex = 0;
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -463,6 +515,109 @@
             if(sidebar) sidebar.classList.toggle('-translate-x-full');
             if(overlay) overlay.classList.toggle('hidden');
         }
+
+        // --- SISTEM TOAST NOTIFICATION ELEGAN ---
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-[100] transition-all duration-300 transform translate-y-0 opacity-100 flex items-center gap-3 font-bold text-sm ${isError ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`;
+            toast.innerHTML = `<i data-lucide="${isError ? 'alert-triangle' : 'info'}" class="w-5 h-5"></i> <span>${message}</span>`;
+            document.body.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-5');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- SISTEM TOMBOL PINTAR GPS TERBARU (LIVE FETCH DARI DUA SHEET BERBEDA) ---
+        function openGPS() {
+            let isMotor = (currentGid === '1495287037' || currentGid === '1107508733' || currentSheetType === 'INVOICE_MOTOR' || (isDiagramMode && currentDiagramType === 'motor'));
+            let typeContext = isMotor ? 'motor' : 'mobil';
+
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            let selectedOwner = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value.toUpperCase() : 'ALL';
+            
+            // Logika Fallback Khusus Motor: Ambil unit pertama yang punya link
+            if (isMotor && selectedOwner === 'ALL') {
+                selectedOwner = 'MOTOR_FALLBACK';
+            }
+
+            if (!isMotor && selectedOwner === 'ALL') {
+                showToast('Silakan pilih salah satu PEMILIK di menu dropdown filter terlebih dahulu.', true);
+                return;
+            }
+
+            // Animasi Loading pada Tombol
+            const btn = document.getElementById('liveGpsBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-spin"></i><span class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-widest hidden sm:block">Loading...</span>`;
+            lucide.createIcons();
+
+            // Tentukan URL Spreadsheet berdasarkan tipe kendaraan (Mobil: gid=73478022, Motor: gid=503672149)
+            let targetGid = isMotor ? '503672149' : '73478022';
+            const url = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${targetGid}&single=true&output=csv&t=${new Date().getTime()}`;
+            
+            Papa.parse(url, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+
+                    const rows = results.data;
+                    if(!rows || rows.length < 2 || String(rows[0][0]).toLowerCase().includes("<!doctype")) {
+                        showToast('Gagal memuat data GPS. Pastikan Sheet GPS sudah di-publish.', true);
+                        return;
+                    }
+
+                    let targetLink = null;
+                    let ownerFound = false;
+
+                    for(let i=1; i<rows.length; i++) {
+                        const row = rows[i];
+                        
+                        if (isMotor && selectedOwner === 'MOTOR_FALLBACK') {
+                             if (row[0] && String(row[0]).trim() !== '') {
+                                ownerFound = true; // Tandai bahwa minimal kita sudah mengecek baris motor
+                                let candidateLink = row[2] ? String(row[2]).trim() : "";
+                                if (candidateLink && candidateLink.toUpperCase() !== 'BELUM ADA LINK' && candidateLink !== '-') {
+                                    targetLink = candidateLink;
+                                    selectedOwner = String(row[0]).trim().toUpperCase(); // Update nama
+                                    break;
+                                }
+                            }
+                        } else {
+                            if(row[0] && String(row[0]).trim().toUpperCase() === selectedOwner) {
+                                ownerFound = true;
+                                targetLink = row[2] ? String(row[2]).trim() : "";
+                                break;
+                            }
+                        }
+                    }
+
+                    if (targetLink && targetLink.toUpperCase() !== 'BELUM ADA LINK' && targetLink !== '-' && targetLink !== '') {
+                        if (!targetLink.startsWith('http://') && !targetLink.startsWith('https://')) {
+                            targetLink = 'https://' + targetLink;
+                        }
+                        window.open(targetLink, '_blank');
+                    } else {
+                        // Skenario: Link kosong, sengaja dikosongkan, atau data belum ditarik
+                        if (isMotor || ownerFound) {
+                            showToast('Link GPS belum Tersedia', true);
+                        } else {
+                            showToast(`Data GPS untuk Pemilik "${selectedOwner}" tidak ditemukan. (Menunggu Sinkronisasi)`, true);
+                        }
+                    }
+                },
+                error: function() {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                    showToast('Terjadi kesalahan jaringan saat mengambil link GPS.', true);
+                }
+            });
+        }
+        // --------------------------------
 
         async function fetchData() {
             const refreshIcon = document.getElementById('refresh-icon');
@@ -475,6 +630,7 @@
                 header: false,
                 complete: function(results) {
                     const rows = results.data;
+                    rawCsvData = rows; // Simpan data mentah keseluruhan untuk Excel
 
                     if (rows.length > 0 && (String(rows[0][0]).toLowerCase().includes("<!doctype") || String(rows[0][0]).toLowerCase().includes("<html"))) {
                         const tableBody = document.getElementById('tableBody');
@@ -496,7 +652,14 @@
                         return;
                     }
 
-                    // EKSTRAK BULAN 
+                    // EKSTRAK DATA KHUSUS TIMELINE DARI BARIS 3 (INDEX 2)
+                    if (currentSheetType === 'TIMELINE' && rows.length >= 3) {
+                        timelineProjectName = rows[2][1] ? String(rows[2][1]).trim() : 'TIMELINE';
+                        timelineDuration = rows[2][2] ? String(rows[2][2]).trim() : '0';
+                        timelineStartDate = rows[2][3] ? String(rows[2][3]).trim() : '-';
+                        timelineEndDate = rows[2][4] ? String(rows[2][4]).trim() : '-';
+                    }
+
                     currentSheetMonth = '';
                     if (currentSheetType.startsWith('INVOICE')) {
                         for (let i = 0; i < Math.min(15, rows.length); i++) {
@@ -524,16 +687,17 @@
                         }
                     }
 
-                    // PENCARIAN BARIS HEADER CERDAS
                     let headerIndex = rows.findIndex(row => {
                         const rowStr = row.join(" ").toUpperCase();
                         return rowStr.includes("CABANG") || rowStr.includes("NOPOL") || rowStr.includes("NO POL") || 
                                rowStr.includes("JENIS KENDARAAN") || rowStr.includes("JENIS SEWA") || 
                                rowStr.includes("NAMA LENGKAP") || rowStr.includes("NILAI INVOICE") || 
-                               rowStr.includes("SISA AKHIR SEWA") || rowStr.includes("PROJECT");
+                               rowStr.includes("SISA AKHIR SEWA") || rowStr.includes("TASK DETAIL") || 
+                               (rowStr.includes("PROJECT") && rowStr.includes("CABANG"));
                     });
                     
                     if (headerIndex === -1) headerIndex = 1;
+                    currentHeaderIndex = headerIndex; // Simpan index header
 
                     const headers = rows[headerIndex].map(h => String(h).trim());
                     const dataRows = rows.slice(headerIndex + 1);
@@ -543,7 +707,7 @@
                         headers.forEach((header, i) => {
                             obj[header] = row[i];
                         });
-                        obj._rawRow = row; // Simpan row asli untuk akses index aman di diagram
+                        obj._rawRow = row; 
                         return obj;
                     });
 
@@ -578,6 +742,11 @@
             let label = 'MOBIL';
             let periodeLabel = 'CL';
             let periodeTitle = 'DATA UNIT';
+            
+            // Variabel baru untuk menampung label stat-card secara dinamis
+            let sheetSumberLabel = 'SHEET SUMBER';
+            let unitTerfilterLabel = 'UNIT TERFILTER';
+            let kategoriAktifLabel = 'KATEGORI AKTIF';
 
             if(currentSheetType.startsWith('INVOICE')) {
                 const selectEl = document.getElementById('invoiceSheetFilter');
@@ -601,6 +770,15 @@
             else if(currentSheetType === 'SDM') label = 'SDM';
             else if(currentSheetType === 'BATTERY') label = 'BATTERY';
             else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
+            else if(currentSheetType === 'TIMELINE') {
+                label = timelineProjectName || 'TIMELINE';
+                // Penyesuaian label stat-card khusus TIMELINE
+                sheetSumberLabel = 'PROJECT NAME';
+                unitTerfilterLabel = 'PROJECT DURASION';
+                kategoriAktifLabel = 'PROJECT START DATE';
+                periodeTitle = 'PROJECT END DATE';
+                periodeLabel = timelineEndDate || '-';
+            }
             else if(currentSheetType === 'DETAIL_UNIT') {
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
@@ -613,6 +791,20 @@
             
             const statPeriodeVal = document.getElementById('stat-periode-val');
             if (statPeriodeVal) statPeriodeVal.innerText = periodeLabel;
+
+            // Mengganti label text pada stat-card
+            const statCards = document.querySelectorAll('.stat-card p');
+            if(statCards.length >= 3) {
+                statCards[0].innerText = sheetSumberLabel;
+                // statCards[1] adalah ID stat-count-label yang akan ditimpa di updateStats, jadi kita biarkan saja
+                statCards[2].innerText = kategoriAktifLabel;
+            }
+
+            // Khusus TIMELINE, kita menimpa Kategori Aktif (Value-nya) menjadi Start Date
+            const statCategory = document.getElementById('stat-category-val');
+            if (statCategory && currentSheetType === 'TIMELINE') {
+                statCategory.innerText = timelineStartDate || '-';
+            }
         }
 
         async function onBulanChange(selectElement) {
@@ -678,13 +870,65 @@
 
         function updateDynamicFilters() {
             populateUsiaFilter();
-            populatePemilikFilter();
+            populateGpsFilter();
             if (isDiagramMode && (currentDiagramType === 'motor' || currentDiagramType === 'mobil')) {
                 populateJenisKendaraanDiagramFilter();
             } else {
                 const jenisFilter = document.getElementById('jenisFilter');
                 if (jenisFilter) jenisFilter.style.display = 'none';
             }
+            populatePemilikFilter();
+        }
+
+        function populateGpsFilter() {
+            const gpsFilter = document.getElementById('gpsFilter');
+            if (!gpsFilter || originalData.length === 0) return;
+
+            if (currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
+                gpsFilter.style.display = 'none';
+                gpsFilter.value = 'all';
+                return;
+            }
+
+            const keys = Object.keys(originalData[0]);
+            const gpsKey = keys.find(k => k.toUpperCase().includes("GPS"));
+
+            if (!gpsKey) {
+                gpsFilter.style.display = 'none';
+                gpsFilter.value = 'all';
+                return;
+            }
+
+            gpsFilter.style.display = 'block';
+
+            const uniqueGps = new Set();
+            let hasBlank = false;
+            
+            originalData.forEach(row => {
+                let val = String(row[gpsKey] || "").trim().toUpperCase();
+                if (val && val !== '-' && val !== 'UNDEFINED' && val !== 'NULL') {
+                    uniqueGps.add(val);
+                } else {
+                    hasBlank = true;
+                }
+            });
+
+            const sortedGps = Array.from(uniqueGps).sort();
+            const currentSelection = gpsFilter.value;
+
+            let optionsHTML = `<option value="all">SEMUA GPS</option>`;
+            sortedGps.forEach(val => {
+                optionsHTML += `<option value="${val}">${val}</option>`;
+            });
+            
+            if (hasBlank) {
+                optionsHTML += `<option value="BLANK">BELUM TERPASANG / KOSONG</option>`;
+            }
+
+            gpsFilter.innerHTML = optionsHTML;
+            if (currentSelection === 'BLANK' && hasBlank) gpsFilter.value = 'BLANK';
+            else if (sortedGps.includes(currentSelection)) gpsFilter.value = currentSelection;
+            else gpsFilter.value = 'all';
         }
 
         function populateJenisKendaraanDiagramFilter() {
@@ -718,12 +962,17 @@
         }
 
         function populateUsiaFilter() {
-            const usiaFilter = document.getElementById('usiaFilter');
-            if (!usiaFilter) return;
+            const usiaContainer = document.getElementById('usiaFilterContainer');
+            const usiaMin = document.getElementById('usiaMinFilter');
+            const usiaMax = document.getElementById('usiaMaxFilter');
+            
+            if (!usiaContainer || !usiaMin || !usiaMax) return;
 
-            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType.startsWith('INVOICE')) {
-                usiaFilter.style.display = 'none';
-                usiaFilter.value = 'all'; 
+            // isDiagramMode dihapus dari pengecualian agar filter Usia tetap muncul di Diagram
+            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
+                usiaContainer.style.display = 'none';
+                usiaMin.value = 'all'; 
+                usiaMax.value = 'all'; 
                 return;
             }
 
@@ -731,11 +980,11 @@
             const usiaKey = keys.find(k => k.toUpperCase().includes("USIA UNIT"));
 
             if (!usiaKey) {
-                usiaFilter.style.display = 'none';
+                usiaContainer.style.display = 'none';
                 return;
             }
 
-            usiaFilter.style.display = 'block';
+            usiaContainer.style.display = 'flex';
 
             const uniqueUsia = new Set();
             originalData.forEach(row => {
@@ -751,22 +1000,32 @@
                 return numA - numB;
             });
 
-            const currentSelection = usiaFilter.value;
-            let optionsHTML = `<option value="all">SEMUA USIA</option>`;
+            const currentMin = usiaMin.value;
+            const currentMax = usiaMax.value;
+
+            let optionsMinHTML = `<option value="all">MIN USIA</option>`;
+            let optionsMaxHTML = `<option value="all">MAX USIA</option>`;
+            
             sortedUsia.forEach(usia => {
-                optionsHTML += `<option value="${usia}">${usia}</option>`;
+                optionsMinHTML += `<option value="${usia}">${usia}</option>`;
+                optionsMaxHTML += `<option value="${usia}">${usia}</option>`;
             });
 
-            usiaFilter.innerHTML = optionsHTML;
-            if (sortedUsia.includes(currentSelection)) usiaFilter.value = currentSelection;
-            else usiaFilter.value = 'all';
+            usiaMin.innerHTML = optionsMinHTML;
+            usiaMax.innerHTML = optionsMaxHTML;
+
+            if (sortedUsia.includes(currentMin)) usiaMin.value = currentMin;
+            else usiaMin.value = 'all';
+            
+            if (sortedUsia.includes(currentMax)) usiaMax.value = currentMax;
+            else usiaMax.value = 'all';
         }
 
         function populatePemilikFilter() {
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (!pemilikFilter || originalData.length === 0) return;
 
-            if (currentSheetType.startsWith('INVOICE')) {
+            if (currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'none';
                 pemilikFilter.value = 'all';
                 return;
@@ -808,22 +1067,59 @@
             isDiagramMode = false;
             toggleChart(false);
             
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) {
+                if (type === 'TIMELINE') {
+                    searchContainer.style.display = 'none'; // Sembunyikan pencarian
+                    const searchInput = document.getElementById('searchInput');
+                    if(searchInput) searchInput.value = ''; // Reset teks pencarian
+                } else {
+                    searchContainer.style.display = ''; // Tampilkan kembali pencarian
+                }
+            }
+
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
-                filterContainer.style.display = 'flex';
-                filterContainer.innerHTML = standardFiltersHTML;
+                // Sembunyikan filter status (Sewa Aktif/Habis) khusus untuk menu TIMELINE
+                if (type === 'TIMELINE') {
+                    filterContainer.style.display = 'none';
+                } else {
+                    filterContainer.style.display = 'flex';
+                    filterContainer.innerHTML = standardFiltersHTML;
+                }
             }
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
             
-            const usiaFilter = document.getElementById('usiaFilter');
-            if (usiaFilter && type !== 'SDM' && type !== 'PENAMBAHAN' && !type.startsWith('INVOICE')) {
-                usiaFilter.style.display = 'block';
+            const usiaFilterContainer = document.getElementById('usiaFilterContainer');
+            if (usiaFilterContainer && type !== 'SDM' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
+                usiaFilterContainer.style.display = 'flex';
+            } else if (usiaFilterContainer) {
+                usiaFilterContainer.style.display = 'none';
             }
+
+            const gpsFilter = document.getElementById('gpsFilter');
+            if (gpsFilter && type !== 'SDM' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
+                gpsFilter.style.display = 'block';
+            } else if (gpsFilter) {
+                gpsFilter.style.display = 'none';
+            }
+
             const pemilikFilter = document.getElementById('pemilikFilter');
-            if (pemilikFilter && !type.startsWith('INVOICE')) {
+            if (pemilikFilter && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'block';
+            } else if (pemilikFilter) {
+                pemilikFilter.style.display = 'none';
+            }
+
+            const liveGpsBtn = document.getElementById('liveGpsBtn');
+            if (liveGpsBtn) {
+                if (type === 'SDM' || type === 'PENAMBAHAN' || type === 'BATTERY' || type === 'TIMELINE' || type.startsWith('INVOICE')) {
+                    liveGpsBtn.style.display = 'none';
+                } else {
+                    liveGpsBtn.style.display = 'flex';
+                }
             }
             
             const invoiceSheetFilter = document.getElementById('invoiceSheetFilter');
@@ -880,18 +1176,33 @@
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
             if(element) element.classList.add('sidebar-active');
 
-            // Hide standard filters safe
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) searchContainer.style.display = '';
+
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) filterContainer.style.display = 'none';
-            const usiaFilter = document.getElementById('usiaFilter');
-            if (usiaFilter) usiaFilter.style.display = 'none';
             
-            // Pemilik and Jenis Filter are handled dynamically in updateDynamicFilters
+            const usiaFilterContainer = document.getElementById('usiaFilterContainer');
+            if (usiaFilterContainer) usiaFilterContainer.style.display = 'none';
+
+            const gpsFilter = document.getElementById('gpsFilter');
+            if (gpsFilter) gpsFilter.style.display = 'none';
+            
             const pemilikFilter = document.getElementById('pemilikFilter');
-            if (pemilikFilter) pemilikFilter.style.display = 'block'; 
+            if (pemilikFilter) {
+                if (diagramType === 'motor' || diagramType === 'mobil') {
+                    pemilikFilter.style.display = 'block';
+                } else {
+                    pemilikFilter.style.display = 'none';
+                }
+            }
+
+            const liveGpsBtn = document.getElementById('liveGpsBtn');
+            if (liveGpsBtn) liveGpsBtn.style.display = 'none';
             
             const invoiceSheetFilter = document.getElementById('invoiceSheetFilter');
             if (invoiceSheetFilter) invoiceSheetFilter.style.display = 'none';
+            
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'none';
 
@@ -945,14 +1256,12 @@
             typeCounts["LAINNYA"] = 0;
 
             dataToRender.forEach(row => {
-                // Kolom C = Index ke-2 (Cabang)
                 const cab = row._rawRow && row._rawRow[2] ? String(row._rawRow[2]).trim() : "TIDAK DIKETAHUI";
                 if (!cab || cab === "-" || cab === "0" || cab.toUpperCase().includes("CABANG")) return;
 
                 cabangSet.add(cab);
                 if (!dataMatrix[cab]) dataMatrix[cab] = {};
 
-                // Kolom M/L = Index dinamis
                 let rawJenis = row._rawRow && row._rawRow[config.colIndex] ? String(row._rawRow[config.colIndex]).toUpperCase() : "LAINNYA";
                 let matchedType = "LAINNYA";
                 for (const type of targetTypes) {
@@ -1030,6 +1339,9 @@
             leaseStatusFilter = 'all';
             currentSheetType = 'DETAIL_UNIT'; 
 
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) searchContainer.style.display = '';
+
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
                 filterContainer.style.display = 'flex';
@@ -1038,6 +1350,9 @@
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+
+            const liveGpsBtn = document.getElementById('liveGpsBtn');
+            if (liveGpsBtn) liveGpsBtn.style.display = 'flex';
             
             const invoiceSheetFilter = document.getElementById('invoiceSheetFilter');
             if (invoiceSheetFilter) invoiceSheetFilter.style.display = 'none';
@@ -1072,8 +1387,8 @@
             const btnMobil = document.getElementById('detail-mobil');
             const btnMotor = document.getElementById('detail-motor');
             
-            if(btnMobil) btnMobil.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap " + (type === 'mobil' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
-            if(btnMotor) btnMotor.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap " + (type === 'motor' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
+            if(btnMobil) btnMobil.className = "flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg whitespace-nowrap " + (type === 'mobil' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
+            if(btnMotor) btnMotor.className = "flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg whitespace-nowrap " + (type === 'motor' ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50");
 
             const targetGid = type === 'mobil' ? '289536394' : '1495287037';
             const title = type === 'mobil' ? 'DATABASE DETAIL MOBIL' : 'DATABASE DETAIL MOTOR';
@@ -1213,17 +1528,26 @@
             activeCategory = 'all';
             leaseStatusFilter = 'all';
             
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) searchContainer.style.display = '';
+
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) filterContainer.style.display = 'none';
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
             
-            const usiaFilter = document.getElementById('usiaFilter');
-            if (usiaFilter) usiaFilter.style.display = 'none';
+            const gpsFilter = document.getElementById('gpsFilter');
+            if (gpsFilter) gpsFilter.style.display = 'none';
+            
+            const usiaFilterContainer = document.getElementById('usiaFilterContainer');
+            if (usiaFilterContainer) usiaFilterContainer.style.display = 'none';
             
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (pemilikFilter) pemilikFilter.style.display = 'none';
+
+            const liveGpsBtn = document.getElementById('liveGpsBtn');
+            if (liveGpsBtn) liveGpsBtn.style.display = 'none';
             
             const invoiceSheetFilter = document.getElementById('invoiceSheetFilter');
             if (invoiceSheetFilter) invoiceSheetFilter.style.display = 'block';
@@ -1291,9 +1615,9 @@
                 const btn = document.getElementById(`status-${b}`);
                 if (btn) {
                     if (b === status) {
-                        btn.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap bg-blue-600 text-white";
+                        btn.className = "flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg whitespace-nowrap bg-blue-600 text-white shadow-sm";
                     } else {
-                        btn.className = "flex-1 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-black transition-all rounded-md whitespace-nowrap text-slate-500 hover:bg-slate-50";
+                        btn.className = "flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg whitespace-nowrap text-slate-500 hover:bg-slate-50";
                     }
                 }
             });
@@ -1303,17 +1627,23 @@
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const query = searchInput ? searchInput.value.toLowerCase() : '';
-            const usiaFilter = document.getElementById('usiaFilter');
             const pemilikFilter = document.getElementById('pemilikFilter');
             const jenisFilter = document.getElementById('jenisFilter');
+            const gpsFilter = document.getElementById('gpsFilter');
             
-            const selectedUsia = (usiaFilter && usiaFilter.style.display !== 'none') ? usiaFilter.value : 'all';
+            const usiaMinFilter = document.getElementById('usiaMinFilter');
+            const usiaMaxFilter = document.getElementById('usiaMaxFilter');
+            const usiaContainer = document.getElementById('usiaFilterContainer');
+            
+            const selectedMinUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMinFilter) ? usiaMinFilter.value : 'all';
+            const selectedMaxUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMaxFilter) ? usiaMaxFilter.value : 'all';
             const selectedPemilik = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value : 'all';
             const selectedJenis = (jenisFilter && jenisFilter.style.display !== 'none') ? jenisFilter.value : 'all';
+            const selectedGps = (gpsFilter && gpsFilter.style.display !== 'none') ? gpsFilter.value : 'all';
             
             if (isWaitingForGoogleSync) return;
 
-            const filtered = originalData.filter(row => {
+            currentFilteredData = originalData.filter(row => {
 
                 if (currentSheetType.startsWith('INVOICE')) {
                     return Object.values(row).some(val => String(val).toLowerCase().includes(query));
@@ -1334,12 +1664,26 @@
                     else if (leaseStatusFilter === 'habis') matchesStatus = sisaSewaValue.includes("MASA SEWA HABIS");
                 }
 
+                // Logika Filter RENTANG USIA
                 let matchesUsia = true;
-                if (selectedUsia !== 'all') {
+                if (selectedMinUsia !== 'all' || selectedMaxUsia !== 'all') {
                     const usiaKey = keys.find(k => k.toUpperCase().includes("USIA UNIT"));
                     if (usiaKey) {
-                        const usiaValue = String(row[usiaKey] || "").toUpperCase().trim();
-                        matchesUsia = (usiaValue === selectedUsia);
+                        const usiaValueStr = String(row[usiaKey] || "").toUpperCase().trim();
+                        const usiaNum = parseInt(usiaValueStr.replace(/\D/g, ''));
+                        
+                        if (isNaN(usiaNum)) {
+                            matchesUsia = false; 
+                        } else {
+                            if (selectedMinUsia !== 'all') {
+                                const minNum = parseInt(selectedMinUsia.replace(/\D/g, '')) || 0;
+                                if (usiaNum < minNum) matchesUsia = false;
+                            }
+                            if (selectedMaxUsia !== 'all') {
+                                const maxNum = parseInt(selectedMaxUsia.replace(/\D/g, '')) || 0;
+                                if (usiaNum > maxNum) matchesUsia = false;
+                            }
+                        }
                     }
                 }
 
@@ -1360,16 +1704,29 @@
                     matchesJenis = (jenisVal === selectedJenis);
                 }
 
+                let matchesGps = true;
+                if (selectedGps !== 'all') {
+                    const gpsKey = keys.find(k => k.toUpperCase().includes("GPS"));
+                    if (gpsKey) {
+                        const gpsValue = String(row[gpsKey] || "").toUpperCase().trim();
+                        if (selectedGps === 'BLANK') {
+                            matchesGps = (!gpsValue || gpsValue === '-' || gpsValue === 'UNDEFINED' || gpsValue === 'NULL');
+                        } else {
+                            matchesGps = (gpsValue === selectedGps);
+                        }
+                    }
+                }
+
                 const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
 
-                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesSearch;
+                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesSearch;
             });
 
             if (isDiagramMode) {
-                renderChart(filtered);
+                renderChart(currentFilteredData);
             } else {
-                renderTable(filtered);
-                updateStats(filtered);
+                renderTable(currentFilteredData);
+                updateStats(currentFilteredData);
             }
         }
 
@@ -1386,6 +1743,9 @@
                 countLabel = "JUMLAH BATTERY";
             } else if (currentSheetType === 'SDM') {
                 countLabel = "TOTAL PERSONEL";
+            } else if (currentSheetType === 'TIMELINE') {
+                countLabel = "PROJECT DURASION";
+                displayCount = typeof timelineDuration !== 'undefined' ? timelineDuration : '0';
             } else if (currentSheetType.startsWith('INVOICE')) {
                 countLabel = "ITEM INVOICE";
                 if (filtered.length > 0) {
@@ -1417,6 +1777,7 @@
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
             const rowCountBadge = document.getElementById('row-count-badge');
+            const mainTable = document.getElementById('mainTable');
             
             if(!head || !body) return;
 
@@ -1426,11 +1787,23 @@
             const isInvoiceSDM = currentSheetType === 'INVOICE_SDM';
             const isBattery = currentSheetType === 'BATTERY';
 
-            head.innerHTML = config.map(col => `
-                <th class="px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest">
-                    ${col.label}
-                </th>
-            `).join('');
+            // Menyesuaikan lebar tabel khusus untuk TIMELINE agar tidak kebesaran
+            if (mainTable) {
+                if (currentSheetType === 'TIMELINE') {
+                    mainTable.className = "w-full text-left border-collapse min-w-[600px] lg:min-w-full";
+                } else {
+                    mainTable.className = "w-full text-left border-collapse min-w-[900px] lg:min-w-[1200px]";
+                }
+            }
+
+            head.innerHTML = config.map(col => {
+                let thClass = "px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest";
+                // Rapatkan kolom selain Task Detail di Timeline
+                if (currentSheetType === 'TIMELINE' && col.label !== 'TASK DETAIL') {
+                    thClass += " w-[1%]";
+                }
+                return `<th class="${thClass}">${col.label}</th>`;
+            }).join('');
 
             const validData = data.filter(row => Object.values(row).join('').trim() !== '');
 
@@ -1522,7 +1895,16 @@
                         val = actualKey !== undefined ? row[actualKey] : "-";
                     }
                     
-                    let cellClass = "px-4 sm:px-5 py-3 sm:py-3.5 border-r border-slate-50 truncate max-w-[200px] sm:max-w-[250px]";
+                    let cellClass = "px-4 sm:px-5 py-3 sm:py-3.5 border-r border-slate-50";
+                    
+                    // Logika Styling Tabel (Timeline vs Normal)
+                    if (currentSheetType === 'TIMELINE') {
+                        if (col.label !== 'TASK DETAIL') {
+                            cellClass += " whitespace-nowrap w-[1%]";
+                        }
+                    } else {
+                        cellClass += " truncate max-w-[200px] sm:max-w-[250px]";
+                    }
                     
                     const upperVal = String(val).toUpperCase();
                     if (upperVal.includes("MASA SEWA HABIS") || (String(val).trim() === '-' && col.label && col.label.toUpperCase() === "SISA AKHIR SEWA")) {
@@ -1533,7 +1915,6 @@
                         cellClass += " text-right font-mono";
                     }
 
-                    // --- TAMBAHAN LOGIKA PEWARNAAN KOLOM ACHIEVED ---
                     if (currentSheetType === 'PENAMBAHAN' && col.label === "ACHIEVED") {
                         let slaKey = Object.keys(row).find(k => k.trim().toUpperCase().includes("SLA"));
                         let slaVal = slaKey ? parseFloat(row[slaKey]) : NaN;
@@ -1541,13 +1922,12 @@
 
                         if (!isNaN(slaVal) && !isNaN(achVal)) {
                             if (achVal <= slaVal) {
-                                cellClass += " text-green-700 font-black bg-green-50"; // Hijau jika memenuhi SLA atau di bawahnya
+                                cellClass += " text-green-700 font-black bg-green-50"; 
                             } else {
-                                cellClass += " text-red-600 font-black bg-red-50"; // Merah jika melewati SLA
+                                cellClass += " text-red-600 font-black bg-red-50"; 
                             }
                         }
                     }
-                    // ------------------------------------------------
 
                     return `<td class="${cellClass}" title="${val}">${val}</td>`;
                 }).join('');
@@ -1559,11 +1939,6 @@
         }
 
         function exportToExcel() {
-            const table = document.getElementById("mainTable");
-            const html = table.outerHTML;
-            const url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
-            const link = document.createElement("a");
-            
             const statSheetVal = document.getElementById('stat-sheet-val');
             let exportName = statSheetVal ? statSheetVal.innerText : "Data";
             
@@ -1575,6 +1950,58 @@
                 }
             }
 
+            let html = '';
+
+            if (currentSheetType === 'TIMELINE') {
+                // Rekonstruksi Tabel Excel Khusus TimeLine (Identik dengan Google Sheet)
+                let tableContent = '<table border="1" style="border-collapse: collapse; font-family: Arial, sans-serif;">';
+                
+                // 1. Ekspor Header dan Meta Info (Baris 1 s/d Baris Judul)
+                for (let i = 0; i <= currentHeaderIndex; i++) {
+                    if (!rawCsvData[i]) continue;
+                    tableContent += '<tr>';
+                    rawCsvData[i].forEach(cell => {
+                        let bg = "";
+                        let color = "black";
+                        // Berikan warna Biru Tua (#002060) pada baris meta dan baris judul
+                        if (i === 1 || i === currentHeaderIndex) {
+                            bg = "#002060"; 
+                            color = "white";
+                        }
+                        tableContent += `<td style="background-color: ${bg}; color: ${color}; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1;">${cell !== undefined ? cell : ''}</td>`;
+                    });
+                    tableContent += '</tr>';
+                }
+
+                // 2. Ekspor Baris Data yang sedang terfilter
+                currentFilteredData.forEach(row => {
+                    tableContent += '<tr>';
+                    if (row._rawRow) {
+                        row._rawRow.forEach((cell, idx) => {
+                            let bg = "";
+                            let color = "black";
+                            // Warnai blok timeline (Tanggal) dengan Biru Tua jika kolom > 4 dan sel tidak kosong
+                            if (idx > 4 && String(cell).trim() !== '') {
+                                bg = "#002060"; 
+                                color = "white";
+                            }
+                            tableContent += `<td style="background-color: ${bg}; color: ${color}; padding: 5px; border: 1px solid #cbd5e1;">${cell !== undefined ? cell : ''}</td>`;
+                        });
+                    }
+                    tableContent += '</tr>';
+                });
+
+                tableContent += '</table>';
+                html = tableContent;
+
+            } else {
+                // Ekspor Tabel Standar
+                const table = document.getElementById("mainTable");
+                html = table.outerHTML;
+            }
+
+            const url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            const link = document.createElement("a");
             link.download = `Dedicated_AAM_${exportName}.xls`;
             link.href = url;
             link.click();
