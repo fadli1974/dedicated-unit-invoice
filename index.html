@@ -146,7 +146,7 @@
                 <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-wide truncate hidden sm:block">AAM Dashboard</h2>
             </div>
             
-            <!-- Kotak Pencarian Dipindah ke Header -->
+            <!-- Kotak Pencarian -->
             <div id="searchContainer" class="flex-1 max-w-xl relative group mx-2 sm:mx-4 transition-all duration-300">
                 <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors duration-300"></i>
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Cari unit, nopol, cabang..." 
@@ -251,19 +251,31 @@
             </div>
 
             <!-- KOTAK STATISTIK BERSIH -->
-            <div id="statsStandard" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <!-- Ditambahkan id "statsRow" agar grid bisa disesuaikan dinamis -->
+            <div id="statsRow" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                <!-- Card 1 -->
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Sheet Sumber</p>
                     <h3 id="stat-sheet-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">MOBIL</h3>
                 </div>
+                
+                <!-- Card Tambahan Khusus TIMELINE (Disembunyikan secara default) -->
+                <div id="stat-timeline-extra" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">TOTAL UNIT</p>
+                    <h3 id="stat-timeline-unit-val" class="text-lg sm:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
+                </div>
+
+                <!-- Card 2 -->
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p id="stat-count-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Unit Terfilter</p>
                     <h3 id="stat-count-standard" class="text-lg sm:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
                 </div>
+                <!-- Card 3 -->
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
-                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Kategori Aktif</p>
+                    <p id="stat-kategori-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Kategori Aktif</p>
                     <h3 id="stat-category-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">SEMUA UNIT</h3>
                 </div>
+                <!-- Card 4 -->
                 <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
                     <p id="stat-periode-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">DATA UNIT</p>
                     <h3 id="stat-periode-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">CL</h3>
@@ -431,6 +443,7 @@
             'TIMELINE': [
                 { label: "TASK ID", keys: ["Task ID", "Task_ID", "ID"] },
                 { label: "TASK DETAIL", keys: ["Task Detail", "Detail"] },
+                { label: "UNIT", keys: ["Unit", "UNIT", "JML UNIT"] },
                 { label: "DURATION", keys: ["Duration", "Durasi"] },
                 { label: "START DATE", keys: ["Start Date", "Mulai"] },
                 { label: "END DATE", keys: ["End Date", "Selesai"] }
@@ -496,15 +509,15 @@
         let originalData = [];
         let activeCategory = 'all';
         let leaseStatusFilter = 'all';
-        let gpsLinksConfig = { mobil: {}, motor: {} }; // Konfigurasi GPS Pintar Baru
+        let gpsLinksConfig = { mobil: {}, motor: {} }; 
 
         // Variabel penampung data unik TIMELINE
         let timelineProjectName = '';
+        let timelineTotalUnit = '';
         let timelineDuration = '';
         let timelineStartDate = '';
         let timelineEndDate = '';
         
-        // Variabel penampung Raw Data untuk Export Excel Sempurna
         let currentFilteredData = [];
         let rawCsvData = [];
         let currentHeaderIndex = 0;
@@ -653,11 +666,13 @@
                     }
 
                     // EKSTRAK DATA KHUSUS TIMELINE DARI BARIS 3 (INDEX 2)
+                    // Mengacu pada Kolom B(1), C(2), D(3), E(4), F(5)
                     if (currentSheetType === 'TIMELINE' && rows.length >= 3) {
                         timelineProjectName = rows[2][1] ? String(rows[2][1]).trim() : 'TIMELINE';
-                        timelineDuration = rows[2][2] ? String(rows[2][2]).trim() : '0';
-                        timelineStartDate = rows[2][3] ? String(rows[2][3]).trim() : '-';
-                        timelineEndDate = rows[2][4] ? String(rows[2][4]).trim() : '-';
+                        timelineTotalUnit = rows[2][2] ? String(rows[2][2]).trim() : '0';
+                        timelineDuration = rows[2][3] ? String(rows[2][3]).trim() : '0';
+                        timelineStartDate = rows[2][4] ? String(rows[2][4]).trim() : '-';
+                        timelineEndDate = rows[2][5] ? String(rows[2][5]).trim() : '-';
                     }
 
                     currentSheetMonth = '';
@@ -748,6 +763,9 @@
             let unitTerfilterLabel = 'UNIT TERFILTER';
             let kategoriAktifLabel = 'KATEGORI AKTIF';
 
+            const statsRow = document.getElementById('statsRow');
+            const statTimelineExtra = document.getElementById('stat-timeline-extra');
+
             if(currentSheetType.startsWith('INVOICE')) {
                 const selectEl = document.getElementById('invoiceSheetFilter');
                 if (selectEl && selectEl.options.length > 0) {
@@ -782,6 +800,17 @@
             else if(currentSheetType === 'DETAIL_UNIT') {
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
+
+            // Tampilkan kotak ke-5 (Total Unit) HANYA saat di Timeline
+            if (currentSheetType === 'TIMELINE') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-6";
+                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
+                const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
+                if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
+            } else {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+            }
             
             const statSheetVal = document.getElementById('stat-sheet-val');
             if (statSheetVal) statSheetVal.innerText = label;
@@ -792,18 +821,56 @@
             const statPeriodeVal = document.getElementById('stat-periode-val');
             if (statPeriodeVal) statPeriodeVal.innerText = periodeLabel;
 
-            // Mengganti label text pada stat-card
-            const statCards = document.querySelectorAll('.stat-card p');
-            if(statCards.length >= 3) {
-                statCards[0].innerText = sheetSumberLabel;
-                // statCards[1] adalah ID stat-count-label yang akan ditimpa di updateStats, jadi kita biarkan saja
-                statCards[2].innerText = kategoriAktifLabel;
+            // PERBAIKAN: Menggunakan ID langsung agar elemen 100% pasti ditemukan!
+            const statSheetLabel = document.querySelector('#statsRow > div:first-child > p');
+            if (statSheetLabel) statSheetLabel.innerText = sheetSumberLabel;
+
+            const statKategoriLabel = document.getElementById('stat-kategori-label');
+            let jenisServiceText = ""; 
+
+            if (statKategoriLabel) {
+                if (currentGid === '289536394' && currentSheetType === 'UNIT') {
+                    statKategoriLabel.innerText = "JENIS SERVICE"; 
+                    
+                    if (originalData && originalData.length > 0) {
+                        const jenisServiceKey = Object.keys(originalData[0]).find(k => k.toUpperCase() === "JENIS SERVICE" || k.toUpperCase() === "JENIS SEWA VENDOR");
+                        if (jenisServiceKey && originalData[0][jenisServiceKey]) {
+                            jenisServiceText = originalData[0][jenisServiceKey];
+                        } else if (originalData[0]._rawRow && originalData[0]._rawRow[13]) { 
+                             jenisServiceText = originalData[0]._rawRow[13];
+                        } else {
+                            jenisServiceText = "Dedicated Mobil"; 
+                        }
+                    } else {
+                        jenisServiceText = "Dedicated Mobil";
+                    }
+                } else {
+                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'PROJECT START DATE'
+                }
             }
 
-            // Khusus TIMELINE, kita menimpa Kategori Aktif (Value-nya) menjadi Start Date
             const statCategory = document.getElementById('stat-category-val');
-            if (statCategory && currentSheetType === 'TIMELINE') {
-                statCategory.innerText = timelineStartDate || '-';
+            if (statCategory) {
+                if (currentSheetType === 'TIMELINE') {
+                    statCategory.innerText = timelineStartDate || '-';
+                } else if (isDiagramMode) {
+                    statCategory.innerText = currentDiagramType === 'mobil' ? 'DIAGRAM MOBIL' : 'DIAGRAM MOTOR';
+                } else if (currentSheetType.startsWith('INVOICE')) {
+                     statCategory.innerText = 'INVOICE VIEW';
+                } else if (currentSheetType === 'DETAIL_UNIT') {
+                     statCategory.innerText = 'DETAIL VIEW';
+                } else {
+                    // Cari elemen sidebar yang sedang aktif untuk mengambil teksnya
+                    const activeSidebarItem = document.querySelector('.sidebar-active');
+                    if (activeSidebarItem) {
+                        // Bersihkan teks dari ikon (spasi dan tab berlebih)
+                        let rawText = activeSidebarItem.innerText.trim();
+                        // Hapus teks tambahan seperti ikon jika ada (misal di beberapa kasus lucide menambahkan teks tersembunyi)
+                        statCategory.innerText = rawText.toUpperCase();
+                    } else {
+                         statCategory.innerText = label || activeCategory || 'SEMUA UNIT';
+                    }
+                }
             }
         }
 
@@ -847,7 +914,7 @@
             if(refreshIcon) refreshIcon.classList.add('animate-spin');
             if(rowBadge) rowBadge.innerText = 'SINKRONISASI GOOGLE...';
             if(tableBody) {
-                tableBody.innerHTML = `<tr><td colspan="${config.length}" class="p-10 sm:p-20 text-center text-blue-600 font-black tracking-widest text-xs sm:text-sm"><i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-3"></i> MENGIRIM PERINTAH KE GOOGLE...<br><span class="text-[10px] text-slate-500 font-medium block mt-2">Menarik data real-time langsung dari Google Sheet.</span></td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="${config.length}" class="p-10 sm:p-20 text-center text-blue-600 font-black tracking-widest text-xs sm:text-sm"><i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-3"></i> MENGIRIM PERINTAH KE GOOGLE...<br><span class="text-[10px] text-slate-50 font-medium block mt-2">Menarik data real-time langsung dari Google Sheet.</span></td></tr>`;
             }
             lucide.createIcons();
 
@@ -968,7 +1035,6 @@
             
             if (!usiaContainer || !usiaMin || !usiaMax) return;
 
-            // isDiagramMode dihapus dari pengecualian agar filter Usia tetap muncul di Diagram
             if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
                 usiaContainer.style.display = 'none';
                 usiaMin.value = 'all'; 
@@ -1070,17 +1136,16 @@
             const searchContainer = document.getElementById('searchContainer');
             if (searchContainer) {
                 if (type === 'TIMELINE') {
-                    searchContainer.style.display = 'none'; // Sembunyikan pencarian
+                    searchContainer.style.display = 'none'; 
                     const searchInput = document.getElementById('searchInput');
-                    if(searchInput) searchInput.value = ''; // Reset teks pencarian
+                    if(searchInput) searchInput.value = ''; 
                 } else {
-                    searchContainer.style.display = ''; // Tampilkan kembali pencarian
+                    searchContainer.style.display = ''; 
                 }
             }
 
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
-                // Sembunyikan filter status (Sewa Aktif/Habis) khusus untuk menu TIMELINE
                 if (type === 'TIMELINE') {
                     filterContainer.style.display = 'none';
                 } else {
@@ -1141,9 +1206,6 @@
             
             const headerIcon = document.getElementById('table-header-icon');
             if (headerIcon) headerIcon.setAttribute('data-lucide', icon);
-            
-            const statCategory = document.getElementById('stat-category-val');
-            if (statCategory) statCategory.innerText = title;
 
             updateSheetLabel();
             lucide.createIcons();
@@ -1183,7 +1245,7 @@
             if (filterContainer) filterContainer.style.display = 'none';
             
             const usiaFilterContainer = document.getElementById('usiaFilterContainer');
-            if (usiaFilterContainer) usiaFilterContainer.style.display = 'none';
+            if (usiaFilterContainer) usiaFilterContainer.style.display = 'flex';
 
             const gpsFilter = document.getElementById('gpsFilter');
             if (gpsFilter) gpsFilter.style.display = 'none';
@@ -1225,15 +1287,20 @@
             const tableSec = document.getElementById('tableSection');
             const statsStd = document.getElementById('statsStandard');
             const statsDiag = document.getElementById('statsDiagram');
+            const statsRow = document.getElementById('statsRow');
 
             if (show) {
                 if(chartSec) chartSec.classList.remove('hidden');
                 if(tableSec) tableSec.classList.add('hidden');
+                // Sembunyikan semua kotak statistik saat di mode diagram
+                if(statsRow) statsRow.classList.add('hidden');
                 if(statsStd) statsStd.classList.add('hidden');
                 if(statsDiag) statsDiag.classList.remove('hidden');
             } else {
                 if(chartSec) chartSec.classList.add('hidden');
                 if(tableSec) tableSec.classList.remove('hidden');
+                // Tampilkan kembali semua kotak statistik saat keluar dari mode diagram
+                if(statsRow) statsRow.classList.remove('hidden');
                 if(statsStd) statsStd.classList.remove('hidden');
                 if(statsDiag) statsDiag.classList.add('hidden');
             }
@@ -1368,10 +1435,8 @@
 
             const headerIcon = document.getElementById('table-header-icon');
             if (headerIcon) headerIcon.setAttribute('data-lucide', 'list');
-            
-            const statCategory = document.getElementById('stat-category-val');
-            if (statCategory) statCategory.innerText = 'DETAIL VIEW';
 
+            updateSheetLabel();
             lucide.createIcons();
             switchDetailView('mobil');
 
@@ -1601,9 +1666,7 @@
             const headerIcon = document.getElementById('table-header-icon');
             if (headerIcon) headerIcon.setAttribute('data-lucide', 'file-text');
             
-            const statCategory = document.getElementById('stat-category-val');
-            if (statCategory) statCategory.innerText = 'INVOICE VIEW';
-
+            updateSheetLabel();
             lucide.createIcons();
             fetchData();
         }
@@ -1787,22 +1850,29 @@
             const isInvoiceSDM = currentSheetType === 'INVOICE_SDM';
             const isBattery = currentSheetType === 'BATTERY';
 
-            // Menyesuaikan lebar tabel khusus untuk TIMELINE agar tidak kebesaran
+            // Menyesuaikan lebar tabel khusus untuk TIMELINE agar tidak kebesaran & presisi proporsional
             if (mainTable) {
                 if (currentSheetType === 'TIMELINE') {
-                    mainTable.className = "w-full text-left border-collapse min-w-[600px] lg:min-w-full";
+                    mainTable.className = "w-full text-left border-collapse min-w-[800px] lg:min-w-full table-fixed";
                 } else {
-                    mainTable.className = "w-full text-left border-collapse min-w-[900px] lg:min-w-[1200px]";
+                    mainTable.className = "w-full text-left border-collapse min-w-[900px] lg:min-w-[1200px] table-auto";
                 }
             }
 
             head.innerHTML = config.map(col => {
-                let thClass = "px-4 sm:px-5 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest";
-                // Rapatkan kolom selain Task Detail di Timeline
-                if (currentSheetType === 'TIMELINE' && col.label !== 'TASK DETAIL') {
-                    thClass += " w-[1%]";
+                let thClass = "px-3 sm:px-4 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest";
+                let inlineStyle = "";
+                
+                // Styling spesifik untuk Header Timeline agar presisi sejajar dengan Stat Cards di atasnya
+                if (currentSheetType === 'TIMELINE') {
+                    if (col.label === 'TASK ID') { thClass += " text-center"; inlineStyle = "width: 8%;"; }
+                    else if (col.label === 'TASK DETAIL') { thClass += " text-left truncate"; inlineStyle = "width: 32%;"; }
+                    else if (col.label === 'UNIT') { thClass += " text-center"; inlineStyle = "width: 15%;"; }
+                    else if (col.label === 'DURATION') { thClass += " text-center"; inlineStyle = "width: 15%;"; }
+                    else if (col.label === 'START DATE' || col.label === 'END DATE') { thClass += " text-center whitespace-nowrap"; inlineStyle = "width: 15%;"; }
                 }
-                return `<th class="${thClass}">${col.label}</th>`;
+                
+                return `<th class="${thClass}" style="${inlineStyle}">${col.label}</th>`;
             }).join('');
 
             const validData = data.filter(row => Object.values(row).join('').trim() !== '');
@@ -1895,13 +1965,19 @@
                         val = actualKey !== undefined ? row[actualKey] : "-";
                     }
                     
-                    let cellClass = "px-4 sm:px-5 py-3 sm:py-3.5 border-r border-slate-50";
+                    // Merapikan nilai kosong agar menampilkan "-" daripada spasi kosong
+                    if (typeof val === 'string' && val.trim() === '') val = '-';
                     
-                    // Logika Styling Tabel (Timeline vs Normal)
+                    let cellClass = "px-3 sm:px-4 py-3 sm:py-3.5 border-r border-slate-50";
+                    let inlineStyle = "";
+                    
+                    // Logika Styling Tabel Presisi (Timeline vs Normal)
                     if (currentSheetType === 'TIMELINE') {
-                        if (col.label !== 'TASK DETAIL') {
-                            cellClass += " whitespace-nowrap w-[1%]";
-                        }
+                        if (col.label === 'TASK ID') { cellClass += " text-center font-bold text-slate-500"; inlineStyle = "width: 8%;"; }
+                        else if (col.label === 'TASK DETAIL') { cellClass += " text-left truncate"; inlineStyle = "width: 32%;"; }
+                        else if (col.label === 'UNIT') { cellClass += " text-center font-black text-blue-600"; inlineStyle = "width: 15%;"; }
+                        else if (col.label === 'DURATION') { cellClass += " text-center font-bold text-slate-700"; inlineStyle = "width: 15%;"; }
+                        else if (col.label === 'START DATE' || col.label === 'END DATE') { cellClass += " text-center whitespace-nowrap text-slate-600"; inlineStyle = "width: 15%;"; }
                     } else {
                         cellClass += " truncate max-w-[200px] sm:max-w-[250px]";
                     }
@@ -1929,7 +2005,7 @@
                         }
                     }
 
-                    return `<td class="${cellClass}" title="${val}">${val}</td>`;
+                    return `<td class="${cellClass}" style="${inlineStyle}" title="${val}">${val}</td>`;
                 }).join('');
                 
                 return `<tr class="hover:bg-blue-50/50 transition-all border-b border-slate-50 text-slate-700 font-medium">${cells}</tr>`;
@@ -1980,8 +2056,8 @@
                         row._rawRow.forEach((cell, idx) => {
                             let bg = "";
                             let color = "black";
-                            // Warnai blok timeline (Tanggal) dengan Biru Tua jika kolom > 4 dan sel tidak kosong
-                            if (idx > 4 && String(cell).trim() !== '') {
+                            // Warnai blok timeline (Tanggal) dengan Biru Tua jika kolom > 5 dan sel tidak kosong (disesuaikan karena ada kolom Unit)
+                            if (idx > 5 && String(cell).trim() !== '') {
                                 bg = "#002060"; 
                                 color = "white";
                             }
