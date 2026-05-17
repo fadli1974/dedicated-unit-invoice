@@ -79,6 +79,10 @@
                     <div onclick="showDiagram('289536394', 'Mobil', this, 'mobil')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
                     </div>
+                    <!-- Menu Timeline Peremajaan -->
+                    <div onclick="switchSheet('all', 'Timeline Peremajaan', 'calendar-clock', '703630601', 'TIMELINE', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="calendar-clock" class="w-3 h-3 text-cyan-400"></i> Timeline Peremajaan
+                    </div>
                 </div>
             </div>
 
@@ -100,6 +104,10 @@
                     <!-- Menu Diagram Motor -->
                     <div onclick="showDiagram('1495287037', 'Motor', this, 'motor')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
+                    </div>
+                    <!-- Menu Timeline Peremajaan Motor -->
+                    <div onclick="switchSheet('all', 'Timeline Peremajaan Motor', 'calendar-clock', '450578458', 'TIMELINE', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="calendar-clock" class="w-3 h-3 text-cyan-400"></i> Timeline Peremajaan
                     </div>
                 </div>
             </div>
@@ -790,26 +798,54 @@
             else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
             else if(currentSheetType === 'TIMELINE') {
                 label = timelineProjectName || 'TIMELINE';
-                // Penyesuaian label stat-card khusus TIMELINE
                 sheetSumberLabel = 'PROJECT NAME';
-                unitTerfilterLabel = 'PROJECT DURASION';
-                kategoriAktifLabel = 'PROJECT START DATE';
-                periodeTitle = 'PROJECT END DATE';
+                unitTerfilterLabel = 'DURATION';
+                kategoriAktifLabel = 'START DATE';
+                periodeTitle = 'END DATE';
                 periodeLabel = timelineEndDate || '-';
             }
             else if(currentSheetType === 'DETAIL_UNIT') {
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
 
-            // Tampilkan kotak ke-5 (Total Unit) HANYA saat di Timeline
+            // --- SISTEM LAYOUT SEJAJAR KHUSUS TIMELINE (Rasio 40:15:15:15:15 tanpa celah) ---
             if (currentSheetType === 'TIMELINE') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-6";
+                // Menyatukan kotak menjadi 1 baris panjang dengan pembatas garis (divide-x)
+                if (statsRow) statsRow.className = "flex w-full mb-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden divide-x divide-slate-200";
+                
                 if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
                 const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
                 if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
+                
+                const cards = statsRow.querySelectorAll('.stat-card');
+                if(cards.length >= 5) {
+                    // Lebar disamakan persis 100% dengan kolom tabel via inline style width
+                    // Ditambahkan min-w-0 agar truncate pada teks di dalamnya bekerja dengan baik
+                    cards[0].className = "p-3 sm:px-4 sm:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0";
+                    cards[0].style.width = "40%";
+                    cards[1].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
+                    cards[1].style.width = "15%";
+                    cards[2].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
+                    cards[2].style.width = "15%";
+                    cards[3].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
+                    cards[3].style.width = "15%";
+                    cards[4].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
+                    cards[4].style.width = "15%";
+                }
             } else {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+                
+                // Reset styling saat kembali ke tabel normal
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach((card, index) => {
+                    card.style.width = ""; // Hapus width inline
+                    if (index === 1) { // stat-timeline-extra
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden";
+                    } else {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left";
+                    }
+                });
             }
             
             const statSheetVal = document.getElementById('stat-sheet-val');
@@ -845,7 +881,7 @@
                         jenisServiceText = "Dedicated Mobil";
                     }
                 } else {
-                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'PROJECT START DATE'
+                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'PROJECT START DATE' khusus timeline
                 }
             }
 
@@ -859,6 +895,12 @@
                      statCategory.innerText = 'INVOICE VIEW';
                 } else if (currentSheetType === 'DETAIL_UNIT') {
                      statCategory.innerText = 'DETAIL VIEW';
+                } else if (currentGid === '289536394' && currentSheetType === 'UNIT') {
+                    if (originalData.length > 0) {
+                        statCategory.innerText = jenisServiceText;
+                    } else {
+                        statCategory.innerText = "Dedicated Mobil";
+                    }
                 } else {
                     // Cari elemen sidebar yang sedang aktif untuk mengambil teksnya
                     const activeSidebarItem = document.querySelector('.sidebar-active');
@@ -1807,7 +1849,7 @@
             } else if (currentSheetType === 'SDM') {
                 countLabel = "TOTAL PERSONEL";
             } else if (currentSheetType === 'TIMELINE') {
-                countLabel = "PROJECT DURASION";
+                countLabel = "DURATION"; 
                 displayCount = typeof timelineDuration !== 'undefined' ? timelineDuration : '0';
             } else if (currentSheetType.startsWith('INVOICE')) {
                 countLabel = "ITEM INVOICE";
