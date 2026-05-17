@@ -65,12 +65,22 @@
         <nav class="flex-1 px-4 space-y-1 text-sm font-medium overflow-y-auto custom-scrollbar pb-6">
             <!-- Section Mobil -->
             <div>
-                <div onclick="switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg sidebar-active" id="menu-mobil">
-                    <i data-lucide="car" class="w-4 h-4"></i> Unit Mobil
+                <!-- Header Accordion Mobil -->
+                <div onclick="toggleSubMenu('submenu-mobil')" class="sidebar-item flex items-center justify-between p-3 rounded-lg bg-blue-600 text-white" id="header-mobil">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="car" class="w-4 h-4"></i> Unit Mobil
+                    </div>
+                    <i data-lucide="chevron-down" id="icon-submenu-mobil" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(180deg);"></i>
                 </div>
-                <div class="ml-9 mt-1 space-y-1 border-l border-slate-800">
+                
+                <!-- Isi Submenu Mobil (Terbuka Default karena Aktif Pertama Kali) -->
+                <div id="submenu-mobil" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 500px;">
+                    <!-- Menu Induk yang tersembunyi (agar tetap bisa memanggil 'Semua Unit Mobil') -->
+                    <div onclick="switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item sidebar-active" id="menu-mobil">
+                        <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Mobil
+                    </div>
                     <div onclick="switchSheet('BBM', 'UNIT BBM', 'fuel', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item">
-                        <i data-lucide="fuel" class="w-3 h-3"></i> Mobil BBM
+                        <i data-lucide="fuel" class="w-3 h-3 text-slate-500"></i> Mobil BBM
                     </div>
                     <div onclick="switchSheet('Listrik', 'UNIT LISTRIK', 'zap', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="zap" class="w-3 h-3 text-yellow-500"></i> Mobil Listrik
@@ -79,7 +89,7 @@
                     <div onclick="showDiagram('289536394', 'Mobil', this, 'mobil')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
                     </div>
-                    <!-- Menu Timeline Peremajaan -->
+                    <!-- Menu Timeline Peremajaan Mobil -->
                     <div onclick="switchSheet('all', 'Timeline Peremajaan', 'calendar-clock', '703630601', 'TIMELINE', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="calendar-clock" class="w-3 h-3 text-cyan-400"></i> Timeline Peremajaan
                     </div>
@@ -88,10 +98,19 @@
 
             <!-- Section Motor -->
             <div class="mt-4">
-                <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg" id="menu-motor">
-                    <i data-lucide="bike" class="w-4 h-4"></i> Unit Motor
+                <!-- Header Accordion Motor -->
+                <div onclick="toggleSubMenu('submenu-motor')" class="sidebar-item flex items-center justify-between p-3 rounded-lg" id="header-motor">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="bike" class="w-4 h-4"></i> Unit Motor
+                    </div>
+                    <i data-lucide="chevron-down" id="icon-submenu-motor" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(0deg);"></i>
                 </div>
-                <div class="ml-9 mt-1 space-y-1 border-l border-slate-800">
+                
+                <!-- Isi Submenu Motor (Tertutup Default) -->
+                <div id="submenu-motor" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 0px;">
+                    <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item" id="menu-motor">
+                        <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Motor
+                    </div>
                     <div onclick="switchSheet('Konvensional', 'UNIT MOTOR KONVENSIONAL', 'fuel', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="fuel" class="w-3 h-3 text-slate-500"></i> Motor Konvensional
                     </div>
@@ -114,29 +133,29 @@
 
             <div class="pt-4 border-t border-slate-800 mt-4 space-y-1">
                 <!-- Menu SDM -->
-                <div onclick="switchSheet('all', 'SDM', 'users', '666929758', 'SDM', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                <div onclick="toggleSubMenu(''); switchSheet('all', 'SDM', 'users', '666929758', 'SDM', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="users" class="w-4 h-4"></i> SDM
                 </div>
                 <!-- Menu Battery -->
-                <div onclick="switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                <div onclick="toggleSubMenu(''); switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="battery-charging" class="w-4 h-4"></i> Battery
                 </div>
                 <!-- Menu Penambahan Unit -->
-                <div onclick="switchSheet('all', 'Penambahan Unit/SDM', 'plus-circle', '1066270407', 'PENAMBAHAN', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                <div onclick="toggleSubMenu(''); switchSheet('all', 'Penambahan Unit/SDM', 'plus-circle', '1066270407', 'PENAMBAHAN', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="plus-circle" class="w-4 h-4 text-green-500"></i> Penambahan Unit/SDM
                 </div>
                 <!-- Menu TimeLine -->
-                <div onclick="switchSheet('all', 'TimeLine', 'calendar-days', '421262394', 'TIMELINE', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
+                <div onclick="toggleSubMenu(''); switchSheet('all', 'TimeLine', 'calendar-days', '421262394', 'TIMELINE', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="calendar-days" class="w-4 h-4 text-purple-500"></i> TimeLine
                 </div>
 
                 <!-- Menu Detail -->
-                <div onclick="showDetail(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-detail">
+                <div onclick="toggleSubMenu(''); showDetail(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-detail">
                     <i data-lucide="list" class="w-4 h-4"></i> Detail
                 </div>
                 
                 <!-- Menu Invoices -->
-                <div onclick="handleInvoiceClick(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-invoices">
+                <div onclick="toggleSubMenu(''); handleInvoiceClick(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-invoices">
                     <i data-lucide="file-text" class="w-4 h-4"></i> Invoices
                     <i data-lucide="lock" id="invoice-lock-icon" class="w-3 h-3 ml-auto text-slate-500"></i>
                 </div>
@@ -530,6 +549,66 @@
         let rawCsvData = [];
         let currentHeaderIndex = 0;
 
+        function toggleSubMenu(menuId) {
+            const allSubmenus = ['submenu-mobil', 'submenu-motor'];
+            const headerMobil = document.getElementById('header-mobil');
+            const headerMotor = document.getElementById('header-motor');
+            
+            allSubmenus.forEach(id => {
+                const submenu = document.getElementById(id);
+                const icon = document.getElementById('icon-' + id);
+                
+                if (!submenu) return;
+
+                if (id === menuId) {
+                    // Jika sedang tertutup, maka buka
+                    if (submenu.style.maxHeight === '0px' || submenu.style.maxHeight === '') {
+                        submenu.style.maxHeight = '500px'; // Buka area submenu
+                        if(icon) icon.style.transform = 'rotate(180deg)'; // Putar panah ke atas
+                        
+                        // Beri warna latar belakang biru pada header yang terbuka
+                        if(id === 'submenu-mobil' && headerMobil) {
+                            headerMobil.classList.add('bg-blue-600', 'text-white');
+                            headerMobil.classList.remove('text-slate-400');
+                        }
+                        if(id === 'submenu-motor' && headerMotor) {
+                            headerMotor.classList.add('bg-blue-600', 'text-white');
+                            headerMotor.classList.remove('text-slate-400');
+                        }
+
+                    } else {
+                        // Jika sedang terbuka, maka tutup
+                        submenu.style.maxHeight = '0px';
+                        if(icon) icon.style.transform = 'rotate(0deg)'; // Putar panah ke bawah
+                        
+                        // Hapus warna biru pada header jika ditutup
+                        if(id === 'submenu-mobil' && headerMobil) {
+                            headerMobil.classList.remove('bg-blue-600', 'text-white');
+                            headerMobil.classList.add('text-slate-400');
+                        }
+                        if(id === 'submenu-motor' && headerMotor) {
+                            headerMotor.classList.remove('bg-blue-600', 'text-white');
+                            headerMotor.classList.add('text-slate-400');
+                        }
+                    }
+                } else {
+                    // Tutup submenu lain yang tidak diklik (Efek Accordion otomatis)
+                    submenu.style.maxHeight = '0px';
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                    
+                    // Kembalikan header lain ke warna dasar
+                    if(id === 'submenu-mobil' && headerMobil) {
+                        headerMobil.classList.remove('bg-blue-600', 'text-white');
+                        headerMobil.classList.add('text-slate-400');
+                    }
+                    if(id === 'submenu-motor' && headerMotor) {
+                        headerMotor.classList.remove('bg-blue-600', 'text-white');
+                        headerMotor.classList.add('text-slate-400');
+                    }
+                }
+            });
+        }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
@@ -881,7 +960,7 @@
                         jenisServiceText = "Dedicated Mobil";
                     }
                 } else {
-                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'PROJECT START DATE' khusus timeline
+                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'START DATE' khusus timeline
                 }
             }
 
