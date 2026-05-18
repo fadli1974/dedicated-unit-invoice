@@ -887,10 +887,10 @@
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
 
-            // --- SISTEM LAYOUT SEJAJAR KHUSUS TIMELINE (Rasio 40:15:15:15:15 tanpa celah) ---
+            // --- SISTEM LAYOUT SEJAJAR KHUSUS TIMELINE (Rasio 40:15:15:15:15 HANYA UNTUK DESKTOP) ---
             if (currentSheetType === 'TIMELINE') {
-                // Menyatukan kotak menjadi 1 baris panjang dengan pembatas garis (divide-x)
-                if (statsRow) statsRow.className = "flex w-full mb-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden divide-x divide-slate-200";
+                // Di Mobile: Grid 2 Kolom dengan jarak. Di Desktop (lg): Flex 1 baris tanpa celah (divide-x)
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
                 
                 if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
                 const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
@@ -898,18 +898,22 @@
                 
                 const cards = statsRow.querySelectorAll('.stat-card');
                 if(cards.length >= 5) {
-                    // Lebar disamakan persis 100% dengan kolom tabel via inline style width
-                    // Ditambahkan min-w-0 agar truncate pada teks di dalamnya bekerja dengan baik
-                    cards[0].className = "p-3 sm:px-4 sm:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0";
-                    cards[0].style.width = "40%";
-                    cards[1].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
-                    cards[1].style.width = "15%";
-                    cards[2].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
-                    cards[2].style.width = "15%";
-                    cards[3].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
-                    cards[3].style.width = "15%";
-                    cards[4].className = "p-2 sm:px-3 sm:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0";
-                    cards[4].style.width = "15%";
+                    // Reset inline style (width) agar tidak memaksakan lebar di HP
+                    // Kotak pertama (Project Name) dibuat penuh 2 kolom di HP (col-span-2)
+                    cards[0].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-3 lg:px-4 lg:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0 col-span-2 lg:w-[40%]";
+                    cards[0].style.width = ""; 
+                    
+                    cards[1].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    cards[1].style.width = ""; 
+                    
+                    cards[2].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    cards[2].style.width = ""; 
+                    
+                    cards[3].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    cards[3].style.width = ""; 
+                    
+                    cards[4].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    cards[4].style.width = ""; 
                 }
             } else {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
