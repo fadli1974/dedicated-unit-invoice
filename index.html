@@ -73,9 +73,8 @@
                     <i data-lucide="chevron-down" id="icon-submenu-mobil" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(180deg);"></i>
                 </div>
                 
-                <!-- Isi Submenu Mobil (Terbuka Default karena Aktif Pertama Kali) -->
+                <!-- Isi Submenu Mobil -->
                 <div id="submenu-mobil" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 500px;">
-                    <!-- Menu Induk yang tersembunyi (agar tetap bisa memanggil 'Semua Unit Mobil') -->
                     <div onclick="switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item sidebar-active" id="menu-mobil">
                         <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Mobil
                     </div>
@@ -278,34 +277,47 @@
             </div>
 
             <!-- KOTAK STATISTIK BERSIH -->
-            <!-- Ditambahkan id "statsRow" agar grid bisa disesuaikan dinamis -->
             <div id="statsRow" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                <!-- Card 1 -->
-                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
-                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Sheet Sumber</p>
-                    <h3 id="stat-sheet-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">MOBIL</h3>
+                <!-- Card 1 (Sheet Sumber) -->
+                <div id="stat-card-1" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
+                    <p id="stat-sheet-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Sheet Sumber</p>
+                    <h3 id="stat-sheet-val" class="text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate">MOBIL</h3>
                 </div>
                 
                 <!-- Card Tambahan Khusus TIMELINE (Disembunyikan secara default) -->
-                <div id="stat-timeline-extra" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden">
+                <div id="stat-timeline-extra" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden text-center items-center">
                     <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">TOTAL UNIT</p>
-                    <h3 id="stat-timeline-unit-val" class="text-lg sm:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
+                    <h3 id="stat-timeline-unit-val" class="text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
                 </div>
 
-                <!-- Card 2 -->
-                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
+                <!-- Card 2 (Unit Terfilter / Duration) -->
+                <div id="stat-card-2" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
                     <p id="stat-count-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Unit Terfilter</p>
-                    <h3 id="stat-count-standard" class="text-lg sm:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
+                    <h3 id="stat-count-standard" class="text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
                 </div>
-                <!-- Card 3 -->
-                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
+                
+                <!-- Card 3 (Kategori Aktif / Start Date) -->
+                <div id="stat-card-3" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
                     <p id="stat-kategori-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Kategori Aktif</p>
-                    <h3 id="stat-category-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">SEMUA UNIT</h3>
+                    <h3 id="stat-category-val" class="text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate">SEMUA UNIT</h3>
                 </div>
-                <!-- Card 4 -->
-                <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card">
+
+                <!-- Card Tambahan Khusus INVOICE 1: Harga Sewa -->
+                <div id="stat-invoice-harga" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden text-left">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Total Harga Sewa</p>
+                    <h3 id="stat-invoice-harga-val" class="text-base sm:text-lg lg:text-xl font-black text-green-600 tracking-tight truncate">Rp 0</h3>
+                </div>
+
+                <!-- Card Tambahan Khusus INVOICE 2: Biaya Lain2 -->
+                <div id="stat-invoice-biaya" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden text-left">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Total Biaya Lain2</p>
+                    <h3 id="stat-invoice-biaya-val" class="text-base sm:text-lg lg:text-xl font-black text-orange-500 tracking-tight truncate">Rp 0</h3>
+                </div>
+
+                <!-- Card 4 (Periode / End Date) -->
+                <div id="stat-card-4" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
                     <p id="stat-periode-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">DATA UNIT</p>
-                    <h3 id="stat-periode-val" class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight truncate">CL</h3>
+                    <h3 id="stat-periode-val" class="text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate">CL</h3>
                 </div>
             </div>
 
@@ -702,7 +714,6 @@
                         }
                         window.open(targetLink, '_blank');
                     } else {
-                        // Skenario: Link kosong, sengaja dikosongkan, atau data belum ditarik
                         if (isMotor || ownerFound) {
                             showToast('Link GPS belum Tersedia', true);
                         } else {
@@ -753,7 +764,6 @@
                     }
 
                     // EKSTRAK DATA KHUSUS TIMELINE DARI BARIS 3 (INDEX 2)
-                    // Mengacu pada Kolom B(1), C(2), D(3), E(4), F(5)
                     if (currentSheetType === 'TIMELINE' && rows.length >= 3) {
                         timelineProjectName = rows[2][1] ? String(rows[2][1]).trim() : 'TIMELINE';
                         timelineTotalUnit = rows[2][2] ? String(rows[2][2]).trim() : '0';
@@ -840,18 +850,46 @@
             });
         }
 
+        // Global Helper untuk Hitung Rupiah & Bulan (Digunakan Tabel dan Kotak Statistik)
+        const parseRpGlobal = (str) => {
+            if (!str || str === '-' || str === '') return 0;
+            return parseFloat(String(str).replace(/[Rp\s\.]/g, '').replace(',', '.')) || 0;
+        };
+        const getBulanIdxGlobal = () => {
+            const bulanFilter = document.getElementById('bulanFilter');
+            let m = bulanFilter ? bulanFilter.value : 'all';
+            if (m === 'all' || !m) m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+            const map = {'januari': 27, 'februari': 28, 'maret': 29, 'april': 30, 'mei': 31, 'juni': 32, 'juli': 33, 'agustus': 34, 'september': 35, 'oktober': 36, 'november': 37, 'desember': 38};
+            return map[m] || 27;
+        };
+        const getBulanIdxMotorGlobal = () => {
+            const bulanFilter = document.getElementById('bulanFilter');
+            let m = bulanFilter ? bulanFilter.value : 'all';
+            if (m === 'all' || !m) m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+            const map = {'januari': 25, 'februari': 26, 'maret': 27, 'april': 28, 'mei': 29, 'juni': 30, 'juli': 31, 'agustus': 32, 'september': 33, 'oktober': 34, 'november': 35, 'desember': 36};
+            return map[m] || 25;
+        };
+        const getBulanIdxSDMGlobal = () => {
+            const bulanFilter = document.getElementById('bulanFilter');
+            let m = bulanFilter ? bulanFilter.value : 'all';
+            if (m === 'all' || !m) m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
+            const map = {'januari': 20, 'februari': 21, 'maret': 22, 'april': 23, 'mei': 24, 'juni': 25, 'juli': 26, 'agustus': 27, 'september': 28, 'oktober': 29, 'november': 30, 'desember': 31};
+            return map[m] || 20;
+        };
+
         function updateSheetLabel() {
             let label = 'MOBIL';
             let periodeLabel = 'CL';
             let periodeTitle = 'DATA UNIT';
             
-            // Variabel baru untuk menampung label stat-card secara dinamis
             let sheetSumberLabel = 'SHEET SUMBER';
             let unitTerfilterLabel = 'UNIT TERFILTER';
             let kategoriAktifLabel = 'KATEGORI AKTIF';
 
             const statsRow = document.getElementById('statsRow');
             const statTimelineExtra = document.getElementById('stat-timeline-extra');
+            const statInvoiceHarga = document.getElementById('stat-invoice-harga');
+            const statInvoiceBiaya = document.getElementById('stat-invoice-biaya');
 
             if(currentSheetType.startsWith('INVOICE')) {
                 const selectEl = document.getElementById('invoiceSheetFilter');
@@ -887,46 +925,53 @@
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
 
-            // --- SISTEM LAYOUT SEJAJAR KHUSUS TIMELINE (Rasio 40:15:15:15:15 HANYA UNTUK DESKTOP) ---
+            // Atur Grid berdasar Mode (Invoice, Timeline, Standard)
             if (currentSheetType === 'TIMELINE') {
-                // Di Mobile: Grid 2 Kolom dengan jarak. Di Desktop (lg): Flex 1 baris tanpa celah (divide-x)
                 if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
-                
                 if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+
                 const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
                 if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
                 
-                const cards = statsRow.querySelectorAll('.stat-card');
-                if(cards.length >= 5) {
-                    // Reset inline style (width) agar tidak memaksakan lebar di HP
-                    // Kotak pertama (Project Name) dibuat penuh 2 kolom di HP (col-span-2)
-                    cards[0].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-3 lg:px-4 lg:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0 col-span-2 lg:w-[40%]";
-                    cards[0].style.width = ""; 
-                    
-                    cards[1].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
-                    cards[1].style.width = ""; 
-                    
-                    cards[2].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
-                    cards[2].style.width = ""; 
-                    
-                    cards[3].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
-                    cards[3].style.width = ""; 
-                    
-                    cards[4].className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
-                    cards[4].style.width = ""; 
+                const c1 = document.getElementById('stat-card-1');
+                const c2 = document.getElementById('stat-timeline-extra');
+                const c3 = document.getElementById('stat-card-2');
+                const c4 = document.getElementById('stat-card-3');
+                const c5 = document.getElementById('stat-card-4');
+
+                if (c1 && c2 && c3 && c4 && c5) {
+                    c1.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-3 lg:px-4 lg:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0 col-span-2 lg:w-[40%]";
+                    c2.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c3.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c4.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                 }
+            } else if (currentSheetType.startsWith('INVOICE')) {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; // 6 kotak sejajar
+                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
+                
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = ""; 
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
             } else {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
                 
-                // Reset styling saat kembali ke tabel normal
                 const cards = statsRow.querySelectorAll('.stat-card');
-                cards.forEach((card, index) => {
-                    card.style.width = ""; // Hapus width inline
-                    if (index === 1) { // stat-timeline-extra
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden";
-                    } else {
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left";
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
             }
@@ -940,8 +985,7 @@
             const statPeriodeVal = document.getElementById('stat-periode-val');
             if (statPeriodeVal) statPeriodeVal.innerText = periodeLabel;
 
-            // PERBAIKAN: Menggunakan ID langsung agar elemen 100% pasti ditemukan!
-            const statSheetLabel = document.querySelector('#statsRow > div:first-child > p');
+            const statSheetLabel = document.querySelector('#stat-card-1 > p');
             if (statSheetLabel) statSheetLabel.innerText = sheetSumberLabel;
 
             const statKategoriLabel = document.getElementById('stat-kategori-label');
@@ -964,7 +1008,7 @@
                         jenisServiceText = "Dedicated Mobil";
                     }
                 } else {
-                    statKategoriLabel.innerText = kategoriAktifLabel; // Otomatis menjadi 'START DATE' khusus timeline
+                    statKategoriLabel.innerText = kategoriAktifLabel; 
                 }
             }
 
@@ -985,12 +1029,9 @@
                         statCategory.innerText = "Dedicated Mobil";
                     }
                 } else {
-                    // Cari elemen sidebar yang sedang aktif untuk mengambil teksnya
                     const activeSidebarItem = document.querySelector('.sidebar-active');
                     if (activeSidebarItem) {
-                        // Bersihkan teks dari ikon (spasi dan tab berlebih)
                         let rawText = activeSidebarItem.innerText.trim();
-                        // Hapus teks tambahan seperti ikon jika ada (misal di beberapa kasus lucide menambahkan teks tersembunyi)
                         statCategory.innerText = rawText.toUpperCase();
                     } else {
                          statCategory.innerText = label || activeCategory || 'SEMUA UNIT';
@@ -1154,6 +1195,7 @@
         }
 
         function populateUsiaFilter() {
+            const width = window.innerWidth;
             const usiaContainer = document.getElementById('usiaFilterContainer');
             const usiaMin = document.getElementById('usiaMinFilter');
             const usiaMax = document.getElementById('usiaMaxFilter');
@@ -1661,7 +1703,6 @@
                 download: true,
                 header: true, 
                 complete: function(results) {
-                    
                     if (results.data.length > 0 && Object.keys(results.data[0]).some(k => k.toLowerCase().includes("<html"))) {
                         if (errorMsg) {
                             errorMsg.innerHTML = "Gagal memverifikasi. Pastikan Share Google Sheet adalah 'Anyone with link'.";
@@ -1832,7 +1873,6 @@
             if (isWaitingForGoogleSync) return;
 
             currentFilteredData = originalData.filter(row => {
-
                 if (currentSheetType.startsWith('INVOICE')) {
                     return Object.values(row).some(val => String(val).toLowerCase().includes(query));
                 }
@@ -1950,6 +1990,39 @@
                 } else {
                     displayCount = 0;
                 }
+
+                // Kalkulasi Total Harga Sewa & Biaya Lain2
+                let totalHargaSewa = 0;
+                let totalBiayaLain = 0;
+
+                filtered.forEach(row => {
+                    let hargaSewa = 0;
+                    let tambahanBiaya = 0;
+
+                    if (currentSheetType === 'INVOICE_MOBIL') {
+                        hargaSewa = row._rawRow && row._rawRow[20] !== undefined ? parseRpGlobal(row._rawRow[20]) : 0;
+                        tambahanBiaya = row._rawRow && row._rawRow[getBulanIdxGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxGlobal()]) : 0;
+                    } else if (currentSheetType === 'INVOICE_MOTOR') {
+                        hargaSewa = row._rawRow && row._rawRow[19] !== undefined ? parseRpGlobal(row._rawRow[19]) : 0;
+                        tambahanBiaya = row._rawRow && row._rawRow[getBulanIdxMotorGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxMotorGlobal()]) : 0;
+                    } else if (currentSheetType === 'INVOICE_SDM') {
+                        hargaSewa = row._rawRow && row._rawRow[13] !== undefined ? parseRpGlobal(row._rawRow[13]) : 0;
+                        tambahanBiaya = row._rawRow && row._rawRow[getBulanIdxSDMGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxSDMGlobal()]) : 0;
+                    } else if (currentSheetType === 'INVOICE_BATTERY') {
+                        let hargaKey = Object.keys(row).find(k => k.trim().toUpperCase() === "HARGA SEWA");
+                        hargaSewa = hargaKey && row[hargaKey] ? parseRpGlobal(row[hargaKey]) : 0;
+                    }
+                    totalHargaSewa += hargaSewa;
+                    totalBiayaLain += tambahanBiaya;
+                });
+
+                const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+                const valHarga = document.getElementById('stat-invoice-harga-val');
+                const valBiaya = document.getElementById('stat-invoice-biaya-val');
+                
+                if (valHarga) valHarga.innerText = formatRp(totalHargaSewa);
+                if (valBiaya) valBiaya.innerText = formatRp(totalBiayaLain);
+
             } else {
                 countLabel = "UNIT TERFILTER";
             }
@@ -1975,7 +2048,6 @@
             const isInvoiceSDM = currentSheetType === 'INVOICE_SDM';
             const isBattery = currentSheetType === 'BATTERY';
 
-            // Menyesuaikan lebar tabel khusus untuk TIMELINE agar tidak kebesaran & presisi proporsional
             if (mainTable) {
                 if (currentSheetType === 'TIMELINE') {
                     mainTable.className = "w-full text-left border-collapse min-w-[800px] lg:min-w-full table-fixed";
@@ -1988,7 +2060,6 @@
                 let thClass = "px-3 sm:px-4 py-3 sm:py-4 border-r border-slate-200 whitespace-nowrap font-black text-slate-700 bg-slate-50 text-[10px] sm:text-[11px] uppercase tracking-widest";
                 let inlineStyle = "";
                 
-                // Styling spesifik untuk Header Timeline agar presisi sejajar dengan Stat Cards di atasnya
                 if (currentSheetType === 'TIMELINE') {
                     if (col.label === 'TASK ID') { thClass += " text-center"; inlineStyle = "width: 8%;"; }
                     else if (col.label === 'TASK DETAIL') { thClass += " text-left truncate"; inlineStyle = "width: 32%;"; }
@@ -2004,46 +2075,10 @@
 
             if (validData.length === 0) {
                 let emptyMsg = "Data Tidak Dijumpai";
-                
                 body.innerHTML = `<tr><td colspan="${config.length}" class="p-10 sm:p-20 text-center text-slate-400 font-bold tracking-widest text-xs sm:text-sm leading-relaxed">${emptyMsg}</td></tr>`;
                 if(rowCountBadge) rowCountBadge.innerText = `0 BARIS`;
                 return;
             }
-
-            const parseRp = (str) => {
-                if (!str || str === '-' || str === '') return 0;
-                return parseFloat(String(str).replace(/[Rp\s\.]/g, '').replace(',', '.')) || 0;
-            };
-
-            const getBulanIdx = () => {
-                const bulanFilter = document.getElementById('bulanFilter');
-                let m = bulanFilter ? bulanFilter.value : 'all';
-                if (m === 'all' || !m) {
-                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
-                }
-                const map = {'januari': 27, 'februari': 28, 'maret': 29, 'april': 30, 'mei': 31, 'juni': 32, 'juli': 33, 'agustus': 34, 'september': 35, 'oktober': 36, 'november': 37, 'desember': 38};
-                return map[m] || 27;
-            };
-
-            const getBulanIdxMotor = () => {
-                const bulanFilter = document.getElementById('bulanFilter');
-                let m = bulanFilter ? bulanFilter.value : 'all';
-                if (m === 'all' || !m) {
-                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
-                }
-                const map = {'januari': 25, 'februari': 26, 'maret': 27, 'april': 28, 'mei': 29, 'juni': 30, 'juli': 31, 'agustus': 32, 'september': 33, 'oktober': 34, 'november': 35, 'desember': 36};
-                return map[m] || 25;
-            };
-
-            const getBulanIdxSDM = () => {
-                const bulanFilter = document.getElementById('bulanFilter');
-                let m = bulanFilter ? bulanFilter.value : 'all';
-                if (m === 'all' || !m) {
-                    m = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'][new Date().getMonth()];
-                }
-                const map = {'januari': 20, 'februari': 21, 'maret': 22, 'april': 23, 'mei': 24, 'juni': 25, 'juli': 26, 'agustus': 27, 'september': 28, 'oktober': 29, 'november': 30, 'desember': 31};
-                return map[m] || 20;
-            };
 
             body.innerHTML = validData.map((row, idx) => {
                 const cells = config.map(col => {
@@ -2055,19 +2090,16 @@
                         } else if (col.rawIdx !== undefined) {
                             val = row._rawRow && row._rawRow[col.rawIdx] !== undefined && String(row._rawRow[col.rawIdx]).trim() !== "" ? row._rawRow[col.rawIdx] : "-";
                         } else if (col.isDynamicMonth) {
-                            let mIdx = getBulanIdx();
-                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                            val = row._rawRow && row._rawRow[getBulanIdxGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxGlobal()]) : 0;
                         } else if (col.isDynamicMonthMotor) {
-                            let mIdx = getBulanIdxMotor();
-                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                            val = row._rawRow && row._rawRow[getBulanIdxMotorGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxMotorGlobal()]) : 0;
                         } else if (col.isDynamicMonthSDM) {
-                            let mIdx = getBulanIdxSDM();
-                            val = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                            val = row._rawRow && row._rawRow[getBulanIdxSDMGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxSDMGlobal()]) : 0;
                         } else if (col.isCalcInv || col.isCalcPpn || col.isCalcTotal) {
                             let hargaIdx = isInvoiceMobil ? 20 : (isInvoiceMotor ? 19 : 13);
-                            let hargaSewa = row._rawRow && row._rawRow[hargaIdx] !== undefined ? parseRp(row._rawRow[hargaIdx]) : 0;
-                            let mIdx = isInvoiceMobil ? getBulanIdx() : (isInvoiceMotor ? getBulanIdxMotor() : getBulanIdxSDM());
-                            let tambahanBiaya = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRp(row._rawRow[mIdx]) : 0;
+                            let hargaSewa = row._rawRow && row._rawRow[hargaIdx] !== undefined ? parseRpGlobal(row._rawRow[hargaIdx]) : 0;
+                            let mIdx = isInvoiceMobil ? getBulanIdxGlobal() : (isInvoiceMotor ? getBulanIdxMotorGlobal() : getBulanIdxSDMGlobal());
+                            let tambahanBiaya = row._rawRow && row._rawRow[mIdx] !== undefined ? parseRpGlobal(row._rawRow[mIdx]) : 0;
                             
                             let inv = hargaSewa + tambahanBiaya;
                             let ppn = inv * 0.11;
@@ -2090,13 +2122,11 @@
                         val = actualKey !== undefined ? row[actualKey] : "-";
                     }
                     
-                    // Merapikan nilai kosong agar menampilkan "-" daripada spasi kosong
                     if (typeof val === 'string' && val.trim() === '') val = '-';
                     
                     let cellClass = "px-3 sm:px-4 py-3 sm:py-3.5 border-r border-slate-50";
                     let inlineStyle = "";
                     
-                    // Logika Styling Tabel Presisi (Timeline vs Normal)
                     if (currentSheetType === 'TIMELINE') {
                         if (col.label === 'TASK ID') { cellClass += " text-center font-bold text-slate-500"; inlineStyle = "width: 8%;"; }
                         else if (col.label === 'TASK DETAIL') { cellClass += " text-left truncate"; inlineStyle = "width: 32%;"; }
@@ -2154,17 +2184,13 @@
             let html = '';
 
             if (currentSheetType === 'TIMELINE') {
-                // Rekonstruksi Tabel Excel Khusus TimeLine (Identik dengan Google Sheet)
                 let tableContent = '<table border="1" style="border-collapse: collapse; font-family: Arial, sans-serif;">';
-                
-                // 1. Ekspor Header dan Meta Info (Baris 1 s/d Baris Judul)
                 for (let i = 0; i <= currentHeaderIndex; i++) {
                     if (!rawCsvData[i]) continue;
                     tableContent += '<tr>';
                     rawCsvData[i].forEach(cell => {
                         let bg = "";
                         let color = "black";
-                        // Berikan warna Biru Tua (#002060) pada baris meta dan baris judul
                         if (i === 1 || i === currentHeaderIndex) {
                             bg = "#002060"; 
                             color = "white";
@@ -2174,14 +2200,12 @@
                     tableContent += '</tr>';
                 }
 
-                // 2. Ekspor Baris Data yang sedang terfilter
                 currentFilteredData.forEach(row => {
                     tableContent += '<tr>';
                     if (row._rawRow) {
                         row._rawRow.forEach((cell, idx) => {
                             let bg = "";
                             let color = "black";
-                            // Warnai blok timeline (Tanggal) dengan Biru Tua jika kolom > 5 dan sel tidak kosong (disesuaikan karena ada kolom Unit)
                             if (idx > 5 && String(cell).trim() !== '') {
                                 bg = "#002060"; 
                                 color = "white";
@@ -2196,7 +2220,6 @@
                 html = tableContent;
 
             } else {
-                // Ekspor Tabel Standar
                 const table = document.getElementById("mainTable");
                 html = table.outerHTML;
             }
