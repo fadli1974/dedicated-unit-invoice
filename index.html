@@ -105,7 +105,7 @@
                     <i data-lucide="chevron-down" id="icon-submenu-motor" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(0deg);"></i>
                 </div>
                 
-                <!-- Isi Submenu Motor (Tertutup Default) -->
+                <!-- Isi Submenu Motor -->
                 <div id="submenu-motor" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 0px;">
                     <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item" id="menu-motor">
                         <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Motor
@@ -131,29 +131,21 @@
             </div>
 
             <div class="pt-4 border-t border-slate-800 mt-4 space-y-1">
-                <!-- Menu SDM -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'SDM', 'users', '666929758', 'SDM', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="users" class="w-4 h-4"></i> SDM
                 </div>
-                <!-- Menu Battery -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="battery-charging" class="w-4 h-4"></i> Battery
                 </div>
-                <!-- Menu Penambahan Unit -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'Penambahan Unit/SDM', 'plus-circle', '1066270407', 'PENAMBAHAN', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="plus-circle" class="w-4 h-4 text-green-500"></i> Penambahan Unit/SDM
                 </div>
-                <!-- Menu TimeLine -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'TimeLine', 'calendar-days', '421262394', 'TIMELINE', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="calendar-days" class="w-4 h-4 text-purple-500"></i> TimeLine
                 </div>
-
-                <!-- Menu Detail -->
                 <div onclick="toggleSubMenu(''); showDetail(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-detail">
                     <i data-lucide="list" class="w-4 h-4"></i> Detail
                 </div>
-                
-                <!-- Menu Invoices -->
                 <div onclick="toggleSubMenu(''); handleInvoiceClick(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-invoices">
                     <i data-lucide="file-text" class="w-4 h-4"></i> Invoices
                     <i data-lucide="lock" id="invoice-lock-icon" class="w-3 h-3 ml-auto text-slate-500"></i>
@@ -253,9 +245,7 @@
                 <!-- BAGIAN KANAN: Tombol Status, Last Sync & Live GPS -->
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto justify-start xl:justify-end flex-shrink-0">
                     <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar">
-                        <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap shadow-sm">Semua</button>
-                        <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
-                        <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
+                        <!-- Konten filter ini akan diganti secara dinamis via JS -->
                     </div>
 
                     <!-- Kotak Last Sync -->
@@ -273,7 +263,6 @@
                         <span class="text-[10px] sm:text-xs font-black text-slate-700 group-hover:text-red-700 uppercase tracking-widest hidden sm:block">Live GPS</span>
                     </button>
                 </div>
-                
             </div>
 
             <!-- KOTAK STATISTIK BERSIH -->
@@ -322,9 +311,7 @@
             </div>
 
             <!-- Stats Card (Diagram Mode) -->
-            <div id="statsDiagram" class="hidden grid gap-3 sm:gap-4 mb-6">
-                <!-- Data will be injected here via JS -->
-            </div>
+            <div id="statsDiagram" class="hidden grid gap-3 sm:gap-4 mb-6"></div>
 
             <!-- Chart Section -->
             <div id="chartSection" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-6">
@@ -335,9 +322,7 @@
                 <div class="h-[450px] w-full relative">
                     <canvas id="mainChart"></canvas>
                 </div>
-                <div id="chartLegend" class="mt-4 flex flex-wrap gap-4 justify-center text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    <!-- Legend will be injected here via JS -->
-                </div>
+                <div id="chartLegend" class="mt-4 flex flex-wrap gap-4 justify-center text-[10px] font-black uppercase tracking-widest text-slate-500"></div>
             </div>
 
             <!-- Table Container -->
@@ -349,7 +334,6 @@
                     </div>
                     <span id="row-count-badge" class="bg-white/20 px-2 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-widest uppercase flex-shrink-0">0 BARIS</span>
                 </div>
-                
                 <div class="overflow-x-auto overflow-y-auto max-h-[65vh] custom-scrollbar bg-slate-50 w-full relative">
                     <table id="mainTable" class="w-full text-left border-collapse min-w-[900px] lg:min-w-[1200px]">
                         <thead class="text-[#475569] text-[10px] sm:text-[11px] font-black uppercase tracking-widest border-b-2 border-slate-200 table-sticky-header">
@@ -365,33 +349,29 @@
     </div>
 
     <script>
-        // MENGGUNAKAN ID PUBLIKASI (2PACX) -> ANTI CORS BLOCK, BISA DIBUKA DI KOMPUTER LOKAL
         const sheetId = '2PACX-1vS1nuc1LUOgAwrWd1h06uGSPRwWh3LiO-eVYmnd_bCG7TS5lGGOj0PZOYmdQaqs8lfAVAMN3Ss5XQ8K';
         let currentGid = '289536394'; 
         let currentSheetType = 'UNIT'; 
         let currentSheetMonth = ''; 
         let isWaitingForGoogleSync = false;
 
-        // Variables for Diagram
         let isDiagramMode = false;
         let mainChart = null;
         let currentDiagramType = 'mobil';
 
-        // Konfigurasi Diagram Bertumpuk
         const DIAGRAM_CONFIG = {
             'mobil': {
-                colIndex: 12, // Kolom M (Jenis Kendaraan)
+                colIndex: 12, 
                 types: ["PICKUP BOX", "CDE", "CDD", "BLIND VAN", "FUSO"],
                 colors: { "PICKUP BOX": "#3b82f6", "CDE": "#10b981", "CDD": "#f59e0b", "BLIND VAN": "#8b5cf6", "FUSO": "#ef4444", "LAINNYA": "#94a3b8" }
             },
             'motor': {
-                colIndex: 11, // Kolom L (Jenis Kendaraan Motor)
+                colIndex: 11, 
                 types: ["MOTOR KONVENSIONAL", "MOTOR LISTRIK"],
                 colors: { "MOTOR KONVENSIONAL": "#64748b", "MOTOR LISTRIK": "#eab308", "LAINNYA": "#94a3b8" }
             }
         };
 
-        // Kamus penerjemah bulan
         const engToIndoMonth = {
             'january': 'januari', 'february': 'februari', 'march': 'maret',
             'april': 'april', 'may': 'mei', 'mai': 'mei', 'june': 'juni',
@@ -414,6 +394,76 @@
             <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap">Mobil</button>
             <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
         `;
+
+        const penambahanFiltersHTML = `
+            <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs font-black text-slate-600 px-1 py-1 flex-wrap">
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <span class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider font-black">BULAN AWAL:</span>
+                    <input type="month" id="tglPermintaanFilter" onchange="applyFilters()" class="px-1.5 py-1 border border-slate-200 rounded-lg outline-none text-slate-700 font-bold bg-slate-50 focus:bg-white text-[10px] cursor-pointer">
+                </div>
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <span class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider font-black">BULAN AKHIR:</span>
+                    <input type="month" id="tglPemenuhanFilter" onchange="applyFilters()" class="px-1.5 py-1 border border-slate-200 rounded-lg outline-none text-slate-700 font-bold bg-slate-50 focus:bg-white text-[10px] cursor-pointer">
+                </div>
+                <button onclick="clearDateFilters()" class="p-1 text-slate-400 hover:text-red-500 focus:outline-none transition-colors" title="Reset Filter Tanggal">
+                    <i data-lucide="x-circle" class="w-4 h-4"></i>
+                </button>
+            </div>
+        `;
+
+        function parseGoogleDate(str) {
+            if (!str) return '';
+            str = String(str).trim().toLowerCase();
+            
+            const monthNames = {
+                'januari': '01', 'january': '01', 'jan': '01',
+                'februari': '02', 'february': '02', 'feb': '02',
+                'maret': '03', 'march': '03', 'mar': '03',
+                'april': '04', 'apr': '04',
+                'mei': '05', 'may': '05',
+                'juni': '06', 'june': '06', 'jun': '06',
+                'juli': '07', 'july': '07', 'jul': '07',
+                'agustus': '08', 'august': '08', 'agu': '08', 'aug': '08',
+                'september': '09', 'sep': '09', 'sept': '09',
+                'oktober': '10', 'october': '10', 'okt': '10', 'oct': '10',
+                'november': '11', 'nov': '11',
+                'desember': '12', 'december': '12', 'des': '12', 'dec': '12'
+            };
+
+            for (const [name, num] of Object.entries(monthNames)) {
+                if (str.includes(name)) {
+                    str = str.replace(new RegExp(name, 'g'), '-' + num + '-');
+                    break;
+                }
+            }
+
+            const clean = str.replace(/[^0-9]/g, '-');
+            const parts = clean.split('-').filter(p => p !== '');
+            if (parts.length < 3) return '';
+
+            let y, m, d;
+            if (parts[0].length === 4) { 
+                y = parts[0]; m = parts[1]; d = parts[2];
+            } else if (parts[2].length >= 4) { 
+                y = parts[2].substring(0,4);
+                d = parts[0]; m = parts[1];
+            } else if (parts[2].length === 2) { 
+                y = '20' + parts[2];
+                d = parts[0]; m = parts[1];
+            } else {
+                return '';
+            }
+
+            return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        }
+
+        function clearDateFilters() {
+            const reqInput = document.getElementById('tglPermintaanFilter');
+            const fulInput = document.getElementById('tglPemenuhanFilter');
+            if (reqInput) reqInput.value = '';
+            if (fulInput) fulInput.value = '';
+            applyFilters();
+        }
 
         const COLUMN_CONFIGS = {
             'UNIT': [
@@ -550,7 +600,6 @@
         let leaseStatusFilter = 'all';
         let gpsLinksConfig = { mobil: {}, motor: {} }; 
 
-        // Variabel penampung data unik TIMELINE
         let timelineProjectName = '';
         let timelineTotalUnit = '';
         let timelineDuration = '';
@@ -573,12 +622,10 @@
                 if (!submenu) return;
 
                 if (id === menuId) {
-                    // Jika sedang tertutup, maka buka
                     if (submenu.style.maxHeight === '0px' || submenu.style.maxHeight === '') {
-                        submenu.style.maxHeight = '500px'; // Buka area submenu
-                        if(icon) icon.style.transform = 'rotate(180deg)'; // Putar panah ke atas
+                        submenu.style.maxHeight = '500px'; 
+                        if(icon) icon.style.transform = 'rotate(180deg)'; 
                         
-                        // Beri warna latar belakang biru pada header yang terbuka
                         if(id === 'submenu-mobil' && headerMobil) {
                             headerMobil.classList.add('bg-blue-600', 'text-white');
                             headerMobil.classList.remove('text-slate-400');
@@ -587,13 +634,10 @@
                             headerMotor.classList.add('bg-blue-600', 'text-white');
                             headerMotor.classList.remove('text-slate-400');
                         }
-
                     } else {
-                        // Jika sedang terbuka, maka tutup
                         submenu.style.maxHeight = '0px';
-                        if(icon) icon.style.transform = 'rotate(0deg)'; // Putar panah ke bawah
+                        if(icon) icon.style.transform = 'rotate(0deg)'; 
                         
-                        // Hapus warna biru pada header jika ditutup
                         if(id === 'submenu-mobil' && headerMobil) {
                             headerMobil.classList.remove('bg-blue-600', 'text-white');
                             headerMobil.classList.add('text-slate-400');
@@ -604,11 +648,9 @@
                         }
                     }
                 } else {
-                    // Tutup submenu lain yang tidak diklik (Efek Accordion otomatis)
                     submenu.style.maxHeight = '0px';
                     if (icon) icon.style.transform = 'rotate(0deg)';
                     
-                    // Kembalikan header lain ke warna dasar
                     if(id === 'submenu-mobil' && headerMobil) {
                         headerMobil.classList.remove('bg-blue-600', 'text-white');
                         headerMobil.classList.add('text-slate-400');
@@ -628,7 +670,6 @@
             if(overlay) overlay.classList.toggle('hidden');
         }
 
-        // --- SISTEM TOAST NOTIFICATION ELEGAN ---
         function showToast(message, isError = false) {
             const toast = document.createElement('div');
             toast.className = `fixed top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-[100] transition-all duration-300 transform translate-y-0 opacity-100 flex items-center gap-3 font-bold text-sm ${isError ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`;
@@ -642,7 +683,6 @@
             }, 4000);
         }
 
-        // --- SISTEM TOMBOL PINTAR GPS TERBARU (LIVE FETCH DARI DUA SHEET BERBEDA) ---
         function openGPS() {
             let isMotor = (currentGid === '1495287037' || currentGid === '1107508733' || currentSheetType === 'INVOICE_MOTOR' || (isDiagramMode && currentDiagramType === 'motor'));
             let typeContext = isMotor ? 'motor' : 'mobil';
@@ -650,7 +690,6 @@
             const pemilikFilter = document.getElementById('pemilikFilter');
             let selectedOwner = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value.toUpperCase() : 'ALL';
             
-            // Logika Fallback Khusus Motor: Ambil unit pertama yang punya link
             if (isMotor && selectedOwner === 'ALL') {
                 selectedOwner = 'MOTOR_FALLBACK';
             }
@@ -660,13 +699,11 @@
                 return;
             }
 
-            // Animasi Loading pada Tombol
             const btn = document.getElementById('liveGpsBtn');
             const originalHtml = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-spin"></i><span class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-widest hidden sm:block">Loading...</span>`;
             lucide.createIcons();
 
-            // Tentukan URL Spreadsheet berdasarkan tipe kendaraan (Mobil: gid=73478022, Motor: gid=503672149)
             let targetGid = isMotor ? '503672149' : '73478022';
             const url = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${targetGid}&single=true&output=csv&t=${new Date().getTime()}`;
             
@@ -691,11 +728,11 @@
                         
                         if (isMotor && selectedOwner === 'MOTOR_FALLBACK') {
                              if (row[0] && String(row[0]).trim() !== '') {
-                                ownerFound = true; // Tandai bahwa minimal kita sudah mengecek baris motor
+                                ownerFound = true; 
                                 let candidateLink = row[2] ? String(row[2]).trim() : "";
                                 if (candidateLink && candidateLink.toUpperCase() !== 'BELUM ADA LINK' && candidateLink !== '-') {
                                     targetLink = candidateLink;
-                                    selectedOwner = String(row[0]).trim().toUpperCase(); // Update nama
+                                    selectedOwner = String(row[0]).trim().toUpperCase(); 
                                     break;
                                 }
                             }
@@ -728,7 +765,6 @@
                 }
             });
         }
-        // --------------------------------
 
         async function fetchData() {
             const refreshIcon = document.getElementById('refresh-icon');
@@ -741,7 +777,7 @@
                 header: false,
                 complete: function(results) {
                     const rows = results.data;
-                    rawCsvData = rows; // Simpan data mentah keseluruhan untuk Excel
+                    rawCsvData = rows; 
 
                     if (rows.length > 0 && (String(rows[0][0]).toLowerCase().includes("<!doctype") || String(rows[0][0]).toLowerCase().includes("<html"))) {
                         const tableBody = document.getElementById('tableBody');
@@ -763,7 +799,6 @@
                         return;
                     }
 
-                    // EKSTRAK DATA KHUSUS TIMELINE DARI BARIS 3 (INDEX 2)
                     if (currentSheetType === 'TIMELINE' && rows.length >= 3) {
                         timelineProjectName = rows[2][1] ? String(rows[2][1]).trim() : 'TIMELINE';
                         timelineTotalUnit = rows[2][2] ? String(rows[2][2]).trim() : '0';
@@ -809,7 +844,7 @@
                     });
                     
                     if (headerIndex === -1) headerIndex = 1;
-                    currentHeaderIndex = headerIndex; // Simpan index header
+                    currentHeaderIndex = headerIndex; 
 
                     const headers = rows[headerIndex].map(h => String(h).trim());
                     const dataRows = rows.slice(headerIndex + 1);
@@ -850,7 +885,6 @@
             });
         }
 
-        // Global Helper untuk Hitung Rupiah & Bulan (Digunakan Tabel dan Kotak Statistik)
         const parseRpGlobal = (str) => {
             if (!str || str === '-' || str === '') return 0;
             return parseFloat(String(str).replace(/[Rp\s\.]/g, '').replace(',', '.')) || 0;
@@ -925,7 +959,6 @@
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
 
-            // Atur Grid berdasar Mode (Invoice, Timeline, Standard)
             if (currentSheetType === 'TIMELINE') {
                 if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
                 if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
@@ -949,7 +982,7 @@
                     c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                 }
             } else if (currentSheetType.startsWith('INVOICE')) {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; // 6 kotak sejajar
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; 
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
@@ -1315,9 +1348,30 @@
             if (filterContainer) {
                 if (type === 'TIMELINE') {
                     filterContainer.style.display = 'none';
+                } else if (type === 'PENAMBAHAN') {
+                    filterContainer.style.display = 'flex';
+                    filterContainer.innerHTML = `
+                        <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs font-black text-slate-600 px-1 py-1 flex-wrap">
+                            <div class="flex items-center gap-1 sm:gap-1.5">
+                                <span class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider font-black">BULAN AWAL:</span>
+                                <input type="month" id="tglPermintaanFilter" onchange="applyFilters()" class="px-1.5 py-1 border border-slate-200 rounded-lg outline-none text-slate-700 font-bold bg-slate-50 focus:bg-white text-[10px] cursor-pointer">
+                            </div>
+                            <div class="flex items-center gap-1 sm:gap-1.5">
+                                <span class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider font-black">BULAN AKHIR:</span>
+                                <input type="month" id="tglPemenuhanFilter" onchange="applyFilters()" class="px-1.5 py-1 border border-slate-200 rounded-lg outline-none text-slate-700 font-bold bg-slate-50 focus:bg-white text-[10px] cursor-pointer">
+                            </div>
+                            <button onclick="clearDateFilters()" class="p-1 text-slate-400 hover:text-red-500 focus:outline-none transition-colors" title="Reset Filter Tanggal">
+                                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
                 } else {
                     filterContainer.style.display = 'flex';
-                    filterContainer.innerHTML = standardFiltersHTML;
+                    filterContainer.innerHTML = `
+                        <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap shadow-sm">Semua</button>
+                        <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
+                        <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
+                    `;
                 }
             }
             
@@ -1459,14 +1513,11 @@
             if (show) {
                 if(chartSec) chartSec.classList.remove('hidden');
                 if(tableSec) tableSec.classList.add('hidden');
-                // Sembunyikan semua kotak statistik saat di mode diagram
-                if(statsRow) statsRow.classList.add('hidden');
                 if(statsStd) statsStd.classList.add('hidden');
                 if(statsDiag) statsDiag.classList.remove('hidden');
             } else {
                 if(chartSec) chartSec.classList.add('hidden');
                 if(tableSec) tableSec.classList.remove('hidden');
-                // Tampilkan kembali semua kotak statistik saat keluar dari mode diagram
                 if(statsRow) statsRow.classList.remove('hidden');
                 if(statsStd) statsStd.classList.remove('hidden');
                 if(statsDiag) statsDiag.classList.add('hidden');
@@ -1563,7 +1614,6 @@
                 }).join('');
             }
         }
-        // --- AKHIR SISTEM DIAGRAM ---
 
         function showDetail(element) {
             isDiagramMode = false;
@@ -1579,7 +1629,10 @@
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
                 filterContainer.style.display = 'flex';
-                filterContainer.innerHTML = detailFiltersHTML;
+                filterContainer.innerHTML = `
+                    <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap">Mobil</button>
+                    <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
+                `;
             }
             
             const jenisFilter = document.getElementById('jenisFilter');
@@ -1853,6 +1906,61 @@
             applyFilters();
         }
 
+        // FUNGSI HELPER PARSER TANGGAL
+        function parseGoogleDate(str) {
+            if (!str) return '';
+            str = String(str).trim().toLowerCase();
+            
+            const monthNames = {
+                'januari': '01', 'january': '01', 'jan': '01',
+                'februari': '02', 'february': '02', 'feb': '02',
+                'maret': '03', 'march': '03', 'mar': '03',
+                'april': '04', 'apr': '04',
+                'mei': '05', 'may': '05',
+                'juni': '06', 'june': '06', 'jun': '06',
+                'juli': '07', 'july': '07', 'jul': '07',
+                'agustus': '08', 'august': '08', 'agu': '08', 'aug': '08',
+                'september': '09', 'sep': '09', 'sept': '09',
+                'oktober': '10', 'october': '10', 'okt': '10', 'oct': '10',
+                'november': '11', 'nov': '11',
+                'desember': '12', 'december': '12', 'des': '12', 'dec': '12'
+            };
+
+            for (const [name, num] of Object.entries(monthNames)) {
+                if (str.includes(name)) {
+                    str = str.replace(new RegExp(name, 'g'), '-' + num + '-');
+                    break;
+                }
+            }
+
+            const clean = str.replace(/[^0-9]/g, '-');
+            const parts = clean.split('-').filter(p => p !== '');
+            if (parts.length < 3) return '';
+
+            let y, m, d;
+            if (parts[0].length === 4) { 
+                y = parts[0]; m = parts[1]; d = parts[2];
+            } else if (parts[2].length >= 4) { 
+                y = parts[2].substring(0,4);
+                d = parts[0]; m = parts[1];
+            } else if (parts[2].length === 2) { 
+                y = '20' + parts[2];
+                d = parts[0]; m = parts[1];
+            } else {
+                return '';
+            }
+
+            return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        }
+
+        function clearDateFilters() {
+            const reqInput = document.getElementById('tglPermintaanFilter');
+            const fulInput = document.getElementById('tglPemenuhanFilter');
+            if (reqInput) reqInput.value = '';
+            if (fulInput) fulInput.value = '';
+            applyFilters();
+        }
+
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const query = searchInput ? searchInput.value.toLowerCase() : '';
@@ -1871,6 +1979,12 @@
             const selectedGps = (gpsFilter && gpsFilter.style.display !== 'none') ? gpsFilter.value : 'all';
             
             if (isWaitingForGoogleSync) return;
+
+            // AMBIL NILAI FILTER BULAN (DENGAN PENGECEKAN AMAN)
+            const startInput = document.getElementById('tglPermintaanFilter');
+            const endInput = document.getElementById('tglPemenuhanFilter');
+            const startMonthVal = startInput ? startInput.value : ''; 
+            const endMonthVal = endInput ? endInput.value : ''; 
 
             currentFilteredData = originalData.filter(row => {
                 if (currentSheetType.startsWith('INVOICE')) {
@@ -1892,7 +2006,6 @@
                     else if (leaseStatusFilter === 'habis') matchesStatus = sisaSewaValue.includes("MASA SEWA HABIS");
                 }
 
-                // Logika Filter RENTANG USIA
                 let matchesUsia = true;
                 if (selectedMinUsia !== 'all' || selectedMaxUsia !== 'all') {
                     const usiaKey = keys.find(k => k.toUpperCase().includes("USIA UNIT"));
@@ -1945,13 +2058,34 @@
                     }
                 }
 
+                // FILTER RENTANG BULAN (KHUSUS PENAMBAHAN)
+                let matchesDateRange = true;
+                if (currentSheetType === 'PENAMBAHAN' && (startMonthVal || endMonthVal)) {
+                    const rowValReq = row._rawRow && row._rawRow[7] !== undefined ? String(row._rawRow[7]) : "";
+                    const parsedReqDate = parseGoogleDate(rowValReq); // -> YYYY-MM-DD
+
+                    if (!parsedReqDate) {
+                        matchesDateRange = false;
+                    } else {
+                        const reqMonth = parsedReqDate.substring(0, 7); // -> YYYY-MM
+                        
+                        if (startMonthVal && reqMonth < startMonthVal) {
+                            matchesDateRange = false; 
+                        }
+                        if (endMonthVal && reqMonth > endMonthVal) {
+                            matchesDateRange = false; 
+                        }
+                    }
+                }
+
                 const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
 
-                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesSearch;
+                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesSearch && matchesDateRange;
             });
 
             if (isDiagramMode) {
                 renderChart(currentFilteredData);
+                updateStats(currentFilteredData); 
             } else {
                 renderTable(currentFilteredData);
                 updateStats(currentFilteredData);
@@ -1962,7 +2096,29 @@
             let displayCount = filtered.length;
             let countLabel = "Data Terfilter";
             
-            if (currentSheetType === 'BATTERY') {
+            if (isDiagramMode) {
+                countLabel = "TOTAL UNIT";
+                let totalUnits = 0;
+                if (filtered && filtered.length > 0) {
+                    const keys = Object.keys(filtered[0]);
+                    const unitKey = keys.find(k => {
+                        const uk = k.toUpperCase().trim();
+                        return uk === "JUMLAH UNIT" || uk === "JUMLAH" || uk === "UNIT" || uk === "JML UNIT" || uk === "JML" || uk === "JUMLAH UNIT KENDARAAN";
+                    });
+
+                    if (unitKey) {
+                        filtered.forEach(row => {
+                            const val = parseFloat(String(row[unitKey]).replace(/[^0-9\.]/g, '')) || 0;
+                            totalUnits += val;
+                        });
+                    } else {
+                        totalUnits = filtered.length;
+                    }
+                } else {
+                    totalUnits = 0;
+                }
+                displayCount = totalUnits;
+            } else if (currentSheetType === 'BATTERY') {
                 const totalJml = filtered.reduce((sum, row) => {
                     const val = parseInt(String(row._rawRow && row._rawRow[4] !== undefined ? row._rawRow[4] : 0).replace(/[^0-9]/g, '')) || 0;
                     return sum + val;
