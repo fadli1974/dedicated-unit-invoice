@@ -1036,17 +1036,13 @@
                 if (currentGid === '289536394' && currentSheetType === 'UNIT') {
                     statKategoriLabel.innerText = "JENIS SERVICE"; 
                     
-                    if (originalData && originalData.length > 0) {
-                        const jenisServiceKey = Object.keys(originalData[0]).find(k => k.toUpperCase() === "JENIS SERVICE" || k.toUpperCase() === "JENIS SEWA VENDOR");
-                        if (jenisServiceKey && originalData[0][jenisServiceKey]) {
-                            jenisServiceText = originalData[0][jenisServiceKey];
-                        } else if (originalData[0]._rawRow && originalData[0]._rawRow[13]) { 
-                             jenisServiceText = originalData[0]._rawRow[13];
-                        } else {
-                            jenisServiceText = "Dedicated Mobil"; 
-                        }
+                    // Setel teks dinamis khusus untuk Mobil BBM dan Mobil Listrik
+                    if (activeCategory === 'BBM') {
+                        jenisServiceText = "MOBIL BBM";
+                    } else if (activeCategory === 'Listrik') {
+                        jenisServiceText = "MOBIL LISTRIK";
                     } else {
-                        jenisServiceText = "Dedicated Mobil";
+                        jenisServiceText = "SEMUA UNIT MOBIL"; 
                     }
                 } else {
                     statKategoriLabel.innerText = kategoriAktifLabel; 
@@ -1064,11 +1060,8 @@
                 } else if (currentSheetType === 'DETAIL_UNIT') {
                      statCategory.innerText = 'DETAIL VIEW';
                 } else if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    if (originalData.length > 0) {
-                        statCategory.innerText = jenisServiceText;
-                    } else {
-                        statCategory.innerText = "Dedicated Mobil";
-                    }
+                    // Masukkan teks dinamis yang sudah diatur di atas
+                    statCategory.innerText = jenisServiceText;
                 } else {
                     const activeSidebarItem = document.querySelector('.sidebar-active');
                     if (activeSidebarItem) {
