@@ -105,7 +105,7 @@
                     <i data-lucide="chevron-down" id="icon-submenu-motor" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(0deg);"></i>
                 </div>
                 
-                <!-- Isi Submenu Motor (Tertutup Default) -->
+                <!-- Isi Submenu Motor -->
                 <div id="submenu-motor" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 0px;">
                     <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item" id="menu-motor">
                         <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Motor
@@ -130,30 +130,44 @@
                 </div>
             </div>
 
+            <!-- Section Karyawan (Baru) -->
+            <div class="mt-4">
+                <div onclick="toggleSubMenu('submenu-karyawan')" class="sidebar-item flex items-center justify-between p-3 rounded-lg" id="header-karyawan">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="id-card" class="w-4 h-4 text-sky-400"></i> Nama Karyawan
+                    </div>
+                    <i data-lucide="chevron-down" id="icon-submenu-karyawan" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(0deg);"></i>
+                </div>
+                
+                <div id="submenu-karyawan" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 0px;">
+                    <div onclick="switchSheet('all', 'Nama Karyawan', 'users', '1709109057', 'KARYAWAN', this)" class="sidebar-item sub-menu-item" id="menu-karyawan">
+                        <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Karyawan
+                    </div>
+                    <div onclick="switchSheet('Mobil', 'Karyawan Mobil', 'car', '1709109057', 'KARYAWAN', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="car" class="w-3 h-3 text-slate-500"></i> Dedicated Mobil
+                    </div>
+                    <div onclick="switchSheet('Motor', 'Karyawan Motor', 'bike', '1709109057', 'KARYAWAN', this)" class="sidebar-item sub-menu-item">
+                        <i data-lucide="bike" class="w-3 h-3 text-slate-500"></i> Dedicated Motor
+                    </div>
+                </div>
+            </div>
+
             <div class="pt-4 border-t border-slate-800 mt-4 space-y-1">
-                <!-- Menu SDM -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'SDM', 'users', '666929758', 'SDM', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="users" class="w-4 h-4"></i> SDM
                 </div>
-                <!-- Menu Battery -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'BATTERY', 'battery-charging', '1751487446', 'BATTERY', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="battery-charging" class="w-4 h-4"></i> Battery
                 </div>
-                <!-- Menu Penambahan Unit -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'Penambahan Unit/SDM', 'plus-circle', '1066270407', 'PENAMBAHAN', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="plus-circle" class="w-4 h-4 text-green-500"></i> Penambahan Unit/SDM
                 </div>
-                <!-- Menu TimeLine -->
                 <div onclick="toggleSubMenu(''); switchSheet('all', 'TimeLine', 'calendar-days', '421262394', 'TIMELINE', this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors">
                     <i data-lucide="calendar-days" class="w-4 h-4 text-purple-500"></i> TimeLine
                 </div>
-
-                <!-- Menu Detail -->
                 <div onclick="toggleSubMenu(''); showDetail(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-detail">
                     <i data-lucide="list" class="w-4 h-4"></i> Detail
                 </div>
-                
-                <!-- Menu Invoices -->
                 <div onclick="toggleSubMenu(''); handleInvoiceClick(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg transition-colors" id="menu-invoices">
                     <i data-lucide="file-text" class="w-4 h-4"></i> Invoices
                     <i data-lucide="lock" id="invoice-lock-icon" class="w-3 h-3 ml-auto text-slate-500"></i>
@@ -203,6 +217,11 @@
                         <option value="all">Semua Jenis</option>
                     </select>
 
+                    <!-- Dropdown Jabatan (Khusus Menu Nama Karyawan) -->
+                    <select id="jabatanFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                        <option value="all">Semua Jabatan</option>
+                    </select>
+
                     <!-- Dropdown GPS -->
                     <select id="gpsFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua GPS</option>
@@ -221,6 +240,17 @@
                         <span class="text-slate-400 font-bold text-xs">-</span>
                         <select id="usiaMaxFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                             <option value="all">MAX USIA</option>
+                        </select>
+                    </div>
+
+                    <!-- RENTANG MASA KERJA (MIN - MAX) Khusus Karyawan -->
+                    <div id="masaKerjaFilterContainer" style="display: none;" class="flex-1 sm:flex-none flex items-center gap-1 sm:gap-2">
+                        <select id="masaKerjaMinFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                            <option value="all">MIN MASA KERJA</option>
+                        </select>
+                        <span class="text-slate-400 font-bold text-xs">-</span>
+                        <select id="masaKerjaMaxFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                            <option value="all">MAX MASA KERJA</option>
                         </select>
                     </div>
 
@@ -505,6 +535,13 @@
                 { label: "NO CHASIS", keys: ["NO CHASIS", "NOMOR RANGKA"] },
                 { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN"] } 
             ],
+            'KARYAWAN': [
+                { label: "CABANG", keys: ["ID Cabang", "Cabang", "CABANG"] },
+                { label: "EMPLOYEE ID", keys: ["Employee Id", "EMPLOYEE ID", "ID"] },
+                { label: "NAMA KARYAWAN", keys: ["Employee Name", "EMPLOYEE NAME", "NAMA"] },
+                { label: "JABATAN", keys: ["Jabatan", "JABATAN", "POSISI"] },
+                { label: "LAMA MASA BEKERJA", rawIdx: 9 }
+            ],
             'SDM': [
                 { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
                 { label: "NAMA", keys: ["NAMA", "NAMA LENGKAP"] },
@@ -571,7 +608,7 @@
                 { label: "INSENTIF", isDynamicMonthMotor: true, isCurr: true },
                 { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
                 { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
-                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
+                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCalcTotal: true, isCurr: true }
             ],
             'INVOICE_BATTERY': [
                 { label: "No", keys: ["No", "NO"] },
@@ -619,13 +656,17 @@
         let currentHeaderIndex = 0;
 
         function toggleSubMenu(menuId) {
-            const allSubmenus = ['submenu-mobil', 'submenu-motor'];
-            const headerMobil = document.getElementById('header-mobil');
-            const headerMotor = document.getElementById('header-motor');
+            const allSubmenus = ['submenu-mobil', 'submenu-motor', 'submenu-karyawan'];
+            const headers = {
+                'submenu-mobil': document.getElementById('header-mobil'),
+                'submenu-motor': document.getElementById('header-motor'),
+                'submenu-karyawan': document.getElementById('header-karyawan')
+            };
             
             allSubmenus.forEach(id => {
                 const submenu = document.getElementById(id);
                 const icon = document.getElementById('icon-' + id);
+                const header = headers[id];
                 
                 if (!submenu) return;
 
@@ -633,39 +674,24 @@
                     if (submenu.style.maxHeight === '0px' || submenu.style.maxHeight === '') {
                         submenu.style.maxHeight = '500px'; 
                         if(icon) icon.style.transform = 'rotate(180deg)'; 
-                        
-                        if(id === 'submenu-mobil' && headerMobil) {
-                            headerMobil.classList.add('bg-blue-600', 'text-white');
-                            headerMobil.classList.remove('text-slate-400');
-                        }
-                        if(id === 'submenu-motor' && headerMotor) {
-                            headerMotor.classList.add('bg-blue-600', 'text-white');
-                            headerMotor.classList.remove('text-slate-400');
+                        if(header) {
+                            header.classList.add('bg-blue-600', 'text-white');
+                            header.classList.remove('text-slate-400');
                         }
                     } else {
                         submenu.style.maxHeight = '0px';
                         if(icon) icon.style.transform = 'rotate(0deg)'; 
-                        
-                        if(id === 'submenu-mobil' && headerMobil) {
-                            headerMobil.classList.remove('bg-blue-600', 'text-white');
-                            headerMobil.classList.add('text-slate-400');
-                        }
-                        if(id === 'submenu-motor' && headerMotor) {
-                            headerMotor.classList.remove('bg-blue-600', 'text-white');
-                            headerMotor.classList.add('text-slate-400');
+                        if(header) {
+                            header.classList.remove('bg-blue-600', 'text-white');
+                            header.classList.add('text-slate-400');
                         }
                     }
                 } else {
                     submenu.style.maxHeight = '0px';
                     if (icon) icon.style.transform = 'rotate(0deg)';
-                    
-                    if(id === 'submenu-mobil' && headerMobil) {
-                        headerMobil.classList.remove('bg-blue-600', 'text-white');
-                        headerMobil.classList.add('text-slate-400');
-                    }
-                    if(id === 'submenu-motor' && headerMotor) {
-                        headerMotor.classList.remove('bg-blue-600', 'text-white');
-                        headerMotor.classList.add('text-slate-400');
+                    if(header) {
+                        header.classList.remove('bg-blue-600', 'text-white');
+                        header.classList.add('text-slate-400');
                     }
                 }
             });
@@ -848,6 +874,7 @@
                                rowStr.includes("JENIS KENDARAAN") || rowStr.includes("JENIS SEWA") || 
                                rowStr.includes("NAMA LENGKAP") || rowStr.includes("NILAI INVOICE") || 
                                rowStr.includes("SISA AKHIR SEWA") || rowStr.includes("TASK DETAIL") || 
+                               rowStr.includes("EMPLOYEE ID") || rowStr.includes("EMPLOYEE NAME") || 
                                (rowStr.includes("PROJECT") && rowStr.includes("CABANG"));
                     });
                     
@@ -952,6 +979,7 @@
             }
             else if(currentGid === '1495287037') label = 'MOTOR';
             else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
+            else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
             else if(currentSheetType === 'SDM') label = 'SDM';
             else if(currentSheetType === 'BATTERY') label = 'BATTERY';
             else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
@@ -1036,7 +1064,6 @@
                 if (currentGid === '289536394' && currentSheetType === 'UNIT') {
                     statKategoriLabel.innerText = "JENIS SERVICE"; 
                     
-                    // Setel teks dinamis khusus untuk Mobil BBM dan Mobil Listrik
                     if (activeCategory === 'BBM') {
                         jenisServiceText = "MOBIL BBM";
                     } else if (activeCategory === 'Listrik') {
@@ -1060,8 +1087,15 @@
                 } else if (currentSheetType === 'DETAIL_UNIT') {
                      statCategory.innerText = 'DETAIL VIEW';
                 } else if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    // Masukkan teks dinamis yang sudah diatur di atas
                     statCategory.innerText = jenisServiceText;
+                } else if (currentSheetType === 'KARYAWAN') {
+                    if (activeCategory === 'Mobil') {
+                        statCategory.innerText = "KARYAWAN MOBIL";
+                    } else if (activeCategory === 'Motor') {
+                        statCategory.innerText = "KARYAWAN MOTOR";
+                    } else {
+                        statCategory.innerText = "SEMUA KARYAWAN";
+                    }
                 } else {
                     const activeSidebarItem = document.querySelector('.sidebar-active');
                     if (activeSidebarItem) {
@@ -1138,6 +1172,8 @@
         function updateDynamicFilters() {
             populateUsiaFilter();
             populateGpsFilter();
+            populateJabatanFilter();
+            populateMasaKerjaFilter();
             if (isDiagramMode && (currentDiagramType === 'motor' || currentDiagramType === 'mobil')) {
                 populateJenisKendaraanDiagramFilter();
             } else {
@@ -1147,11 +1183,118 @@
             populatePemilikFilter();
         }
 
+        function populateMasaKerjaFilter() {
+            const container = document.getElementById('masaKerjaFilterContainer');
+            const minFilter = document.getElementById('masaKerjaMinFilter');
+            const maxFilter = document.getElementById('masaKerjaMaxFilter');
+
+            if (!container || !minFilter || !maxFilter) return;
+
+            if (currentSheetType !== 'KARYAWAN' || originalData.length === 0) {
+                container.style.display = 'none';
+                minFilter.value = 'all';
+                maxFilter.value = 'all';
+                return;
+            }
+
+            container.style.display = 'flex';
+
+            const keys = Object.keys(originalData[0]);
+            const masaKerjaKey = keys.find(k => k.toUpperCase().includes("LAMA MASA BEKERJA") || k.toUpperCase().includes("MASA KERJA"));
+
+            const uniqueYears = new Set();
+
+            originalData.forEach(row => {
+                let valStr = "";
+                if (masaKerjaKey && row[masaKerjaKey]) {
+                    valStr = String(row[masaKerjaKey]);
+                } else if (row._rawRow && row._rawRow[9]) {
+                    valStr = String(row._rawRow[9]);
+                }
+
+                if (valStr && valStr.trim() !== '-' && valStr.trim() !== '') {
+                    const match = valStr.match(/(\d+)\s*Tahun/i);
+                    if (match) {
+                        uniqueYears.add(parseInt(match[1]));
+                    }
+                }
+            });
+
+            const sortedYears = Array.from(uniqueYears).sort((a, b) => a - b);
+            const currentMin = minFilter.value;
+            const currentMax = maxFilter.value;
+
+            let optionsMinHTML = `<option value="all">MIN MASA KERJA</option>`;
+            let optionsMaxHTML = `<option value="all">MAX MASA KERJA</option>`;
+
+            sortedYears.forEach(year => {
+                optionsMinHTML += `<option value="${year}">${year} TAHUN</option>`;
+                optionsMaxHTML += `<option value="${year}">${year} TAHUN</option>`;
+            });
+
+            minFilter.innerHTML = optionsMinHTML;
+            maxFilter.innerHTML = optionsMaxHTML;
+
+            if (currentMin !== 'all' && sortedYears.includes(parseInt(currentMin))) minFilter.value = currentMin;
+            else minFilter.value = 'all';
+
+            if (currentMax !== 'all' && sortedYears.includes(parseInt(currentMax))) maxFilter.value = currentMax;
+            else maxFilter.value = 'all';
+        }
+
+        function populateJabatanFilter() {
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (!jabatanFilter) return;
+
+            if (currentSheetType !== 'KARYAWAN') {
+                jabatanFilter.style.display = 'none';
+                jabatanFilter.value = 'all';
+                return;
+            }
+
+            jabatanFilter.style.display = 'block';
+
+            let optionsHTML = '';
+            if (activeCategory === 'Mobil') {
+                optionsHTML = `
+                    <option value="all">SEMUA JABATAN (MOBIL)</option>
+                    <option value="DRIVER">DRIVER</option>
+                    <option value="LOPER">LOPER</option>
+                    <option value="HELPER">HELPER</option>
+                `;
+            } else if (activeCategory === 'Motor') {
+                optionsHTML = `
+                    <option value="all">SEMUA JABATAN (MOTOR)</option>
+                    <option value="KURIR">KURIR</option>
+                    <option value="SDM KURIR">SDM KURIR</option>
+                `;
+            } else {
+                optionsHTML = `
+                    <option value="all">SEMUA JABATAN</option>
+                    <option value="DRIVER">DRIVER</option>
+                    <option value="LOPER">LOPER</option>
+                    <option value="HELPER">HELPER</option>
+                    <option value="KURIR">KURIR</option>
+                    <option value="SDM KURIR">SDM KURIR</option>
+                `;
+            }
+
+            const currentSelection = jabatanFilter.value;
+            jabatanFilter.innerHTML = optionsHTML;
+            
+            const optionsValues = Array.from(jabatanFilter.options).map(opt => opt.value);
+            if (optionsValues.includes(currentSelection)) {
+                jabatanFilter.value = currentSelection;
+            } else {
+                jabatanFilter.value = 'all';
+            }
+        }
+
         function populateGpsFilter() {
             const gpsFilter = document.getElementById('gpsFilter');
             if (!gpsFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
+            if (currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
                 gpsFilter.style.display = 'none';
                 gpsFilter.value = 'all';
                 return;
@@ -1236,7 +1379,7 @@
             
             if (!usiaContainer || !usiaMin || !usiaMax) return;
 
-            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
+            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
                 usiaContainer.style.display = 'none';
                 usiaMin.value = 'all'; 
                 usiaMax.value = 'all'; 
@@ -1292,7 +1435,7 @@
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (!pemilikFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
+            if (currentSheetType === 'TIMELINE' || currentSheetType === 'KARYAWAN' || currentSheetType.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'none';
                 pemilikFilter.value = 'all';
                 return;
@@ -1347,7 +1490,8 @@
 
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
-                if (type === 'TIMELINE') {
+                // Sembunyikan kotak status (Semua, Aktif, Habis) untuk TIMELINE dan KARYAWAN
+                if (type === 'TIMELINE' || type === 'KARYAWAN') {
                     filterContainer.style.display = 'none';
                 } else if (type === 'PENAMBAHAN') {
                     filterContainer.style.display = 'flex';
@@ -1378,23 +1522,44 @@
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (type === 'KARYAWAN') {
+                if (jabatanFilter) jabatanFilter.style.display = 'block';
+            } else {
+                if (jabatanFilter) {
+                    jabatanFilter.style.display = 'none';
+                    jabatanFilter.value = 'all';
+                }
+            }
+
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (type === 'KARYAWAN') {
+                if (masaKerjaFilterContainer) masaKerjaFilterContainer.style.display = 'flex';
+            } else {
+                if (masaKerjaFilterContainer) {
+                    masaKerjaFilterContainer.style.display = 'none';
+                    document.getElementById('masaKerjaMinFilter').value = 'all';
+                    document.getElementById('masaKerjaMaxFilter').value = 'all';
+                }
+            }
             
             const usiaFilterContainer = document.getElementById('usiaFilterContainer');
-            if (usiaFilterContainer && type !== 'SDM' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
+            if (usiaFilterContainer && type !== 'SDM' && type !== 'KARYAWAN' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
                 usiaFilterContainer.style.display = 'flex';
             } else if (usiaFilterContainer) {
                 usiaFilterContainer.style.display = 'none';
             }
 
             const gpsFilter = document.getElementById('gpsFilter');
-            if (gpsFilter && type !== 'SDM' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
+            if (gpsFilter && type !== 'SDM' && type !== 'KARYAWAN' && type !== 'PENAMBAHAN' && type !== 'BATTERY' && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
                 gpsFilter.style.display = 'block';
             } else if (gpsFilter) {
                 gpsFilter.style.display = 'none';
             }
 
             const pemilikFilter = document.getElementById('pemilikFilter');
-            if (pemilikFilter && type !== 'TIMELINE' && !type.startsWith('INVOICE')) {
+            if (pemilikFilter && type !== 'TIMELINE' && type !== 'KARYAWAN' && !type.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'block';
             } else if (pemilikFilter) {
                 pemilikFilter.style.display = 'none';
@@ -1402,7 +1567,7 @@
 
             const liveGpsBtn = document.getElementById('liveGpsBtn');
             if (liveGpsBtn) {
-                if (type === 'SDM' || type === 'PENAMBAHAN' || type === 'BATTERY' || type === 'TIMELINE' || type.startsWith('INVOICE')) {
+                if (type === 'SDM' || type === 'KARYAWAN' || type === 'PENAMBAHAN' || type === 'BATTERY' || type === 'TIMELINE' || type.startsWith('INVOICE')) {
                     liveGpsBtn.style.display = 'none';
                 } else {
                     liveGpsBtn.style.display = 'flex';
@@ -1471,6 +1636,19 @@
 
             const gpsFilter = document.getElementById('gpsFilter');
             if (gpsFilter) gpsFilter.style.display = 'none';
+
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (jabatanFilter) {
+                jabatanFilter.style.display = 'none';
+                jabatanFilter.value = 'all';
+            }
+
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (masaKerjaFilterContainer) {
+                masaKerjaFilterContainer.style.display = 'none';
+                document.getElementById('masaKerjaMinFilter').value = 'all';
+                document.getElementById('masaKerjaMaxFilter').value = 'all';
+            }
             
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (pemilikFilter) {
@@ -1621,6 +1799,7 @@
             toggleChart(false);
 
             activeCategory = 'all';
+            activeCategory = 'all';
             leaseStatusFilter = 'all';
             currentSheetType = 'DETAIL_UNIT'; 
 
@@ -1638,6 +1817,19 @@
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (jabatanFilter) {
+                jabatanFilter.style.display = 'none';
+                jabatanFilter.value = 'all';
+            }
+
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (masaKerjaFilterContainer) {
+                masaKerjaFilterContainer.style.display = 'none';
+                document.getElementById('masaKerjaMinFilter').value = 'all';
+                document.getElementById('masaKerjaMaxFilter').value = 'all';
+            }
 
             const liveGpsBtn = document.getElementById('liveGpsBtn');
             if (liveGpsBtn) liveGpsBtn.style.display = 'flex';
@@ -1821,6 +2013,19 @@
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (jabatanFilter) {
+                jabatanFilter.style.display = 'none';
+                jabatanFilter.value = 'all';
+            }
+
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (masaKerjaFilterContainer) {
+                masaKerjaFilterContainer.style.display = 'none';
+                document.getElementById('masaKerjaMinFilter').value = 'all';
+                document.getElementById('masaKerjaMaxFilter').value = 'all';
+            }
             
             const gpsFilter = document.getElementById('gpsFilter');
             if (gpsFilter) gpsFilter.style.display = 'none';
@@ -1907,81 +2112,34 @@
             applyFilters();
         }
 
-        // FUNGSI HELPER PARSER TANGGAL
-        function parseGoogleDate(str) {
-            if (!str) return '';
-            str = String(str).trim().toLowerCase();
-            
-            const monthNames = {
-                'januari': '01', 'january': '01', 'jan': '01',
-                'februari': '02', 'february': '02', 'feb': '02',
-                'maret': '03', 'march': '03', 'mar': '03',
-                'april': '04', 'apr': '04',
-                'mei': '05', 'may': '05',
-                'juni': '06', 'june': '06', 'jun': '06',
-                'juli': '07', 'july': '07', 'jul': '07',
-                'agustus': '08', 'august': '08', 'agu': '08', 'aug': '08',
-                'september': '09', 'sep': '09', 'sept': '09',
-                'oktober': '10', 'october': '10', 'okt': '10', 'oct': '10',
-                'november': '11', 'nov': '11',
-                'desember': '12', 'december': '12', 'des': '12', 'dec': '12'
-            };
-
-            for (const [name, num] of Object.entries(monthNames)) {
-                if (str.includes(name)) {
-                    str = str.replace(new RegExp(name, 'g'), '-' + num + '-');
-                    break;
-                }
-            }
-
-            const clean = str.replace(/[^0-9]/g, '-');
-            const parts = clean.split('-').filter(p => p !== '');
-            if (parts.length < 3) return '';
-
-            let y, m, d;
-            if (parts[0].length === 4) { 
-                y = parts[0]; m = parts[1]; d = parts[2];
-            } else if (parts[2].length >= 4) { 
-                y = parts[2].substring(0,4);
-                d = parts[0]; m = parts[1];
-            } else if (parts[2].length === 2) { 
-                y = '20' + parts[2];
-                d = parts[0]; m = parts[1];
-            } else {
-                return '';
-            }
-
-            return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-        }
-
-        function clearDateFilters() {
-            const reqInput = document.getElementById('tglPermintaanFilter');
-            const fulInput = document.getElementById('tglPemenuhanFilter');
-            if (reqInput) reqInput.value = '';
-            if (fulInput) fulInput.value = '';
-            applyFilters();
-        }
-
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const query = searchInput ? searchInput.value.toLowerCase() : '';
             const pemilikFilter = document.getElementById('pemilikFilter');
             const jenisFilter = document.getElementById('jenisFilter');
             const gpsFilter = document.getElementById('gpsFilter');
+            const jabatanFilter = document.getElementById('jabatanFilter');
             
             const usiaMinFilter = document.getElementById('usiaMinFilter');
             const usiaMaxFilter = document.getElementById('usiaMaxFilter');
             const usiaContainer = document.getElementById('usiaFilterContainer');
+
+            const masaKerjaMinFilter = document.getElementById('masaKerjaMinFilter');
+            const masaKerjaMaxFilter = document.getElementById('masaKerjaMaxFilter');
+            const masaKerjaContainer = document.getElementById('masaKerjaFilterContainer');
             
             const selectedMinUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMinFilter) ? usiaMinFilter.value : 'all';
             const selectedMaxUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMaxFilter) ? usiaMaxFilter.value : 'all';
             const selectedPemilik = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value : 'all';
             const selectedJenis = (jenisFilter && jenisFilter.style.display !== 'none') ? jenisFilter.value : 'all';
             const selectedGps = (gpsFilter && gpsFilter.style.display !== 'none') ? gpsFilter.value : 'all';
+            const selectedJabatan = (jabatanFilter && jabatanFilter.style.display !== 'none') ? jabatanFilter.value.toUpperCase() : 'ALL';
             
+            const selectedMinMasaKerja = (masaKerjaContainer && masaKerjaContainer.style.display !== 'none' && masaKerjaMinFilter) ? masaKerjaMinFilter.value : 'all';
+            const selectedMaxMasaKerja = (masaKerjaContainer && masaKerjaContainer.style.display !== 'none' && masaKerjaMaxFilter) ? masaKerjaMaxFilter.value : 'all';
+
             if (isWaitingForGoogleSync) return;
 
-            // AMBIL NILAI FILTER BULAN (DENGAN PENGECEKAN AMAN)
             const startInput = document.getElementById('tglPermintaanFilter');
             const endInput = document.getElementById('tglPemenuhanFilter');
             const startMonthVal = startInput ? startInput.value : ''; 
@@ -2059,16 +2217,50 @@
                     }
                 }
 
-                // FILTER RENTANG BULAN (KHUSUS PENAMBAHAN)
+                let matchesJabatan = true;
+                if (currentSheetType === 'KARYAWAN' && selectedJabatan !== 'ALL') {
+                    const jabatanKey = keys.find(k => k.toUpperCase().includes("JABATAN") || k.toUpperCase().includes("POSISI"));
+                    if (jabatanKey) {
+                        const val = String(row[jabatanKey] || "").trim().toUpperCase();
+                        matchesJabatan = (val === selectedJabatan || val.includes(selectedJabatan));
+                    } else {
+                        matchesJabatan = false;
+                    }
+                }
+
+                let matchesMasaKerja = true;
+                if (currentSheetType === 'KARYAWAN' && (selectedMinMasaKerja !== 'all' || selectedMaxMasaKerja !== 'all')) {
+                    const mkKey = keys.find(k => k.toUpperCase().includes("LAMA MASA BEKERJA") || k.toUpperCase().includes("MASA KERJA"));
+                    let valStr = "";
+                    if (mkKey && row[mkKey]) {
+                        valStr = String(row[mkKey]);
+                    } else if (row._rawRow && row._rawRow[9]) {
+                        valStr = String(row._rawRow[9]);
+                    }
+
+                    if (valStr) {
+                        const match = valStr.match(/(\d+)\s*Tahun/i);
+                        if (match) {
+                            const yearNum = parseInt(match[1]);
+                            if (selectedMinMasaKerja !== 'all' && yearNum < parseInt(selectedMinMasaKerja)) matchesMasaKerja = false;
+                            if (selectedMaxMasaKerja !== 'all' && yearNum > parseInt(selectedMaxMasaKerja)) matchesMasaKerja = false;
+                        } else {
+                            matchesMasaKerja = false; 
+                        }
+                    } else {
+                        matchesMasaKerja = false;
+                    }
+                }
+
                 let matchesDateRange = true;
                 if (currentSheetType === 'PENAMBAHAN' && (startMonthVal || endMonthVal)) {
                     const rowValReq = row._rawRow && row._rawRow[7] !== undefined ? String(row._rawRow[7]) : "";
-                    const parsedReqDate = parseGoogleDate(rowValReq); // -> YYYY-MM-DD
+                    const parsedReqDate = parseGoogleDate(rowValReq); 
 
                     if (!parsedReqDate) {
                         matchesDateRange = false;
                     } else {
-                        const reqMonth = parsedReqDate.substring(0, 7); // -> YYYY-MM
+                        const reqMonth = parsedReqDate.substring(0, 7); 
                         
                         if (startMonthVal && reqMonth < startMonthVal) {
                             matchesDateRange = false; 
@@ -2081,7 +2273,7 @@
 
                 const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
 
-                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesSearch && matchesDateRange;
+                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesJabatan && matchesMasaKerja && matchesSearch && matchesDateRange;
             });
 
             if (isDiagramMode) {
@@ -2128,6 +2320,8 @@
                 countLabel = "JUMLAH BATTERY";
             } else if (currentSheetType === 'SDM') {
                 countLabel = "TOTAL PERSONEL";
+            } else if (currentSheetType === 'KARYAWAN') {
+                countLabel = "TOTAL KARYAWAN";
             } else if (currentSheetType === 'TIMELINE') {
                 countLabel = "DURATION"; 
                 displayCount = typeof timelineDuration !== 'undefined' ? timelineDuration : '0';
@@ -2148,7 +2342,6 @@
                     displayCount = 0;
                 }
 
-                // Kalkulasi Total Harga Sewa & Biaya Lain2
                 let totalHargaSewa = 0;
                 let totalBiayaLain = 0;
 
@@ -2241,7 +2434,8 @@
                 const cells = config.map(col => {
                     let val = "-";
                     
-                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery) && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
+                    // Tambahkan currentSheetType === 'KARYAWAN' agar sistem mengizinkan penarikan data mutlak dari Kolom J (rawIdx: 9)
+                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN') && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
                         if (col.isIndex) {
                             val = idx + 1;
                         } else if (col.rawIdx !== undefined) {
@@ -2268,7 +2462,6 @@
                         }
 
                         if (col.isCurr && typeof val === 'number') {
-                            // Menghilangkan 'Rp' di tabel Invoice
                             val = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(val);
                         }
                     } else {
