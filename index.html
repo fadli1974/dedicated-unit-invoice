@@ -149,6 +149,10 @@
                     <div onclick="switchSheet('Motor', 'Karyawan Motor', 'bike', '1709109057', 'KARYAWAN', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="bike" class="w-3 h-3 text-slate-500"></i> Dedicated Motor
                     </div>
+                    <!-- Menu Diagram Karyawan -->
+                    <div onclick="showDiagram('1709109057', 'Karyawan', this, 'karyawan')" class="sidebar-item sub-menu-item">
+                        <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
+                    </div>
                 </div>
             </div>
 
@@ -407,6 +411,11 @@
                 colIndex: 11, 
                 types: ["MOTOR KONVENSIONAL", "MOTOR LISTRIK"],
                 colors: { "MOTOR KONVENSIONAL": "#64748b", "MOTOR LISTRIK": "#eab308", "LAINNYA": "#94a3b8" }
+            },
+            'karyawan': {
+                colIndex: 5, 
+                types: ["DRIVER", "LOPER", "HELPER", "KURIR", "SDM KURIR"],
+                colors: { "DRIVER": "#3b82f6", "LOPER": "#10b981", "HELPER": "#f59e0b", "KURIR": "#8b5cf6", "SDM KURIR": "#ef4444", "LAINNYA": "#94a3b8" }
             }
         };
 
@@ -1081,7 +1090,8 @@
                 if (currentSheetType === 'TIMELINE') {
                     statCategory.innerText = timelineStartDate || '-';
                 } else if (isDiagramMode) {
-                    statCategory.innerText = currentDiagramType === 'mobil' ? 'DIAGRAM MOBIL' : 'DIAGRAM MOTOR';
+                    if (currentDiagramType === 'karyawan') statCategory.innerText = 'DIAGRAM KARYAWAN';
+                    else statCategory.innerText = currentDiagramType === 'mobil' ? 'DIAGRAM MOBIL' : 'DIAGRAM MOTOR';
                 } else if (currentSheetType.startsWith('INVOICE')) {
                      statCategory.innerText = 'INVOICE VIEW';
                 } else if (currentSheetType === 'DETAIL_UNIT') {
@@ -1618,7 +1628,13 @@
             isDiagramMode = true;
             currentDiagramType = diagramType;
             currentGid = gid;
-            currentSheetType = 'UNIT';
+
+            if (diagramType === 'karyawan') {
+                currentSheetType = 'KARYAWAN';
+            } else {
+                currentSheetType = 'UNIT';
+            }
+            
             activeCategory = 'all';
             leaseStatusFilter = 'all';
 
@@ -1632,22 +1648,45 @@
             if (filterContainer) filterContainer.style.display = 'none';
             
             const usiaFilterContainer = document.getElementById('usiaFilterContainer');
-            if (usiaFilterContainer) usiaFilterContainer.style.display = 'flex';
+            if (usiaFilterContainer) {
+                if (diagramType === 'karyawan') {
+                    usiaFilterContainer.style.display = 'none';
+                } else {
+                    usiaFilterContainer.style.display = 'flex';
+                }
+            }
 
             const gpsFilter = document.getElementById('gpsFilter');
             if (gpsFilter) gpsFilter.style.display = 'none';
 
             const jabatanFilter = document.getElementById('jabatanFilter');
             if (jabatanFilter) {
-                jabatanFilter.style.display = 'none';
-                jabatanFilter.value = 'all';
+                if (diagramType === 'karyawan') {
+                    jabatanFilter.style.display = 'block';
+                } else {
+                    jabatanFilter.style.display = 'none';
+                    jabatanFilter.value = 'all';
+                }
+            }
+
+            const jenisFilter = document.getElementById('jenisFilter');
+            if (jenisFilter) {
+                if (diagramType === 'karyawan') {
+                    jenisFilter.style.display = 'none';
+                } else {
+                    jenisFilter.style.display = 'block';
+                }
             }
 
             const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
             if (masaKerjaFilterContainer) {
-                masaKerjaFilterContainer.style.display = 'none';
-                document.getElementById('masaKerjaMinFilter').value = 'all';
-                document.getElementById('masaKerjaMaxFilter').value = 'all';
+                if (diagramType === 'karyawan') {
+                    masaKerjaFilterContainer.style.display = 'flex';
+                } else {
+                    masaKerjaFilterContainer.style.display = 'none';
+                    document.getElementById('masaKerjaMinFilter').value = 'all';
+                    document.getElementById('masaKerjaMaxFilter').value = 'all';
+                }
             }
             
             const pemilikFilter = document.getElementById('pemilikFilter');
@@ -1720,7 +1759,18 @@
             typeCounts["LAINNYA"] = 0;
 
             dataToRender.forEach(row => {
-                const cab = row._rawRow && row._rawRow[2] ? String(row._rawRow[2]).trim() : "TIDAK DIKETAHUI";
+                // Mendapatkan cabang secara dinamis
+                let cabKey = Object.keys(row).find(k => {
+                    const uk = k.trim().toUpperCase();
+                    return uk === "CABANG" || uk === "ID CABANG" || uk === "CABANG AAM";
+                });
+                let cab = cabKey && row[cabKey] ? String(row[cabKey]).trim() : "TIDAK DIKETAHUI";
+                
+                // Fallback jika tidak ditemukan nama header CABANG yang valid
+                if (cab === "TIDAK DIKETAHUI") {
+                    cab = row._rawRow && row._rawRow[currentDiagramType === 'karyawan' ? 0 : 2] ? String(row._rawRow[currentDiagramType === 'karyawan' ? 0 : 2]).trim() : "TIDAK DIKETAHUI";
+                }
+
                 if (!cab || cab === "-" || cab === "0" || cab.toUpperCase().includes("CABANG")) return;
 
                 cabangSet.add(cab);
@@ -1728,12 +1778,17 @@
 
                 let rawJenis = row._rawRow && row._rawRow[config.colIndex] ? String(row._rawRow[config.colIndex]).toUpperCase() : "LAINNYA";
                 let matchedType = "LAINNYA";
-                for (const type of targetTypes) {
-                    if (rawJenis.includes(type) || (type === "BLIND VAN" && rawJenis.includes("BLINVAN"))) {
+                
+                // Urutkan tipe berdasarkan kepanjangan teksnya agar "SDM KURIR" dicek sebelum "KURIR"
+                const typesToCheck = [...targetTypes].sort((a, b) => b.length - a.length);
+
+                for (const type of typesToCheck) {
+                    if (rawJenis.includes(type) || (type === "BLIND VAN" && rawJenis.includes("BLINVAN")) || (type === "SDM KURIR" && (rawJenis.includes("SDM") || rawJenis === "SDM"))) {
                         matchedType = type;
                         break;
                     }
                 }
+                
                 dataMatrix[cab][matchedType] = (dataMatrix[cab][matchedType] || 0) + 1;
                 typeCounts[matchedType]++;
             });
@@ -2218,7 +2273,7 @@
                 }
 
                 let matchesJabatan = true;
-                if (currentSheetType === 'KARYAWAN' && selectedJabatan !== 'ALL') {
+                if ((currentSheetType === 'KARYAWAN' || (isDiagramMode && currentDiagramType === 'karyawan')) && selectedJabatan !== 'ALL') {
                     const jabatanKey = keys.find(k => k.toUpperCase().includes("JABATAN") || k.toUpperCase().includes("POSISI"));
                     if (jabatanKey) {
                         const val = String(row[jabatanKey] || "").trim().toUpperCase();
@@ -2229,7 +2284,7 @@
                 }
 
                 let matchesMasaKerja = true;
-                if (currentSheetType === 'KARYAWAN' && (selectedMinMasaKerja !== 'all' || selectedMaxMasaKerja !== 'all')) {
+                if ((currentSheetType === 'KARYAWAN' || (isDiagramMode && currentDiagramType === 'karyawan')) && (selectedMinMasaKerja !== 'all' || selectedMaxMasaKerja !== 'all')) {
                     const mkKey = keys.find(k => k.toUpperCase().includes("LAMA MASA BEKERJA") || k.toUpperCase().includes("MASA KERJA"));
                     let valStr = "";
                     if (mkKey && row[mkKey]) {
@@ -2290,7 +2345,7 @@
             let countLabel = "Data Terfilter";
             
             if (isDiagramMode) {
-                countLabel = "TOTAL UNIT";
+                countLabel = currentDiagramType === 'karyawan' ? "TOTAL KARYAWAN" : "TOTAL UNIT";
                 let totalUnits = 0;
                 if (filtered && filtered.length > 0) {
                     const keys = Object.keys(filtered[0]);
@@ -2299,7 +2354,8 @@
                         return uk === "JUMLAH UNIT" || uk === "JUMLAH" || uk === "UNIT" || uk === "JML UNIT" || uk === "JML" || uk === "JUMLAH UNIT KENDARAAN";
                     });
 
-                    if (unitKey) {
+                    // Khusus Karyawan tidak usah pakai kolom 'jumlah unit', 1 baris = 1 orang
+                    if (unitKey && currentDiagramType !== 'karyawan') {
                         filtered.forEach(row => {
                             const val = parseFloat(String(row[unitKey]).replace(/[^0-9\.]/g, '')) || 0;
                             totalUnits += val;
