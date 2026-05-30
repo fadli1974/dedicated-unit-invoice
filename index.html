@@ -2091,7 +2091,7 @@
             if (name.includes("KALIMANTAN BARAT")) return "#84cc16";
             if (name.includes("KALIMANTAN SELATAN")) return "#4d7c0f";
             if (name.includes("KALIMANTAN TIMUR")) return "#2563eb";
-            if (name.includes("PAPUA")) return "#fcd34d";
+            if (name.includes("PAPUA") || name.includes("IRIAN")) return "#fcd34d"; // Warna untuk Papua (Jayapura) ditambahkan di sini
             if (name.includes("SULAWESI SELATAN")) return "#0ea5e9";
             if (name.includes("BANTEN")) return "#8b5cf6";
             if (name.includes("JAKARTA")) return "#e11d48";
@@ -2331,16 +2331,29 @@
                         
                         let isActive = false;
                         for (let ap of activeProvinces) {
+                            let safeAp = ap.replace(/[^A-Z]/g, '');
+                            let safePName = pName.replace(/[^A-Z]/g, '');
+                            
+                            // Alias khusus Papua (karena di beberapa GeoJSON tertulis Irian Jaya)
+                            if ((safeAp.includes("PAPUA") && safePName.includes("IRIAN")) || (safeAp.includes("IRIAN") && safePName.includes("PAPUA"))) {
+                                isActive = true;
+                                break;
+                            }
+
                             // Mencocokkan nama provinsi (Mendukung sebagian teks seperti 'JAKARTA' = 'DKI JAKARTA')
-                            if (ap !== '-' && ap !== '' && (pName.includes(ap) || ap.includes(pName) || pName.replace(/[^A-Z]/g,'') === ap.replace(/[^A-Z]/g,''))) {
+                            if (ap !== '-' && ap !== '' && (pName.includes(ap) || ap.includes(pName) || safePName === safeAp)) {
                                 isActive = true;
                                 break;
                             }
                         }
 
+                        // Alias untuk memastikan mendapatkan warna yang benar jika GeoJSON menyebutnya Irian Jaya
+                        let colorName = pName;
+                        if (isActive && pName.includes("IRIAN")) colorName = "PAPUA";
+
                         if (!isFilterActive && isActive) { // Hanya berwarna jika filter TIDAK aktif
                             return {
-                                fillColor: getProvinceColor(pName),
+                                fillColor: getProvinceColor(colorName),
                                 weight: 1,
                                 opacity: 1,
                                 color: '#ffffff', // Garis batas provinsi
