@@ -25,6 +25,16 @@
         .sub-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 11px; color: #94a3b8; }
         #sidebar { transition: transform 0.3s ease-in-out; }
         .stat-card { transition: all 0.2s ease; border: 1px solid #e2e8f0; }
+        
+        /* Animasi Berkedip Untuk Peta */
+        @keyframes blink-marker {
+            0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.5); }
+            50% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+            100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+        .blinking-marker {
+            animation: blink-marker 1.2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
@@ -2066,6 +2076,34 @@
             }
         }
 
+        // --- DAFTAR WARNA PROVINSI (SESUAI REFERENSI GAMBAR) ---
+        function getProvinceColor(name) {
+            if (name.includes("ACEH")) return "#d97706";
+            if (name.includes("SUMATERA UTARA")) return "#84cc16";
+            if (name.includes("RIAU")) return "#3b82f6";
+            if (name.includes("SUMATERA BARAT")) return "#facc15";
+            if (name.includes("JAMBI")) return "#1e3a8a";
+            if (name.includes("SUMATERA SELATAN")) return "#9a3412";
+            if (name.includes("LAMPUNG")) return "#4b5563";
+            if (name.includes("JAWA BARAT")) return "#2563eb";
+            if (name.includes("JAWA TENGAH")) return "#b45309";
+            if (name.includes("JAWA TIMUR")) return "#15803d";
+            if (name.includes("KALIMANTAN BARAT")) return "#84cc16";
+            if (name.includes("KALIMANTAN SELATAN")) return "#4d7c0f";
+            if (name.includes("KALIMANTAN TIMUR")) return "#2563eb";
+            if (name.includes("PAPUA")) return "#fcd34d";
+            if (name.includes("SULAWESI SELATAN")) return "#0ea5e9";
+            if (name.includes("BANTEN")) return "#8b5cf6";
+            if (name.includes("JAKARTA")) return "#e11d48";
+            if (name.includes("BALI")) return "#f97316";
+
+            // Hash Fallback (Jika nama provinsi tidak ada di daftar atas)
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+            return "#" + "00000".substring(0, 6 - c.length) + c;
+        }
+
         function renderLeafletMap(data) {
             if (!leafletMap) {
                 leafletMap = L.map('indonesiaMap').setView([-2.5489, 118.0149], 5);
@@ -2076,13 +2114,19 @@
                 }).addTo(leafletMap);
             } else {
                 leafletMap.eachLayer((layer) => {
-                    if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                    if (layer instanceof L.Marker || layer instanceof L.CircleMarker || layer instanceof L.GeoJSON) {
                         layer.remove();
                     }
                 });
             }
 
+            // Cek apakah Filter sedang Aktif
+            const provFilterVal = document.getElementById('provinsiMapFilter') ? document.getElementById('provinsiMapFilter').value : 'all';
+            const cityFilterVal = document.getElementById('cityMapFilter') ? document.getElementById('cityMapFilter').value : 'all';
+            const isFilterActive = provFilterVal !== 'all' || cityFilterVal !== 'all';
+
             const validData = data.filter(r => (r.City || r.Provinsi) && r.Latitude && r.Longitude);
+            const activeProvinces = new Set(validData.map(r => String(r['Provinsi'] || '').trim().toUpperCase()));
             
             // --- AGGREGASI DATA BERDASARKAN KOTA / KOORDINAT ---
             // Hal ini memastikan marker yang berada di kota & koordinat sama akan dijumlahkan
@@ -2111,6 +2155,8 @@
 
                 let city = (row['City'] || row['Kota'] || '-').trim().toUpperCase();
                 let prov = (row['Provinsi'] || '-').trim().toUpperCase();
+                let alamat = (row['Alamat'] || row['ALAMAT'] || '').trim();
+                let kodePos = (row['Kode Pos'] || row['KODE POS'] || '').trim();
                 
                 if (prov !== '-' && prov !== '') uniqueProvinces.add(prov);
                 if (city !== '-' && city !== '') uniqueCities.add(city);
@@ -2134,6 +2180,8 @@
                         lng: lng,
                         city: city,
                         prov: prov,
+                        alamat: alamat,
+                        kodePos: kodePos,
                         motor: 0,
                         mobil: 0,
                         total: 0
@@ -2149,89 +2197,168 @@
                 aggregatedData[key].total += qty;
             });
 
-            // Update UI Statistik Kartu Peta
-            const statProv = document.getElementById('stat-map-provinsi');
-            if (statProv) statProv.innerText = uniqueProvinces.size;
-            
-            const statCity = document.getElementById('stat-map-city');
-            if (statCity) statCity.innerText = uniqueCities.size;
-
-            const statTotal = document.getElementById('stat-map-total');
-            if (statTotal) statTotal.innerText = (globalMotor + globalMobil) + " UNIT";
-
-            const statMotor = document.getElementById('stat-map-motor');
-            if (statMotor) statMotor.innerText = globalMotor + " UNIT";
-
-            const statMobil = document.getElementById('stat-map-mobil');
-            if (statMobil) statMobil.innerText = globalMobil + " UNIT";
-
-            let boundsArray = [];
-            let hasValidPoints = false;
-
-            Object.values(aggregatedData).forEach((group) => {
-                let lat = group.lat;
-                let lng = group.lng;
-                let total = group.total;
-                let motor = group.motor;
-                let mobil = group.mobil;
-                let city = group.city;
-                let prov = group.prov;
-
-                if (total <= 0) return;
+            // FUNGSI UNTUK MERENDER SEMUA MARKER SETELAH GEOJSON TAMPIL
+            function drawMarkersAndBounds() {
+                // Update UI Statistik Kartu Peta
+                const statProv = document.getElementById('stat-map-provinsi');
+                if (statProv) statProv.innerText = uniqueProvinces.size;
                 
-                let bgColor = '#3b82f6'; 
-                if (total > 15) bgColor = '#ef4444'; 
-                else if (total > 5) bgColor = '#f59e0b'; 
-                else if (total > 0) bgColor = '#10b981'; 
+                const statCity = document.getElementById('stat-map-city');
+                if (statCity) statCity.innerText = uniqueCities.size;
 
-                const markerHtml = `
-                    <div style="background-color: ${bgColor}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px;">
-                        ${total}
-                    </div>
-                `;
+                const statTotal = document.getElementById('stat-map-total');
+                if (statTotal) statTotal.innerText = (globalMotor + globalMobil) + " UNIT";
 
-                const customIcon = L.divIcon({
-                    html: markerHtml,
-                    className: 'custom-leaflet-marker',
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14],
-                    popupAnchor: [0, -14]
+                const statMotor = document.getElementById('stat-map-motor');
+                if (statMotor) statMotor.innerText = globalMotor + " UNIT";
+
+                const statMobil = document.getElementById('stat-map-mobil');
+                if (statMobil) statMobil.innerText = globalMobil + " UNIT";
+
+                let boundsArray = [];
+                let hasValidPoints = false;
+
+                Object.values(aggregatedData).forEach((group) => {
+                    let lat = group.lat;
+                    let lng = group.lng;
+                    let total = group.total;
+                    let motor = group.motor;
+                    let mobil = group.mobil;
+                    let city = group.city;
+                    let prov = group.prov;
+                    let alamat = group.alamat;
+                    let kodePos = group.kodePos;
+
+                    if (total <= 0) return;
+                    
+                    boundsArray.push([lat, lng]);
+                    hasValidPoints = true;
+
+                    // --- JIKA FILTER TIDAK AKTIF: HANYA TAMPILKAN LABEL TEKS NAMA KOTA ---
+                    if (!isFilterActive) {
+                        const textIcon = L.divIcon({
+                            html: `<div style="font-size: 11px; font-weight: 800; color: white; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; text-align: center; white-space: nowrap; transform: translate(-50%, -50%); cursor: default;">${city}</div>`,
+                            className: 'custom-text-label',
+                            iconSize: [0, 0] // Biarkan 0 agar posisi text persis di titik koordinat
+                        });
+                        L.marker([lat, lng], {icon: textIcon, interactive: false}).addTo(leafletMap);
+                        return; // Berhenti di sini, jangan buat marker lingkaran
+                    }
+
+                    // --- JIKA FILTER AKTIF: TAMPILKAN MARKER LINGKARAN BERKEDIP ---
+                    let bgColor = '#3b82f6'; 
+                    if (total > 15) bgColor = '#ef4444'; 
+                    else if (total > 5) bgColor = '#f59e0b'; 
+                    else if (total > 0) bgColor = '#10b981'; 
+
+                    // Terapkan class berkedip
+                    const markerClass = "blinking-marker";
+                    const markerStyle = `background-color: ${bgColor}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px; box-shadow: 0 3px 6px rgba(0,0,0,0.4);`;
+                    
+                    const markerHtml = `
+                        <div class="${markerClass}" style="${markerStyle}">
+                            ${total}
+                        </div>
+                    `;
+
+                    const customIcon = L.divIcon({
+                        html: markerHtml,
+                        className: 'custom-leaflet-marker',
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14],
+                        popupAnchor: [0, -14]
+                    });
+
+                    const popupContent = `
+                        <div class="p-1 min-w-[220px]">
+                            <div class="mb-2.5 pb-2.5 border-b border-slate-200">
+                                <h4 class="font-black text-slate-800 text-[14px] mb-1 uppercase leading-tight">${city}</h4>
+                                <p class="text-[10px] text-slate-500 font-bold mb-2 uppercase tracking-wider">${prov}</p>
+                                <p class="text-[10px] text-slate-600 font-medium leading-snug flex items-start gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5"></i> <span>${alamat || 'Alamat spesifik belum ditambahkan'}</span></p>
+                                ${kodePos ? `<p class="text-[9px] text-slate-500 font-black mt-2 uppercase tracking-widest bg-slate-100 inline-block px-1.5 py-0.5 rounded">KODE POS: ${kodePos}</p>` : ''}
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded mb-1.5 border border-slate-100">
+                                <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="bike" class="w-3 h-3"></i> MOTOR</span>
+                                <span class="text-xs font-black text-blue-600">${motor} UNIT</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
+                                <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="car" class="w-3 h-3"></i> MOBIL</span>
+                                <span class="text-xs font-black text-emerald-600">${mobil} UNIT</span>
+                            </div>
+                        </div>
+                    `;
+
+                    const marker = L.marker([lat, lng], {icon: customIcon}).addTo(leafletMap);
+                    marker.bindPopup(popupContent);
+                    
+                    marker.on('popupopen', function() {
+                        lucide.createIcons();
+                    });
                 });
-
-                const popupContent = `
-                    <div class="p-1 min-w-[160px]">
-                        <h4 class="font-black text-slate-800 text-[13px] mb-1 border-b border-slate-200 pb-1 uppercase">${city}</h4>
-                        <p class="text-[10px] text-slate-500 font-bold mb-3 uppercase tracking-wider">${prov}</p>
-                        <div class="flex justify-between items-center bg-slate-50 p-2 rounded mb-1.5 border border-slate-100">
-                            <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="bike" class="w-3 h-3"></i> MOTOR</span>
-                            <span class="text-xs font-black text-blue-600">${motor} UNIT</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
-                            <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="car" class="w-3 h-3"></i> MOBIL</span>
-                            <span class="text-xs font-black text-emerald-600">${mobil} UNIT</span>
-                        </div>
-                    </div>
-                `;
-
-                const marker = L.marker([lat, lng], {icon: customIcon}).addTo(leafletMap);
-                marker.bindPopup(popupContent);
                 
-                marker.on('popupopen', function() {
-                    lucide.createIcons();
-                });
+                setTimeout(() => { 
+                    leafletMap.invalidateSize(); 
+                    if (hasValidPoints) {
+                        leafletMap.fitBounds(boundsArray, { padding: [50, 50], maxZoom: 10 });
+                    } else {
+                        leafletMap.setView([-2.5489, 118.0149], 5);
+                    }
+                }, 300);
+            }
 
-                boundsArray.push([lat, lng]);
-                hasValidPoints = true;
-            });
-            
-            setTimeout(() => { 
-                leafletMap.invalidateSize(); 
-                if (hasValidPoints) {
-                    leafletMap.fitBounds(boundsArray, { padding: [50, 50], maxZoom: 10 });
-                } else {
-                    leafletMap.setView([-2.5489, 118.0149], 5);
-                }
-            }, 300);
+            // --- PROSES MERENDER WARNA PROVINSI (GEOJSON) ---
+            if (!window.indoGeoJSON) {
+                fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province-simple.json')
+                    .then(res => res.json())
+                    .then(geoData => {
+                        window.indoGeoJSON = geoData;
+                        drawGeoJSON();
+                        drawMarkersAndBounds();
+                    })
+                    .catch(err => {
+                        console.error("Gagal memuat batas provinsi:", err);
+                        drawMarkersAndBounds();
+                    });
+            } else {
+                drawGeoJSON();
+                drawMarkersAndBounds();
+            }
+
+            function drawGeoJSON() {
+                L.geoJSON(window.indoGeoJSON, {
+                    style: function(feature) {
+                        let pName = String(feature.properties.Propinsi || feature.properties.state || feature.properties.name || "").toUpperCase();
+                        
+                        let isActive = false;
+                        for (let ap of activeProvinces) {
+                            // Mencocokkan nama provinsi (Mendukung sebagian teks seperti 'JAKARTA' = 'DKI JAKARTA')
+                            if (ap !== '-' && ap !== '' && (pName.includes(ap) || ap.includes(pName) || pName.replace(/[^A-Z]/g,'') === ap.replace(/[^A-Z]/g,''))) {
+                                isActive = true;
+                                break;
+                            }
+                        }
+
+                        if (!isFilterActive && isActive) { // Hanya berwarna jika filter TIDAK aktif
+                            return {
+                                fillColor: getProvinceColor(pName),
+                                weight: 1,
+                                opacity: 1,
+                                color: '#ffffff', // Garis batas provinsi
+                                fillOpacity: 0.8
+                            };
+                        } else {
+                            // Sembunyikan dan transparan saat ada kota/provinsi spesifik dipilih
+                            return {
+                                fillColor: '#e2e8f0', 
+                                weight: isFilterActive ? 0 : 1,
+                                opacity: isFilterActive ? 0 : 1,
+                                color: '#ffffff',
+                                fillOpacity: isFilterActive ? 0 : 0.5
+                            };
+                        }
+                    }
+                }).addTo(leafletMap);
+            }
         }
 
         function toggleChart(show) {
