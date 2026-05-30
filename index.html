@@ -9,6 +9,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Library Leaflet (Peta) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
@@ -63,6 +66,13 @@
         </div>
         
         <nav class="flex-1 px-4 space-y-1 text-sm font-medium overflow-y-auto custom-scrollbar pb-6">
+            <!-- Section Peta -->
+            <div class="mb-4 mt-2">
+                <div onclick="toggleSubMenu(''); showMap(this)" class="sidebar-item flex items-center gap-3 p-3 rounded-lg bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors border border-emerald-500/20 shadow-sm" id="menu-peta">
+                    <i data-lucide="map" class="w-4 h-4"></i> <span class="font-black tracking-wide uppercase">Peta Persebaran</span>
+                </div>
+            </div>
+
             <!-- Section Mobil -->
             <div>
                 <!-- Header Accordion Mobil -->
@@ -130,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- Section Karyawan (Baru) -->
+            <!-- Section Karyawan -->
             <div class="mt-4">
                 <div onclick="toggleSubMenu('submenu-karyawan')" class="sidebar-item flex items-center justify-between p-3 rounded-lg" id="header-karyawan">
                     <div class="flex items-center gap-3">
@@ -216,6 +226,16 @@
                 
                 <!-- BAGIAN KIRI: Kumpulan Filter Dropdown -->
                 <div class="flex flex-wrap items-center gap-2 lg:gap-3 w-full xl:w-auto flex-1">
+                    <!-- Dropdown Provinsi (Khusus Peta) -->
+                    <select id="provinsiMapFilter" onchange="onProvinsiMapChange()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none text-xs font-black shadow-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 cursor-pointer uppercase tracking-wide truncate transition-all">
+                        <option value="all">Semua Provinsi</option>
+                    </select>
+
+                    <!-- Dropdown Kota (Khusus Peta) -->
+                    <select id="cityMapFilter" onchange="applyMapFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none text-xs font-black shadow-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 cursor-pointer uppercase tracking-wide truncate transition-all">
+                        <option value="all">Semua Kota/Cabang</option>
+                    </select>
+
                     <!-- Dropdown Jenis Kendaraan (Khusus Diagram) -->
                     <select id="jenisFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Jenis</option>
@@ -354,6 +374,36 @@
 
             <!-- Stats Card (Diagram Mode) -->
             <div id="statsDiagram" class="hidden grid gap-3 sm:gap-4 mb-6"></div>
+
+            <!-- Map Section -->
+            <div id="mapSection" class="hidden bg-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-200 mb-6 flex-col relative" style="height: 75vh; min-height: 500px;">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-slate-700 flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-emerald-500"></i> Peta Distribusi Unit Cabang
+                    </h3>
+                    <button onclick="toggleMap(false); switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', document.getElementById('menu-mobil'))" class="text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="x-circle"></i></button>
+                </div>
+
+                <!-- Kartu Statistik Khusus Peta -->
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
+                    <div class="bg-emerald-50 p-3 sm:p-4 rounded-xl border border-emerald-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase mb-1 tracking-wider truncate">Jumlah Provinsi</p>
+                        <h3 id="stat-map-provinsi" class="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-800 tracking-tight truncate">0</h3>
+                    </div>
+                    <div class="bg-blue-50 p-3 sm:p-4 rounded-xl border border-blue-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[10px] sm:text-xs font-bold text-blue-600 uppercase mb-1 tracking-wider truncate">Jumlah City / Cabang</p>
+                        <h3 id="stat-map-city" class="text-xl sm:text-2xl lg:text-3xl font-black text-blue-800 tracking-tight truncate">0</h3>
+                    </div>
+                </div>
+
+                <div id="mapLoader" class="absolute inset-0 z-20 bg-white/80 flex items-center justify-center hidden rounded-xl">
+                    <div class="flex flex-col items-center gap-3">
+                        <i data-lucide="loader" class="w-8 h-8 animate-spin text-emerald-500"></i>
+                        <span class="text-xs font-bold text-slate-500 tracking-widest uppercase">Memuat Peta...</span>
+                    </div>
+                </div>
+                <div id="indonesiaMap" class="w-full flex-1 rounded-lg z-0 border border-slate-200 shadow-inner"></div>
+            </div>
 
             <!-- Chart Section -->
             <div id="chartSection" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-6">
@@ -630,20 +680,30 @@
                 { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
                 { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
             ],
-            'INVOICE_SDM': [
-                { label: "NO", isIndex: true },
-                { label: "CABANG AAM", rawIdx: 2 },
-                { label: "JENIS SERVICE", rawIdx: 6 },
-                { label: "JENIS SEWA", rawIdx: 16 },
-                { label: "NAMA", rawIdx: 4 },
-                { label: "JML UNIT", rawIdx: 7 },
-                { label: "HARGA SEWA", rawIdx: 13, isCurr: true },
-                { label: "INSENTIF", isDynamicMonthSDM: true, isCurr: true },
-                { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
-                { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
-                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
-            ]
-        };
+                'INVOICE_SDM': [
+                    { label: "NO", isIndex: true },
+                    { label: "CABANG AAM", rawIdx: 2 },
+                    { label: "JENIS SERVICE", rawIdx: 6 },
+                    { label: "JENIS SEWA", rawIdx: 16 },
+                    { label: "NAMA", rawIdx: 4 },
+                    { label: "JML UNIT", rawIdx: 7 },
+                    { label: "HARGA SEWA", rawIdx: 13, isCurr: true },
+                    { label: "INSENTIF", isDynamicMonthSDM: true, isCurr: true },
+                    { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
+                    { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
+                    { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
+                ],
+                'PETA': [
+                    { label: "NO", isIndex: true },
+                    { label: "CABANG", keys: ["ID Cabang", "CABANG"] },
+                    { label: "NOPOL", keys: ["No POL", "NOPOL", "No Polisi"] },
+                    { label: "BAHAN BAKAR", keys: ["Bahan Bakar Unit"] }, 
+                    { label: "JENIS", keys: ["Jenis Unit", "KENDARAAN_ASAL"] },
+                    { label: "JUMLAH", keys: ["Jumlah Unit", "Jumlah"] },
+                    { label: "PROVINSI", keys: ["Provinsi"] },
+                    { label: "KOTA", keys: ["City", "Kota"] }
+                ]
+            };
 
         const INVOICE_GIDS = {
             '1588810041': 'INVOICE_BATTERY'
@@ -812,6 +872,49 @@
         async function fetchData() {
             const refreshIcon = document.getElementById('refresh-icon');
             if(refreshIcon) refreshIcon.classList.add('animate-spin');
+
+            if (currentSheetType === 'PETA') {
+                try {
+                    const mobilUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=289536394&single=true&output=csv&t=${new Date().getTime()}`;
+                    const motorUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=1495287037&single=true&output=csv&t=${new Date().getTime()}`;
+
+                    const [mobilRes, motorRes] = await Promise.all([
+                        fetch(mobilUrl).then(res => res.text()),
+                        fetch(motorUrl).then(res => res.text())
+                    ]);
+
+                    const parseData = (csvText, kategori) => {
+                        const parsed = Papa.parse(csvText, { header: false }).data;
+                        if(parsed.length < 2) return [];
+                        let headerIndex = parsed.findIndex(row => row.join(" ").toUpperCase().includes("CABANG"));
+                        if (headerIndex === -1) headerIndex = 1;
+                        const headers = parsed[headerIndex].map(h => String(h).trim().toUpperCase());
+                        return parsed.slice(headerIndex + 1).map(row => {
+                            let obj = {};
+                            headers.forEach((header, i) => { obj[header] = row[i]; });
+                            obj._rawRow = row;
+                            obj['KENDARAAN_ASAL'] = kategori;
+                            return obj;
+                        });
+                    };
+
+                    const mobilData = parseData(mobilRes, 'MOBIL');
+                    const motorData = parseData(motorRes, 'MOTOR');
+
+                    originalData = [...mobilData, ...motorData];
+                    isWaitingForGoogleSync = false;
+
+                    updateSheetLabel();
+                    updateDynamicFilters();
+                    applyFilters();
+
+                    if(refreshIcon) refreshIcon.classList.remove('animate-spin');
+                } catch (err) {
+                    console.error(err);
+                    if(refreshIcon) refreshIcon.classList.remove('animate-spin');
+                }
+                return;
+            }
             
             const csvUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${currentGid}&single=true&output=csv&t=${new Date().getTime()}`;
 
@@ -992,6 +1095,7 @@
             else if(currentSheetType === 'SDM') label = 'SDM';
             else if(currentSheetType === 'BATTERY') label = 'BATTERY';
             else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
+            else if(currentSheetType === 'PETA') label = 'SUMBER PETA';
             else if(currentSheetType === 'TIMELINE') {
                 label = timelineProjectName || 'TIMELINE';
                 sheetSumberLabel = 'PROJECT NAME';
@@ -1061,7 +1165,11 @@
             if (statPeriodeLabel) statPeriodeLabel.innerText = periodeTitle;
             
             const statPeriodeVal = document.getElementById('stat-periode-val');
-            if (statPeriodeVal) statPeriodeVal.innerText = periodeLabel;
+            if (statPeriodeVal) {
+                statPeriodeVal.innerText = periodeLabel;
+                statPeriodeVal.classList.remove('text-emerald-600', 'text-blue-600');
+                statPeriodeVal.classList.add('text-slate-800');
+            }
 
             const statSheetLabel = document.querySelector('#stat-card-1 > p');
             if (statSheetLabel) statSheetLabel.innerText = sheetSumberLabel;
@@ -1087,8 +1195,13 @@
 
             const statCategory = document.getElementById('stat-category-val');
             if (statCategory) {
+                statCategory.classList.remove('text-blue-600', 'text-emerald-600');
+                statCategory.classList.add('text-slate-800');
+
                 if (currentSheetType === 'TIMELINE') {
                     statCategory.innerText = timelineStartDate || '-';
+                } else if (currentSheetType === 'PETA') {
+                    statCategory.innerText = 'PETA PERSEBARAN';
                 } else if (isDiagramMode) {
                     if (currentDiagramType === 'karyawan') statCategory.innerText = 'DIAGRAM KARYAWAN';
                     else statCategory.innerText = currentDiagramType === 'mobil' ? 'DIAGRAM MOBIL' : 'DIAGRAM MOTOR';
@@ -1486,7 +1599,13 @@
         function switchSheet(category, title, icon, gid, type, element) {
             isDiagramMode = false;
             toggleChart(false);
+            toggleMap(false);
             
+            const provMap = document.getElementById('provinsiMapFilter');
+            if (provMap) provMap.style.display = 'none';
+            const cityMap = document.getElementById('cityMapFilter');
+            if (cityMap) cityMap.style.display = 'none';
+
             const searchContainer = document.getElementById('searchContainer');
             if (searchContainer) {
                 if (type === 'TIMELINE') {
@@ -1641,6 +1760,11 @@
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
             if(element) element.classList.add('sidebar-active');
 
+            const provMap = document.getElementById('provinsiMapFilter');
+            if (provMap) provMap.style.display = 'none';
+            const cityMap = document.getElementById('cityMapFilter');
+            if (cityMap) cityMap.style.display = 'none';
+
             const searchContainer = document.getElementById('searchContainer');
             if (searchContainer) searchContainer.style.display = '';
 
@@ -1708,6 +1832,7 @@
             if (bulanFilter) bulanFilter.style.display = 'none';
 
             toggleChart(true);
+            toggleMap(false);
 
             const chartTitle = document.getElementById('chartTitle');
             if(chartTitle) chartTitle.innerText = `Analisis Distribusi ${title} per Cabang`;
@@ -1719,6 +1844,366 @@
                 const sidebar = document.getElementById('sidebar');
                 if (sidebar && !sidebar.classList.contains('-translate-x-full')) toggleSidebar();
             }
+        }
+
+        // --- SISTEM PETA ---
+        let leafletMap = null;
+        let originalMapData = []; // Menyimpan data peta asli untuk pencarian dinamis
+
+        function toggleMap(show) {
+            const mapSec = document.getElementById('mapSection');
+            const chartSec = document.getElementById('chartSection');
+            const tableSec = document.getElementById('tableSection');
+            const statsDiag = document.getElementById('statsDiagram');
+            const filterArea = document.getElementById('filter-area');
+
+            if (show) {
+                if(mapSec) { mapSec.classList.remove('hidden'); mapSec.classList.add('flex'); }
+                if(chartSec) chartSec.classList.add('hidden');
+                if(statsDiag) statsDiag.classList.add('hidden');
+                // Khusus peta, biarkan area filter terlihat agar dropdown provinsi & kota bisa dipakai
+                if(filterArea) filterArea.classList.remove('hidden');
+
+                // Secara default sembunyikan tabel dan perbesar peta sampai Kota/Cabang dipilih
+                if(tableSec) tableSec.classList.add('hidden');
+                if(mapSec) mapSec.style.height = '85vh';
+            } else {
+                if(mapSec) { mapSec.classList.add('hidden'); mapSec.classList.remove('flex'); }
+                if(tableSec) tableSec.classList.remove('hidden'); // Pastikan tabel kembali muncul untuk menu lain
+            }
+        }
+
+        function showMap(element) {
+            isDiagramMode = false;
+            currentSheetType = 'PETA';
+            currentGid = '1104105911';
+
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
+            if(element) element.classList.add('sidebar-active');
+
+            const headerTitle = document.getElementById('table-header-title');
+            if (headerTitle) headerTitle.innerText = "DATABASE UNIT (MOBIL & MOTOR)";
+            const headerIcon = document.getElementById('table-header-icon');
+            if (headerIcon) headerIcon.setAttribute('data-lucide', 'layers');
+
+            // Sembunyikan filter yang tidak relevan
+            const filterContainer = document.getElementById('filter-container');
+            if (filterContainer) filterContainer.style.display = 'none';
+            const usiaFilterContainer = document.getElementById('usiaFilterContainer');
+            if (usiaFilterContainer) usiaFilterContainer.style.display = 'none';
+            const gpsFilter = document.getElementById('gpsFilter');
+            if (gpsFilter) gpsFilter.style.display = 'none';
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (jabatanFilter) { jabatanFilter.style.display = 'none'; jabatanFilter.value = 'all'; }
+            const jenisFilter = document.getElementById('jenisFilter');
+            if (jenisFilter) jenisFilter.style.display = 'none';
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (masaKerjaFilterContainer) masaKerjaFilterContainer.style.display = 'none';
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            if (pemilikFilter) pemilikFilter.style.display = 'none';
+            const liveGpsBtn = document.getElementById('liveGpsBtn');
+            if (liveGpsBtn) liveGpsBtn.style.display = 'none';
+            const invoiceSheetFilter = document.getElementById('invoiceSheetFilter');
+            if (invoiceSheetFilter) invoiceSheetFilter.style.display = 'none';
+            const bulanFilter = document.getElementById('bulanFilter');
+            if (bulanFilter) bulanFilter.style.display = 'none';
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) searchContainer.style.display = 'none'; // Sembunyikan search unit di peta
+
+            // Munculkan filter Peta
+            const provMap = document.getElementById('provinsiMapFilter');
+            if (provMap) provMap.style.display = 'block';
+            const cityMap = document.getElementById('cityMapFilter');
+            if (cityMap) cityMap.style.display = 'block';
+
+            toggleMap(true);
+            toggleChart(false);
+            lucide.createIcons();
+
+            updateSheetLabel();
+            
+            const countEl = document.getElementById('stat-count-standard');
+            if(countEl) countEl.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin text-blue-500 mx-auto"></i>';
+            lucide.createIcons();
+
+            fetchMapData();
+
+            if (window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar && !sidebar.classList.contains('-translate-x-full')) toggleSidebar();
+            }
+        }
+
+        function fetchMapData() {
+            const mapLoader = document.getElementById('mapLoader');
+            if(mapLoader) mapLoader.classList.remove('hidden');
+
+            // Mengambil data Peta dari Spreadsheet khusus sesuai permintaan
+            const csvUrl = `https://docs.google.com/spreadsheets/d/1aX6E93qqkWoPTe6SItFshsM9_kTLwTrX1bi3ccMtImY/export?format=csv&gid=1104105911&t=${new Date().getTime()}`;
+
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    if(mapLoader) mapLoader.classList.add('hidden');
+                    
+                    // Simpan data peta yang valid ke memory
+                    originalMapData = results.data.filter(r => (r.City || r.Provinsi) && r.Latitude && r.Longitude);
+                    
+                    // Populate originalData agar tabel dan filter berkerja
+                    originalData = originalMapData.map(row => {
+                        return { ...row, _rawRow: Object.values(row) };
+                    });
+
+                    // Populate filter dropdown (akan otomatis call applyMapFilters)
+                    populateMapFilters();
+                },
+                error: function(err) {
+                    if(mapLoader) mapLoader.classList.add('hidden');
+                    showToast('Gagal memuat data Peta', true);
+                }
+            });
+        }
+
+        function populateMapFilters() {
+            const provFilter = document.getElementById('provinsiMapFilter');
+            if (!provFilter) return;
+
+            const uniqueProv = new Set();
+            originalMapData.forEach(row => {
+                let prov = String(row['Provinsi'] || "").trim().toUpperCase();
+                if (prov && prov !== '-' && prov !== 'UNDEFINED') uniqueProv.add(prov);
+            });
+
+            const sortedProv = Array.from(uniqueProv).sort();
+            
+            let provHtml = `<option value="all">SEMUA PROVINSI</option>`;
+            sortedProv.forEach(p => provHtml += `<option value="${p}">${p}</option>`);
+            provFilter.innerHTML = provHtml;
+            provFilter.value = 'all';
+
+            // Panggil untuk mengisi kota sesuai provinsi
+            onProvinsiMapChange(true); 
+        }
+
+        function onProvinsiMapChange(isInit = false) {
+            const provFilter = document.getElementById('provinsiMapFilter');
+            const cityFilter = document.getElementById('cityMapFilter');
+            if (!provFilter || !cityFilter) return;
+
+            const selectedProv = provFilter.value;
+            const uniqueCity = new Set();
+
+            originalMapData.forEach(row => {
+                let prov = String(row['Provinsi'] || "").trim().toUpperCase();
+                let city = String(row['City'] || row['Kota'] || "").trim().toUpperCase();
+                
+                if (selectedProv === 'all' || prov === selectedProv) {
+                    if (city && city !== '-' && city !== 'UNDEFINED') uniqueCity.add(city);
+                }
+            });
+
+            const sortedCity = Array.from(uniqueCity).sort();
+            
+            let cityHtml = `<option value="all">SEMUA KOTA/CABANG</option>`;
+            sortedCity.forEach(c => cityHtml += `<option value="${c}">${c}</option>`);
+            cityFilter.innerHTML = cityHtml;
+            cityFilter.value = 'all'; // Selalu reset city jika prov berubah
+
+            // Selalu apply filter peta
+            applyMapFilters(); 
+        }
+
+        function applyMapFilters() {
+            const provFilter = document.getElementById('provinsiMapFilter');
+            const cityFilter = document.getElementById('cityMapFilter');
+            
+            const selectedProv = provFilter ? provFilter.value : 'all';
+            const selectedCity = cityFilter ? cityFilter.value : 'all';
+
+            const filteredData = originalMapData.filter(row => {
+                let prov = String(row['Provinsi'] || "").trim().toUpperCase();
+                let city = String(row['City'] || row['Kota'] || "").trim().toUpperCase();
+
+                let matchProv = selectedProv === 'all' || prov === selectedProv;
+                let matchCity = selectedCity === 'all' || city === selectedCity;
+
+                return matchProv && matchCity;
+            });
+
+            renderLeafletMap(filteredData);
+            
+            applyFilters();
+
+            // Mengatur visibilitas tabel dan ukuran peta berdasarkan pilihan filter Kota/Cabang
+            const tableSec = document.getElementById('tableSection');
+            const mapSec = document.getElementById('mapSection');
+            
+            if (currentSheetType === 'PETA') {
+                if (selectedCity === 'all') {
+                    // Jika 'Semua Kota' dipilih, sembunyikan tabel dan luaskan peta
+                    if (tableSec) tableSec.classList.add('hidden');
+                    if (mapSec) mapSec.style.height = '85vh'; 
+                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+                } else {
+                    // Jika kota spesifik dipilih, tampilkan tabel database dan sesuaikan tinggi peta
+                    if (tableSec) tableSec.classList.remove('hidden');
+                    if (mapSec) mapSec.style.height = '50vh'; 
+                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+                }
+            }
+        }
+
+        function renderLeafletMap(data) {
+            if (!leafletMap) {
+                leafletMap = L.map('indonesiaMap').setView([-2.5489, 118.0149], 5);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap contributors',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(leafletMap);
+            } else {
+                leafletMap.eachLayer((layer) => {
+                    if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                        layer.remove();
+                    }
+                });
+            }
+
+            const validData = data.filter(r => (r.City || r.Provinsi) && r.Latitude && r.Longitude);
+            
+            // --- AGGREGASI DATA BERDASARKAN KOTA / KOORDINAT ---
+            // Hal ini memastikan marker yang berada di kota & koordinat sama akan dijumlahkan
+            const aggregatedData = {};
+            const uniqueProvinces = new Set();
+            const uniqueCities = new Set();
+
+            validData.forEach((row) => {
+                let latStr = String(row['Latitude']).trim().replace(/,/g, '.');
+                let lngStr = String(row['Longitude']).trim().replace(/,/g, '.');
+
+                let lat = parseFloat(latStr);
+                let lng = parseFloat(lngStr);
+
+                // Koreksi Cerdas Koordinat (Jika format dari excel tanpa titik desimal)
+                if (latStr.indexOf('.') === -1 && Math.abs(lat) > 100) {
+                    lat = lat / 10000;
+                }
+                if (lngStr.indexOf('.') === -1 && Math.abs(lng) > 100) {
+                    lng = lng / 10000;
+                }
+                
+                if(isNaN(lat) || isNaN(lng)) return;
+
+                let city = (row['City'] || row['Kota'] || '-').trim().toUpperCase();
+                let prov = (row['Provinsi'] || '-').trim().toUpperCase();
+                
+                if (prov !== '-' && prov !== '') uniqueProvinces.add(prov);
+                if (city !== '-' && city !== '') uniqueCities.add(city);
+
+                // Ekstrak Jenis Unit dan Jumlah dari spreadsheet (Sesuai Gambar)
+                let jenis = (row['Jenis Unit'] || row['Bahan Bakar Unit'] || '').trim().toUpperCase();
+                let qty = parseInt(row['Jumlah Unit']) || 1; // Default 1 jika kosong
+
+                // Gunakan kombinasi lat, lng, dan city sebagai kunci (key) aggregasi
+                let key = `${lat}_${lng}_${city}`;
+
+                if (!aggregatedData[key]) {
+                    aggregatedData[key] = {
+                        lat: lat,
+                        lng: lng,
+                        city: city,
+                        prov: prov,
+                        motor: 0,
+                        mobil: 0,
+                        total: 0
+                    };
+                }
+
+                if (jenis.includes('MOTOR')) {
+                    aggregatedData[key].motor += qty;
+                } else {
+                    // Asumsikan selain motor adalah mobil (sesuai 'Bahan Bakar Unit' di spreadsheet)
+                    aggregatedData[key].mobil += qty;
+                }
+                
+                aggregatedData[key].total += qty;
+            });
+
+            // Update UI Statistik Kartu Peta
+            const statProv = document.getElementById('stat-map-provinsi');
+            if (statProv) statProv.innerText = uniqueProvinces.size;
+            
+            const statCity = document.getElementById('stat-map-city');
+            if (statCity) statCity.innerText = uniqueCities.size;
+
+            let boundsArray = [];
+            let hasValidPoints = false;
+
+            Object.values(aggregatedData).forEach((group) => {
+                let lat = group.lat;
+                let lng = group.lng;
+                let total = group.total;
+                let motor = group.motor;
+                let mobil = group.mobil;
+                let city = group.city;
+                let prov = group.prov;
+
+                if (total <= 0) return;
+                
+                let bgColor = '#3b82f6'; 
+                if (total > 15) bgColor = '#ef4444'; 
+                else if (total > 5) bgColor = '#f59e0b'; 
+                else if (total > 0) bgColor = '#10b981'; 
+
+                const markerHtml = `
+                    <div style="background-color: ${bgColor}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px;">
+                        ${total}
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    html: markerHtml,
+                    className: 'custom-leaflet-marker',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14],
+                    popupAnchor: [0, -14]
+                });
+
+                const popupContent = `
+                    <div class="p-1 min-w-[160px]">
+                        <h4 class="font-black text-slate-800 text-[13px] mb-1 border-b border-slate-200 pb-1 uppercase">${city}</h4>
+                        <p class="text-[10px] text-slate-500 font-bold mb-3 uppercase tracking-wider">${prov}</p>
+                        <div class="flex justify-between items-center bg-slate-50 p-2 rounded mb-1.5 border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="bike" class="w-3 h-3"></i> MOTOR</span>
+                            <span class="text-xs font-black text-blue-600">${motor} UNIT</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-600 flex items-center gap-1.5"><i data-lucide="car" class="w-3 h-3"></i> MOBIL</span>
+                            <span class="text-xs font-black text-emerald-600">${mobil} UNIT</span>
+                        </div>
+                    </div>
+                `;
+
+                const marker = L.marker([lat, lng], {icon: customIcon}).addTo(leafletMap);
+                marker.bindPopup(popupContent);
+                
+                marker.on('popupopen', function() {
+                    lucide.createIcons();
+                });
+
+                boundsArray.push([lat, lng]);
+                hasValidPoints = true;
+            });
+            
+            setTimeout(() => { 
+                leafletMap.invalidateSize(); 
+                if (hasValidPoints) {
+                    leafletMap.fitBounds(boundsArray, { padding: [50, 50], maxZoom: 10 });
+                } else {
+                    leafletMap.setView([-2.5489, 118.0149], 5);
+                }
+            }, 300);
         }
 
         function toggleChart(show) {
@@ -1852,8 +2337,13 @@
         function showDetail(element) {
             isDiagramMode = false;
             toggleChart(false);
+            toggleMap(false);
 
-            activeCategory = 'all';
+            const provMap = document.getElementById('provinsiMapFilter');
+            if (provMap) provMap.style.display = 'none';
+            const cityMap = document.getElementById('cityMapFilter');
+            if (cityMap) cityMap.style.display = 'none';
+
             activeCategory = 'all';
             leaseStatusFilter = 'all';
             currentSheetType = 'DETAIL_UNIT'; 
@@ -2057,9 +2547,15 @@
         function showInvoiceView(element) {
             isDiagramMode = false;
             toggleChart(false);
+            toggleMap(false);
             activeCategory = 'all';
             leaseStatusFilter = 'all';
             
+            const provMap = document.getElementById('provinsiMapFilter');
+            if (provMap) provMap.style.display = 'none';
+            const cityMap = document.getElementById('cityMapFilter');
+            if (cityMap) cityMap.style.display = 'none';
+
             const searchContainer = document.getElementById('searchContainer');
             if (searchContainer) searchContainer.style.display = '';
 
@@ -2326,9 +2822,26 @@
                     }
                 }
 
+                let matchesMapCity = true;
+                if (currentSheetType === 'PETA') {
+                    const provFilter = document.getElementById('provinsiMapFilter');
+                    const cityFilter = document.getElementById('cityMapFilter');
+                    const selectedProv = provFilter ? provFilter.value : 'all';
+                    const selectedCity = cityFilter ? cityFilter.value : 'all';
+                    
+                    let provVal = String(row['Provinsi'] || "").trim().toUpperCase();
+                    let cityVal = String(row['City'] || row['Kota'] || row['ID Cabang'] || "").trim().toUpperCase();
+
+                    if (selectedCity !== 'all') {
+                        matchesMapCity = (cityVal === selectedCity);
+                    } else if (selectedProv !== 'all') {
+                        matchesMapCity = (provVal === selectedProv);
+                    }
+                }
+
                 const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
 
-                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesJabatan && matchesMasaKerja && matchesSearch && matchesDateRange;
+                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesJabatan && matchesMasaKerja && matchesSearch && matchesDateRange && matchesMapCity;
             });
 
             if (isDiagramMode) {
@@ -2429,6 +2942,41 @@
                 if (valHarga) valHarga.innerText = formatRp(totalHargaSewa);
                 if (valBiaya) valBiaya.innerText = formatRp(totalBiayaLain);
 
+            } else if (currentSheetType === 'PETA') {
+                countLabel = "TOTAL UNIT";
+                let totalMotor = 0;
+                let totalMobil = 0;
+                
+                filtered.forEach(row => {
+                    let jenis = String(row['Jenis Unit'] || row['Bahan Bakar Unit'] || '').toUpperCase();
+                    let qty = parseInt(row['Jumlah Unit']) || 1;
+                    if (jenis.includes('MOTOR')) {
+                        totalMotor += qty;
+                    } else {
+                        totalMobil += qty;
+                    }
+                });
+                
+                displayCount = totalMotor + totalMobil;
+                
+                const statCatLabel = document.getElementById('stat-kategori-label');
+                const statCatVal = document.getElementById('stat-category-val');
+                const statPerLabel = document.getElementById('stat-periode-label');
+                const statPerVal = document.getElementById('stat-periode-val');
+                
+                if (statCatLabel) statCatLabel.innerText = "JUMLAH MOTOR";
+                if (statCatVal) {
+                    statCatVal.innerText = totalMotor + " UNIT";
+                    statCatVal.classList.remove('text-slate-800');
+                    statCatVal.classList.add('text-blue-600');
+                }
+                
+                if (statPerLabel) statPerLabel.innerText = "JUMLAH MOBIL";
+                if (statPerVal) {
+                    statPerVal.innerText = totalMobil + " UNIT";
+                    statPerVal.classList.remove('text-slate-800');
+                    statPerVal.classList.add('text-emerald-600');
+                }
             } else {
                 countLabel = "UNIT TERFILTER";
             }
@@ -2490,11 +3038,11 @@
                 const cells = config.map(col => {
                     let val = "-";
                     
-                    // Tambahkan currentSheetType === 'KARYAWAN' agar sistem mengizinkan penarikan data mutlak dari Kolom J (rawIdx: 9)
-                    if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN') && (col.rawIdx !== undefined || col.isIndex || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
-                        if (col.isIndex) {
-                            val = idx + 1;
-                        } else if (col.rawIdx !== undefined) {
+                    // Logika Dinamis untuk index. Berlaku universal (Termasuk Peta)
+                    if (col.isIndex) {
+                        val = idx + 1;
+                    } else if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN') && (col.rawIdx !== undefined || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
+                        if (col.rawIdx !== undefined) {
                             val = row._rawRow && row._rawRow[col.rawIdx] !== undefined && String(row._rawRow[col.rawIdx]).trim() !== "" ? row._rawRow[col.rawIdx] : "-";
                         } else if (col.isDynamicMonth) {
                             val = row._rawRow && row._rawRow[getBulanIdxGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxGlobal()]) : 0;
