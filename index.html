@@ -327,7 +327,7 @@
                 </div>
             </div>
 
-            <!-- KOTAK STATISTIK BERSIH -->
+            <!-- KOTAK STATISTIK BERSIH (Akan disembunyikan saat di Map) -->
             <div id="statsRow" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
                 <!-- Card 1 (Sheet Sumber) -->
                 <div id="stat-card-1" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
@@ -376,7 +376,7 @@
             <div id="statsDiagram" class="hidden grid gap-3 sm:gap-4 mb-6"></div>
 
             <!-- Map Section -->
-            <div id="mapSection" class="hidden bg-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-200 mb-6 flex-col relative" style="height: 75vh; min-height: 500px;">
+            <div id="mapSection" class="hidden bg-white p-4 sm:p-6 rounded-xl shadow-md border border-slate-200 mb-6 flex-col relative" style="height: calc(100vh - 160px); min-height: 500px;">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-black uppercase tracking-widest text-slate-700 flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-5 h-5 text-emerald-500"></i> Peta Distribusi Unit Cabang
@@ -384,15 +384,27 @@
                     <button onclick="toggleMap(false); switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', document.getElementById('menu-mobil'))" class="text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="x-circle"></i></button>
                 </div>
 
-                <!-- Kartu Statistik Khusus Peta -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                    <div class="bg-emerald-50 p-3 sm:p-4 rounded-xl border border-emerald-200 shadow-sm flex flex-col justify-center text-center">
-                        <p class="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase mb-1 tracking-wider truncate">Jumlah Provinsi</p>
-                        <h3 id="stat-map-provinsi" class="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-800 tracking-tight truncate">0</h3>
+                <!-- Kartu Statistik Khusus Peta (5 Item) -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-4 flex-shrink-0 relative z-10">
+                    <div class="bg-emerald-50 p-2 sm:p-3 rounded-xl border border-emerald-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase mb-0.5 sm:mb-1 tracking-wider truncate">Jumlah Provinsi</p>
+                        <h3 id="stat-map-provinsi" class="text-lg sm:text-xl md:text-2xl font-black text-emerald-800 tracking-tight truncate">0</h3>
                     </div>
-                    <div class="bg-blue-50 p-3 sm:p-4 rounded-xl border border-blue-200 shadow-sm flex flex-col justify-center text-center">
-                        <p class="text-[10px] sm:text-xs font-bold text-blue-600 uppercase mb-1 tracking-wider truncate">Jumlah City / Cabang</p>
-                        <h3 id="stat-map-city" class="text-xl sm:text-2xl lg:text-3xl font-black text-blue-800 tracking-tight truncate">0</h3>
+                    <div class="bg-indigo-50 p-2 sm:p-3 rounded-xl border border-indigo-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-indigo-600 uppercase mb-0.5 sm:mb-1 tracking-wider truncate">Jumlah Cabang</p>
+                        <h3 id="stat-map-city" class="text-lg sm:text-xl md:text-2xl font-black text-indigo-800 tracking-tight truncate">0</h3>
+                    </div>
+                    <div class="bg-red-50 p-2 sm:p-3 rounded-xl border border-red-200 shadow-sm flex flex-col justify-center text-center col-span-2 sm:col-span-1 lg:col-span-1">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-red-600 uppercase mb-0.5 sm:mb-1 tracking-wider truncate">Jumlah Unit</p>
+                        <h3 id="stat-map-total" class="text-lg sm:text-xl md:text-2xl font-black text-red-600 tracking-tight truncate">0 UNIT</h3>
+                    </div>
+                    <div class="bg-blue-50 p-2 sm:p-3 rounded-xl border border-blue-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-blue-600 uppercase mb-0.5 sm:mb-1 tracking-wider truncate">Jumlah Motor</p>
+                        <h3 id="stat-map-motor" class="text-lg sm:text-xl md:text-2xl font-black text-blue-600 tracking-tight truncate">0 UNIT</h3>
+                    </div>
+                    <div class="bg-teal-50 p-2 sm:p-3 rounded-xl border border-teal-200 shadow-sm flex flex-col justify-center text-center">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-teal-600 uppercase mb-0.5 sm:mb-1 tracking-wider truncate">Jumlah Mobil</p>
+                        <h3 id="stat-map-mobil" class="text-lg sm:text-xl md:text-2xl font-black text-teal-600 tracking-tight truncate">0 UNIT</h3>
                     </div>
                 </div>
 
@@ -1072,47 +1084,18 @@
             const statInvoiceHarga = document.getElementById('stat-invoice-harga');
             const statInvoiceBiaya = document.getElementById('stat-invoice-biaya');
 
-            if(currentSheetType.startsWith('INVOICE')) {
-                const selectEl = document.getElementById('invoiceSheetFilter');
-                if (selectEl && selectEl.options.length > 0) {
-                    label = selectEl.options[selectEl.selectedIndex].text;
-                } else {
-                    label = 'INVOICES';
-                }
+            if (currentSheetType === 'TIMELINE') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
+                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
                 
-                periodeTitle = 'PERIODE';
-                const bulanFilter = document.getElementById('bulanFilter');
-                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
-                    periodeLabel = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
-                } else if (currentSheetMonth) {
-                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
-                    periodeLabel = mappedIndoMonth.toUpperCase() + ' 2026';
-                }
-            }
-            else if(currentGid === '1495287037') label = 'MOTOR';
-            else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
-            else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
-            else if(currentSheetType === 'SDM') label = 'SDM';
-            else if(currentSheetType === 'BATTERY') label = 'BATTERY';
-            else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
-            else if(currentSheetType === 'PETA') label = 'SUMBER PETA';
-            else if(currentSheetType === 'TIMELINE') {
                 label = timelineProjectName || 'TIMELINE';
                 sheetSumberLabel = 'PROJECT NAME';
                 unitTerfilterLabel = 'DURATION';
                 kategoriAktifLabel = 'START DATE';
                 periodeTitle = 'END DATE';
                 periodeLabel = timelineEndDate || '-';
-            }
-            else if(currentSheetType === 'DETAIL_UNIT') {
-                label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
-            }
-
-            if (currentSheetType === 'TIMELINE') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
-                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
 
                 const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
                 if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
@@ -1136,6 +1119,22 @@
                 if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
                 
+                const selectEl = document.getElementById('invoiceSheetFilter');
+                if (selectEl && selectEl.options.length > 0) {
+                    label = selectEl.options[selectEl.selectedIndex].text;
+                } else {
+                    label = 'INVOICES';
+                }
+                
+                periodeTitle = 'PERIODE';
+                const bulanFilter = document.getElementById('bulanFilter');
+                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
+                    periodeLabel = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
+                } else if (currentSheetMonth) {
+                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
+                    periodeLabel = mappedIndoMonth.toUpperCase() + ' 2026';
+                }
+
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
                     card.style.width = ""; 
@@ -1143,12 +1142,23 @@
                         card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
+            } else if (currentSheetType === 'PETA') {
+                if (statsRow) statsRow.className = "hidden"; // Sembunyikan sepenuhnya untuk Peta
+                label = 'SUMBER PETA';
             } else {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
                 
+                if(currentGid === '1495287037') label = 'MOTOR';
+                else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
+                else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
+                else if(currentSheetType === 'SDM') label = 'SDM';
+                else if(currentSheetType === 'BATTERY') label = 'BATTERY';
+                else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
+                else if(currentSheetType === 'DETAIL_UNIT') label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
+
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
                     card.style.width = "";
@@ -1856,20 +1866,22 @@
             const tableSec = document.getElementById('tableSection');
             const statsDiag = document.getElementById('statsDiagram');
             const filterArea = document.getElementById('filter-area');
+            const statsRow = document.getElementById('statsRow'); // Mengambil element stats utama
 
             if (show) {
                 if(mapSec) { mapSec.classList.remove('hidden'); mapSec.classList.add('flex'); }
                 if(chartSec) chartSec.classList.add('hidden');
                 if(statsDiag) statsDiag.classList.add('hidden');
-                // Khusus peta, biarkan area filter terlihat agar dropdown provinsi & kota bisa dipakai
+                if(statsRow) statsRow.classList.add('hidden'); // Sembunyikan stats row umum agar peta meluas
                 if(filterArea) filterArea.classList.remove('hidden');
 
                 // Secara default sembunyikan tabel dan perbesar peta sampai Kota/Cabang dipilih
                 if(tableSec) tableSec.classList.add('hidden');
-                if(mapSec) mapSec.style.height = '85vh';
+                if(mapSec) mapSec.style.height = 'calc(100vh - 160px)'; // Memaksimalkan hingga ke bawah layar
             } else {
                 if(mapSec) { mapSec.classList.add('hidden'); mapSec.classList.remove('flex'); }
-                if(tableSec) tableSec.classList.remove('hidden'); // Pastikan tabel kembali muncul untuk menu lain
+                if(tableSec) tableSec.classList.remove('hidden'); 
+                if(statsRow) statsRow.classList.remove('hidden'); // Munculkan kembali stats utama saat keluar dari peta
             }
         }
 
@@ -1916,8 +1928,8 @@
             const cityMap = document.getElementById('cityMapFilter');
             if (cityMap) cityMap.style.display = 'block';
 
-            toggleMap(true);
             toggleChart(false);
+            toggleMap(true);
             lucide.createIcons();
 
             updateSheetLabel();
@@ -2043,12 +2055,12 @@
                 if (selectedCity === 'all') {
                     // Jika 'Semua Kota' dipilih, sembunyikan tabel dan luaskan peta
                     if (tableSec) tableSec.classList.add('hidden');
-                    if (mapSec) mapSec.style.height = '85vh'; 
+                    if (mapSec) mapSec.style.height = 'calc(100vh - 160px)'; // Map meluas menutupi sisa layar
                     setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
                 } else {
                     // Jika kota spesifik dipilih, tampilkan tabel database dan sesuaikan tinggi peta
                     if (tableSec) tableSec.classList.remove('hidden');
-                    if (mapSec) mapSec.style.height = '50vh'; 
+                    if (mapSec) mapSec.style.height = '50vh'; // Kurangi tinggi peta agar tabel database bisa terlihat
                     setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
                 }
             }
@@ -2077,6 +2089,8 @@
             const aggregatedData = {};
             const uniqueProvinces = new Set();
             const uniqueCities = new Set();
+            let globalMotor = 0;
+            let globalMobil = 0;
 
             validData.forEach((row) => {
                 let latStr = String(row['Latitude']).trim().replace(/,/g, '.');
@@ -2101,9 +2115,15 @@
                 if (prov !== '-' && prov !== '') uniqueProvinces.add(prov);
                 if (city !== '-' && city !== '') uniqueCities.add(city);
 
-                // Ekstrak Jenis Unit dan Jumlah dari spreadsheet (Sesuai Gambar)
+                // Ekstrak Jenis Unit dan Jumlah dari spreadsheet
                 let jenis = (row['Jenis Unit'] || row['Bahan Bakar Unit'] || '').trim().toUpperCase();
                 let qty = parseInt(row['Jumlah Unit']) || 1; // Default 1 jika kosong
+
+                if (jenis.includes('MOTOR')) {
+                    globalMotor += qty;
+                } else {
+                    globalMobil += qty;
+                }
 
                 // Gunakan kombinasi lat, lng, dan city sebagai kunci (key) aggregasi
                 let key = `${lat}_${lng}_${city}`;
@@ -2123,7 +2143,6 @@
                 if (jenis.includes('MOTOR')) {
                     aggregatedData[key].motor += qty;
                 } else {
-                    // Asumsikan selain motor adalah mobil (sesuai 'Bahan Bakar Unit' di spreadsheet)
                     aggregatedData[key].mobil += qty;
                 }
                 
@@ -2136,6 +2155,15 @@
             
             const statCity = document.getElementById('stat-map-city');
             if (statCity) statCity.innerText = uniqueCities.size;
+
+            const statTotal = document.getElementById('stat-map-total');
+            if (statTotal) statTotal.innerText = (globalMotor + globalMobil) + " UNIT";
+
+            const statMotor = document.getElementById('stat-map-motor');
+            if (statMotor) statMotor.innerText = globalMotor + " UNIT";
+
+            const statMobil = document.getElementById('stat-map-mobil');
+            if (statMobil) statMobil.innerText = globalMobil + " UNIT";
 
             let boundsArray = [];
             let hasValidPoints = false;
