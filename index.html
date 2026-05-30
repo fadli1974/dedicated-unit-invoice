@@ -1427,7 +1427,7 @@
             const gpsFilter = document.getElementById('gpsFilter');
             if (!gpsFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
+            if (currentSheetType === 'PETA' || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
                 gpsFilter.style.display = 'none';
                 gpsFilter.value = 'all';
                 return;
@@ -1512,7 +1512,7 @@
             
             if (!usiaContainer || !usiaMin || !usiaMax) return;
 
-            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
+            if (originalData.length === 0 || currentSheetType === 'PETA' || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
                 usiaContainer.style.display = 'none';
                 usiaMin.value = 'all'; 
                 usiaMax.value = 'all'; 
@@ -1568,7 +1568,7 @@
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (!pemilikFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'TIMELINE' || currentSheetType === 'KARYAWAN' || currentSheetType.startsWith('INVOICE')) {
+            if (currentSheetType === 'PETA' || currentSheetType === 'TIMELINE' || currentSheetType === 'KARYAWAN' || currentSheetType.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'none';
                 pemilikFilter.value = 'all';
                 return;
