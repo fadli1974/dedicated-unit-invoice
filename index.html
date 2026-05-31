@@ -35,6 +35,31 @@
         .blinking-marker {
             animation: blink-marker 1.2s infinite ease-in-out;
         }
+
+        /* Styling Responsif Untuk Teks Nama Cabang di Peta */
+        .custom-text-label {
+            overflow: visible;
+        }
+        .map-text-label {
+            font-weight: 900;
+            color: white;
+            text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, 0px 2px 4px rgba(0,0,0,0.8);
+            text-align: center;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            cursor: default;
+            font-size: 9px; /* Ukuran diperkecil agar tidak bertumpuk di layar PC */
+            letter-spacing: 0.05em;
+        }
+
+        /* Responsif Layar Kecil (Mobile / HP) */
+        @media (max-width: 768px) {
+            .custom-text-label, .map-text-label {
+                display: none !important; /* Sembunyikan label nama kota sepenuhnya di HP */
+                opacity: 0 !important;
+                visibility: hidden !important;
+            }
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
@@ -2066,12 +2091,12 @@
                     // Jika 'Semua Kota' dipilih, sembunyikan tabel dan luaskan peta
                     if (tableSec) tableSec.classList.add('hidden');
                     if (mapSec) mapSec.style.height = 'calc(100vh - 160px)'; // Map meluas menutupi sisa layar
-                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(true); }, 500);
                 } else {
                     // Jika kota spesifik dipilih, tampilkan tabel database dan sesuaikan tinggi peta
                     if (tableSec) tableSec.classList.remove('hidden');
                     if (mapSec) mapSec.style.height = '50vh'; // Kurangi tinggi peta agar tabel database bisa terlihat
-                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+                    setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(true); }, 500);
                 }
             }
         }
@@ -2106,11 +2131,20 @@
 
         function renderLeafletMap(data) {
             if (!leafletMap) {
-                leafletMap = L.map('indonesiaMap').setView([-2.5489, 118.0149], 5);
+                leafletMap = L.map('indonesiaMap', {
+                    minZoom: 4, // Mencegah peta zoom out terlalu jauh
+                    maxBounds: [
+                        [-15.0, 90.0], // Batas Selatan & Barat (Indonesia)
+                        [15.0, 145.0]  // Batas Utara & Timur
+                    ],
+                    maxBoundsViscosity: 1.0
+                }).setView([-2.5489, 118.0149], 5);
+                
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                     attribution: '&copy; OpenStreetMap contributors',
                     subdomains: 'abcd',
-                    maxZoom: 20
+                    maxZoom: 20,
+                    noWrap: true // Mencegah gambar peta dunia berulang-ulang (repeating)
                 }).addTo(leafletMap);
             } else {
                 leafletMap.eachLayer((layer) => {
@@ -2237,7 +2271,7 @@
                     // --- JIKA FILTER TIDAK AKTIF: HANYA TAMPILKAN LABEL TEKS NAMA KOTA ---
                     if (!isFilterActive) {
                         const textIcon = L.divIcon({
-                            html: `<div style="font-size: 11px; font-weight: 800; color: white; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; text-align: center; white-space: nowrap; transform: translate(-50%, -50%); cursor: default;">${city}</div>`,
+                            html: `<div class="map-text-label">${city}</div>`,
                             className: 'custom-text-label',
                             iconSize: [0, 0] // Biarkan 0 agar posisi text persis di titik koordinat
                         });
@@ -2296,14 +2330,18 @@
                     });
                 });
                 
+                // Mencegah error peta menyusut dengan memberikan jeda ekstra
+                // sebelum memposisikan kamera peta agar ukuran container akurat
                 setTimeout(() => { 
-                    leafletMap.invalidateSize(); 
-                    if (hasValidPoints) {
-                        leafletMap.fitBounds(boundsArray, { padding: [50, 50], maxZoom: 10 });
-                    } else {
-                        leafletMap.setView([-2.5489, 118.0149], 5);
+                    if(leafletMap) {
+                        leafletMap.invalidateSize(true); 
+                        if (hasValidPoints) {
+                            leafletMap.fitBounds(boundsArray, { padding: [50, 50], maxZoom: 10 });
+                        } else {
+                            leafletMap.setView([-2.5489, 118.0149], 5);
+                        }
                     }
-                }, 300);
+                }, 500);
             }
 
             // --- PROSES MERENDER WARNA PROVINSI (GEOJSON) ---
