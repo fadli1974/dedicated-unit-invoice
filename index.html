@@ -1186,13 +1186,27 @@
                 if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
                 
-                if(currentGid === '1495287037') label = 'MOTOR';
+                if(currentSheetType === 'UNIT' && currentGid === '1495287037') {
+                    if (activeCategory === 'all') label = 'SEMUA UNIT MOTOR';
+                    else if (activeCategory === 'Konvensional') label = 'MOTOR KONVENSIONAL';
+                    else if (activeCategory === 'Listrik') label = 'MOTOR LISTRIK';
+                }
+                else if(currentGid === '1495287037') label = 'MOTOR';
                 else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
-                else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
+                else if(currentSheetType === 'KARYAWAN') {
+                    if (activeCategory === 'all') label = 'SEMUA KARYAWAN';
+                    else if (activeCategory === 'Mobil') label = 'KARYAWAN MOBIL';
+                    else if (activeCategory === 'Motor') label = 'KARYAWAN MOTOR';
+                }
                 else if(currentSheetType === 'SDM') label = 'SDM';
                 else if(currentSheetType === 'BATTERY') label = 'BATTERY';
                 else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
                 else if(currentSheetType === 'DETAIL_UNIT') label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
+                else if(currentSheetType === 'UNIT' && currentGid === '289536394') {
+                    if (activeCategory === 'all') label = 'SEMUA UNIT MOBIL';
+                    else if (activeCategory === 'BBM') label = 'MOBIL BBM';
+                    else if (activeCategory === 'Listrik') label = 'MOBIL LISTRIK';
+                }
 
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
@@ -1224,7 +1238,7 @@
 
             if (statKategoriLabel) {
                 if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    statKategoriLabel.innerText = "JENIS SERVICE"; 
+                    statKategoriLabel.innerText = activeCategory === 'all' ? "JUMLAH MOBIL BBM" : "JENIS SERVICE"; 
                     
                     if (activeCategory === 'BBM') {
                         jenisServiceText = "MOBIL BBM";
@@ -1232,6 +1246,26 @@
                         jenisServiceText = "MOBIL LISTRIK";
                     } else {
                         jenisServiceText = "SEMUA UNIT MOBIL"; 
+                    }
+                } else if (currentGid === '1495287037' && currentSheetType === 'UNIT') {
+                    statKategoriLabel.innerText = activeCategory === 'all' ? "JUMLAH MOTOR KONVENSIONAL" : "JENIS SERVICE"; 
+                    
+                    if (activeCategory === 'Konvensional') {
+                        jenisServiceText = "MOTOR KONVENSIONAL";
+                    } else if (activeCategory === 'Listrik') {
+                        jenisServiceText = "MOTOR LISTRIK";
+                    } else {
+                        jenisServiceText = "SEMUA UNIT MOTOR"; 
+                    }
+                } else if (currentSheetType === 'KARYAWAN') {
+                    statKategoriLabel.innerText = activeCategory === 'all' ? "KARYAWAN DEDICATED MOBIL" : "JABATAN AKTIF"; 
+                    
+                    if (activeCategory === 'Mobil') {
+                        jenisServiceText = "KARYAWAN MOBIL";
+                    } else if (activeCategory === 'Motor') {
+                        jenisServiceText = "KARYAWAN MOTOR";
+                    } else {
+                        jenisServiceText = "SEMUA KARYAWAN"; 
                     }
                 } else {
                     statKategoriLabel.innerText = kategoriAktifLabel; 
@@ -1255,15 +1289,11 @@
                 } else if (currentSheetType === 'DETAIL_UNIT') {
                      statCategory.innerText = 'DETAIL VIEW';
                 } else if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    statCategory.innerText = jenisServiceText;
+                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
+                } else if (currentGid === '1495287037' && currentSheetType === 'UNIT') {
+                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
                 } else if (currentSheetType === 'KARYAWAN') {
-                    if (activeCategory === 'Mobil') {
-                        statCategory.innerText = "KARYAWAN MOBIL";
-                    } else if (activeCategory === 'Motor') {
-                        statCategory.innerText = "KARYAWAN MOTOR";
-                    } else {
-                        statCategory.innerText = "SEMUA KARYAWAN";
-                    }
+                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
                 } else {
                     const activeSidebarItem = document.querySelector('.sidebar-active');
                     if (activeSidebarItem) {
@@ -3097,6 +3127,38 @@
                 countLabel = "TOTAL PERSONEL";
             } else if (currentSheetType === 'KARYAWAN') {
                 countLabel = "TOTAL KARYAWAN";
+                if (activeCategory === 'all') {
+                    let countMobil = 0;
+                    let countMotor = 0;
+                    filtered.forEach(row => {
+                        let text = Object.values(row).join(" ").toUpperCase();
+                        if (text.includes("DRIVER") || text.includes("LOPER") || text.includes("HELPER") || text.includes("MOBIL")) {
+                            countMobil++;
+                        } else {
+                            countMotor++;
+                        }
+                    });
+                    
+                    displayCount = countMobil + countMotor;
+                    
+                    const statCatLabel = document.getElementById('stat-kategori-label');
+                    const statCatVal = document.getElementById('stat-category-val');
+                    if (statCatLabel) statCatLabel.innerText = "KARYAWAN DEDICATED MOBIL";
+                    if (statCatVal) {
+                        statCatVal.innerText = countMobil + " ORANG";
+                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600');
+                        statCatVal.classList.add('text-blue-600');
+                    }
+                    
+                    const statPerLabel = document.getElementById('stat-periode-label');
+                    const statPerVal = document.getElementById('stat-periode-val');
+                    if (statPerLabel) statPerLabel.innerText = "KARYAWAN DEDICATED MOTOR";
+                    if (statPerVal) {
+                        statPerVal.innerText = countMotor + " ORANG";
+                        statPerVal.classList.remove('text-slate-800', 'text-blue-600');
+                        statPerVal.classList.add('text-emerald-600');
+                    }
+                }
             } else if (currentSheetType === 'TIMELINE') {
                 countLabel = "DURATION"; 
                 displayCount = typeof timelineDuration !== 'undefined' ? timelineDuration : '0';
@@ -3184,7 +3246,75 @@
                     statPerVal.classList.add('text-emerald-600');
                 }
             } else {
-                countLabel = "UNIT TERFILTER";
+                if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '289536394' && activeCategory === 'all') {
+                    countLabel = "TOTAL MOBIL";
+                    
+                    let countBBM = 0;
+                    let countListrik = 0;
+                    filtered.forEach(row => {
+                        let text = Object.values(row).join(" ").toUpperCase();
+                        if (text.includes("BBM")) {
+                            countBBM++;
+                        } else if (text.includes("LISTRIK")) {
+                            countListrik++;
+                        }
+                    });
+                    
+                    displayCount = countBBM + countListrik;
+                    
+                    const statCatLabel = document.getElementById('stat-kategori-label');
+                    const statCatVal = document.getElementById('stat-category-val');
+                    if (statCatLabel) statCatLabel.innerText = "JUMLAH MOBIL BBM";
+                    if (statCatVal) {
+                        statCatVal.innerText = countBBM + " UNIT";
+                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600');
+                        statCatVal.classList.add('text-blue-600');
+                    }
+                    
+                    const statPerLabel = document.getElementById('stat-periode-label');
+                    const statPerVal = document.getElementById('stat-periode-val');
+                    if (statPerLabel) statPerLabel.innerText = "JUMLAH MOBIL LISTRIK";
+                    if (statPerVal) {
+                        statPerVal.innerText = countListrik + " UNIT";
+                        statPerVal.classList.remove('text-slate-800', 'text-blue-600');
+                        statPerVal.classList.add('text-emerald-600');
+                    }
+                } else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '1495287037' && activeCategory === 'all') {
+                    countLabel = "TOTAL MOTOR";
+                    
+                    let countKonvensional = 0;
+                    let countListrik = 0;
+                    filtered.forEach(row => {
+                        let text = Object.values(row).join(" ").toUpperCase();
+                        if (text.includes("LISTRIK")) {
+                            countListrik++;
+                        } else {
+                            countKonvensional++;
+                        }
+                    });
+                    
+                    displayCount = countKonvensional + countListrik;
+                    
+                    const statCatLabel = document.getElementById('stat-kategori-label');
+                    const statCatVal = document.getElementById('stat-category-val');
+                    if (statCatLabel) statCatLabel.innerText = "JUMLAH MOTOR KONVENSIONAL";
+                    if (statCatVal) {
+                        statCatVal.innerText = countKonvensional + " UNIT";
+                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600');
+                        statCatVal.classList.add('text-blue-600');
+                    }
+                    
+                    const statPerLabel = document.getElementById('stat-periode-label');
+                    const statPerVal = document.getElementById('stat-periode-val');
+                    if (statPerLabel) statPerLabel.innerText = "JUMLAH MOTOR LISTRIK";
+                    if (statPerVal) {
+                        statPerVal.innerText = countListrik + " UNIT";
+                        statPerVal.classList.remove('text-slate-800', 'text-blue-600');
+                        statPerVal.classList.add('text-emerald-600');
+                    }
+                } else {
+                    countLabel = "UNIT TERFILTER";
+                }
             }
 
             const labelEl = document.getElementById('stat-count-label');
