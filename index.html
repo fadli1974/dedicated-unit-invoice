@@ -334,9 +334,13 @@
                     </select>
                 </div>
 
+                <!-- BAGIAN KANAN: Tombol Status, Last Sync & Live GPS -->
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto justify-start xl:justify-end flex-shrink-0">
-                    <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar"></div>
+                    <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar">
+                        <!-- Konten filter ini akan diganti secara dinamis via JS -->
+                    </div>
 
+                    <!-- Kotak Last Sync -->
                     <div class="flex bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm items-center gap-3 sm:gap-4 flex-shrink-0 ml-auto sm:ml-0">
                         <div class="text-right">
                             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 leading-none">Last Sync</p>
@@ -345,7 +349,8 @@
                         <i data-lucide="database" class="w-4 h-4 sm:w-5 sm:h-5 text-green-500"></i>
                     </div>
 
-                    <button id="liveGpsBtn" onclick="openGPS()" class="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-200 transition-all group focus:outline-none focus:ring-2 focus:ring-red-500/20 flex-shrink-0 cursor-pointer" title="Buka Live GPS">
+                    <!-- TOMBOL LIVE GPS -->
+                    <button id="liveGpsBtn" onclick="openGPS()" class="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-200 transition-all group focus:outline-none focus:ring-2 focus:ring-red-500/20 flex-shrink-0 cursor-pointer" title="Buka Live GPS sesuai Pemilik Unit">
                         <i data-lucide="map-pinned" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 group-hover:scale-110 transition-transform"></i>
                         <span class="text-[10px] sm:text-xs font-black text-slate-700 group-hover:text-red-700 uppercase tracking-widest hidden sm:block">Live GPS</span>
                     </button>
@@ -1166,7 +1171,7 @@
                     c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                 }
             } else if (currentSheetType.startsWith('INVOICE')) {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; 
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6"; 
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
@@ -1174,10 +1179,13 @@
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
                     card.style.width = ""; 
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3') {
                         card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
+
+                const c3 = document.getElementById('stat-card-3');
+                if (c3) c3.classList.add('hidden');
             } else if (currentSheetType === 'PETA') {
                 if (statsRow) statsRow.className = "hidden";
                 label = 'SUMBER PETA';
@@ -1195,6 +1203,66 @@
                 cards.forEach(card => {
                     card.style.width = "";
                     if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+            } else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && 
+                     ((currentGid === '289536394' && (activeCategory === 'BBM' || activeCategory === 'Listrik')) || 
+                      (currentGid === '1495287037' && (activeCategory === 'Konvensional' || activeCategory === 'Listrik')))) {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3' && card.id !== 'stat-card-4') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+            } else if (currentSheetType === 'MOTOR_BACKUP' && currentGid === '1107508733') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3' && card.id !== 'stat-card-4') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+            } else if (currentSheetType === 'KARYAWAN' && (activeCategory === 'Mobil' || activeCategory === 'Motor')) {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3' && card.id !== 'stat-card-4') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+            } else if (currentSheetType === 'BATTERY') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+                
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3' && card.id !== 'stat-card-4') {
                         card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
@@ -1334,9 +1402,21 @@
 
             container.style.display = 'flex';
 
+            const keys = Object.keys(originalData[0]);
+            const masaKerjaKey = keys.find(k => k.toUpperCase().trim() === "MASA KERJA") || keys.find(k => {
+                const up = k.toUpperCase();
+                return up.includes("MASA KERJA") || up.includes("LAMA BEKERJA") || up.includes("LAMA KERJA") || up.includes("TAHUN KERJA");
+            });
+
             const uniqueYears = new Set();
+
             originalData.forEach(row => {
-                let valStr = row._rawRow && row._rawRow[10] !== undefined ? String(row._rawRow[10]) : "";
+                let valStr = "";
+                if (masaKerjaKey && row[masaKerjaKey]) {
+                    valStr = String(row[masaKerjaKey]);
+                } else if (row._rawRow && row._rawRow[10] !== undefined) {
+                    valStr = String(row._rawRow[10]);
+                }
 
                 if (valStr && valStr.trim() !== '-' && valStr.trim() !== '') {
                     const match = valStr.match(/(\d+)\s*Tahun/i);
@@ -1716,6 +1796,9 @@
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'none';
             
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+            if (karyawanCatFilter) karyawanCatFilter.style.display = 'none';
+
             const isDifferentSheet = (currentGid !== gid);
             currentGid = gid;
             currentSheetType = type; 
@@ -1818,16 +1901,6 @@
                 }
             }
 
-            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
-            if (karyawanCatFilter) {
-                if (diagramType === 'karyawan') {
-                    karyawanCatFilter.style.display = 'block';
-                } else {
-                    karyawanCatFilter.style.display = 'none';
-                    karyawanCatFilter.value = 'all';
-                }
-            }
-
             const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
             if (masaKerjaFilterContainer) {
                 if (diagramType === 'karyawan') {
@@ -1856,6 +1929,9 @@
             
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'none';
+
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+            if (karyawanCatFilter) karyawanCatFilter.style.display = 'none';
 
             toggleChart(true);
             toggleMap(false);
@@ -2723,6 +2799,9 @@
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'block';
 
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+            if (karyawanCatFilter) karyawanCatFilter.style.display = 'none';
+
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('sidebar-active'));
             if(element) element.classList.add('sidebar-active');
 
@@ -3083,10 +3162,13 @@
             }
 
             if (currentSheetType.startsWith('INVOICE')) {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; 
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6"; 
                 if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
                 
+                const c3 = document.getElementById('stat-card-3');
+                if (c3) c3.classList.add('hidden');
+
                 const selectEl = document.getElementById('invoiceSheetFilter');
                 if (selectEl && selectEl.options.length > 0) {
                     document.getElementById('stat-sheet-val').innerText = selectEl.options[selectEl.selectedIndex].text;
@@ -3365,12 +3447,31 @@
                 displayCount = currentFilteredData.length;
             }
 
+            else if (currentSheetType === 'KARYAWAN' && (activeCategory === 'Mobil' || activeCategory === 'Motor')) {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+
+                countLabel = "TOTAL KARYAWAN";
+                displayCount = currentFilteredData.length;
+                document.querySelector('#stat-card-1 > p').innerText = "KARYAWAN";
+                document.getElementById('stat-sheet-val').innerText = activeCategory === 'Mobil' ? 'DEDICATED MOBIL' : 'DEDICATED MOTOR';
+            }
+
             else {
                 countLabel = "UNIT TERFILTER";
                 if (currentSheetType === 'BATTERY') {
                     const totalJml = currentFilteredData.reduce((sum, row) => sum + (parseInt(String(row._rawRow && row._rawRow[4] !== undefined ? row._rawRow[4] : 0).replace(/[^0-9]/g, '')) || 0), 0);
                     displayCount = totalJml;
                     countLabel = "JUMLAH BATTERY";
+                    
+                    if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                    const c3 = document.getElementById('stat-card-3');
+                    const c4 = document.getElementById('stat-card-4');
+                    if (c3) c3.classList.add('hidden');
+                    if (c4) c4.classList.add('hidden');
                 }
 
                 let jenisServiceText = ""; 
@@ -3382,6 +3483,9 @@
                     document.getElementById('stat-kategori-label').innerText = "JENIS SERVICE"; 
                     if (activeCategory === 'Konvensional') jenisServiceText = "MOTOR KONVENSIONAL";
                     else if (activeCategory === 'Listrik') jenisServiceText = "MOTOR LISTRIK";
+                } else if (currentGid === '1107508733' && currentSheetType === 'MOTOR_BACKUP') {
+                    document.getElementById('stat-kategori-label').innerText = "KATEGORI AKTIF";
+                    jenisServiceText = "MOTOR BACKUP";
                 } else if (currentSheetType === 'KARYAWAN') {
                     document.getElementById('stat-kategori-label').innerText = "JABATAN AKTIF"; 
                     if (activeCategory === 'Mobil') jenisServiceText = "KARYAWAN MOBIL";
