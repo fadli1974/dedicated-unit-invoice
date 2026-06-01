@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dedicated Unit & Invoice Dashboard</title>
+    <title>LJR GROUP - Checklist Dedicated Makasar</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- PapaParse & Lucide & Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Library Leaflet (Peta) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
@@ -25,6 +30,8 @@
         .sub-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 11px; color: #94a3b8; }
         #sidebar { transition: transform 0.3s ease-in-out; }
         .stat-card { transition: all 0.2s ease; border: 1px solid #e2e8f0; }
+
+        .logo-text { font-size: 1.5rem; font-weight: 900; color: white; font-style: italic; letter-spacing: -0.05em; text-transform: uppercase; }
         
         /* Animasi Berkedip Untuk Peta */
         @keyframes blink-marker {
@@ -48,14 +55,14 @@
             white-space: nowrap;
             transform: translate(-50%, -50%);
             cursor: default;
-            font-size: 9px; /* Ukuran diperkecil agar tidak bertumpuk di layar PC */
+            font-size: 9px;
             letter-spacing: 0.05em;
         }
 
         /* Responsif Layar Kecil (Mobile / HP) */
         @media (max-width: 768px) {
             .custom-text-label, .map-text-label {
-                display: none !important; /* Sembunyikan label nama kota sepenuhnya di HP */
+                display: none !important; 
                 opacity: 0 !important;
                 visibility: hidden !important;
             }
@@ -93,9 +100,10 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0f172a] text-slate-400 flex flex-col flex-shrink-0 shadow-2xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
-        <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex justify-between items-center">
-            <span>Dedicated AAM</span>
-            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+        <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex flex-col gap-1 justify-center items-start">
+            <div class="logo-text">LJR GROUP</div>
+            <span class="text-[10px] text-blue-400 tracking-widest font-bold">DEDICATED AAM</span>
+            <button onclick="toggleSidebar()" class="lg:hidden absolute top-6 right-6 text-slate-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
         </div>
@@ -110,7 +118,6 @@
 
             <!-- Section Mobil -->
             <div>
-                <!-- Header Accordion Mobil -->
                 <div onclick="toggleSubMenu('submenu-mobil')" class="sidebar-item flex items-center justify-between p-3 rounded-lg bg-blue-600 text-white" id="header-mobil">
                     <div class="flex items-center gap-3">
                         <i data-lucide="car" class="w-4 h-4"></i> Unit Mobil
@@ -118,7 +125,6 @@
                     <i data-lucide="chevron-down" id="icon-submenu-mobil" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(180deg);"></i>
                 </div>
                 
-                <!-- Isi Submenu Mobil -->
                 <div id="submenu-mobil" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 500px;">
                     <div onclick="switchSheet('all', 'Unit Mobil', 'car', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item sidebar-active" id="menu-mobil">
                         <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Mobil
@@ -129,11 +135,9 @@
                     <div onclick="switchSheet('Listrik', 'UNIT LISTRIK', 'zap', '289536394', 'UNIT', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="zap" class="w-3 h-3 text-yellow-500"></i> Mobil Listrik
                     </div>
-                    <!-- Menu Diagram -->
                     <div onclick="showDiagram('289536394', 'Mobil', this, 'mobil')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
                     </div>
-                    <!-- Menu Timeline Peremajaan Mobil -->
                     <div onclick="switchSheet('all', 'Timeline Peremajaan', 'calendar-clock', '703630601', 'TIMELINE', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="calendar-clock" class="w-3 h-3 text-cyan-400"></i> Timeline Peremajaan
                     </div>
@@ -142,7 +146,6 @@
 
             <!-- Section Motor -->
             <div class="mt-4">
-                <!-- Header Accordion Motor -->
                 <div onclick="toggleSubMenu('submenu-motor')" class="sidebar-item flex items-center justify-between p-3 rounded-lg" id="header-motor">
                     <div class="flex items-center gap-3">
                         <i data-lucide="bike" class="w-4 h-4"></i> Unit Motor
@@ -150,7 +153,6 @@
                     <i data-lucide="chevron-down" id="icon-submenu-motor" class="w-4 h-4 transition-transform duration-300" style="transform: rotate(0deg);"></i>
                 </div>
                 
-                <!-- Isi Submenu Motor -->
                 <div id="submenu-motor" class="ml-9 mt-1 space-y-1 border-l border-slate-800 overflow-hidden transition-all duration-300" style="max-height: 0px;">
                     <div onclick="switchSheet('all', 'Unit Motor', 'bike', '1495287037', 'UNIT', this)" class="sidebar-item sub-menu-item" id="menu-motor">
                         <i data-lucide="layout-grid" class="w-3 h-3 text-slate-500"></i> Semua Unit Motor
@@ -164,11 +166,9 @@
                     <div onclick="switchSheet('all', 'Motor Backup', 'archive', '1107508733', 'MOTOR_BACKUP', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="archive" class="w-3 h-3 text-slate-500"></i> Motor Backup
                     </div>
-                    <!-- Menu Diagram Motor -->
                     <div onclick="showDiagram('1495287037', 'Motor', this, 'motor')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
                     </div>
-                    <!-- Menu Timeline Peremajaan Motor -->
                     <div onclick="switchSheet('all', 'Timeline Peremajaan Motor', 'calendar-clock', '450578458', 'TIMELINE', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="calendar-clock" class="w-3 h-3 text-cyan-400"></i> Timeline Peremajaan
                     </div>
@@ -194,7 +194,6 @@
                     <div onclick="switchSheet('Motor', 'Karyawan Motor', 'bike', '1709109057', 'KARYAWAN', this)" class="sidebar-item sub-menu-item">
                         <i data-lucide="bike" class="w-3 h-3 text-slate-500"></i> Dedicated Motor
                     </div>
-                    <!-- Menu Diagram Karyawan -->
                     <div onclick="showDiagram('1709109057', 'Karyawan', this, 'karyawan')" class="sidebar-item sub-menu-item">
                         <i data-lucide="bar-chart-3" class="w-3 h-3 text-blue-400"></i> Diagram
                     </div>
@@ -261,37 +260,36 @@
                 
                 <!-- BAGIAN KIRI: Kumpulan Filter Dropdown -->
                 <div class="flex flex-wrap items-center gap-2 lg:gap-3 w-full xl:w-auto flex-1">
-                    <!-- Dropdown Provinsi (Khusus Peta) -->
                     <select id="provinsiMapFilter" onchange="onProvinsiMapChange()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none text-xs font-black shadow-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Provinsi</option>
                     </select>
 
-                    <!-- Dropdown Kota (Khusus Peta) -->
                     <select id="cityMapFilter" onchange="applyMapFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none text-xs font-black shadow-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Kota/Cabang</option>
                     </select>
 
-                    <!-- Dropdown Jenis Kendaraan (Khusus Diagram) -->
+                    <select id="karyawanCatFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
+                        <option value="all">Semua Karyawan</option>
+                        <option value="mobil">Karyawan Mobil</option>
+                        <option value="motor">Karyawan Motor</option>
+                    </select>
+
                     <select id="jenisFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Jenis</option>
                     </select>
 
-                    <!-- Dropdown Jabatan (Khusus Menu Nama Karyawan) -->
                     <select id="jabatanFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Jabatan</option>
                     </select>
 
-                    <!-- Dropdown GPS -->
                     <select id="gpsFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua GPS</option>
                     </select>
 
-                    <!-- Dropdown Pemilik -->
                     <select id="pemilikFilter" onchange="applyFilters()" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Pemilik</option>
                     </select>
 
-                    <!-- RENTANG USIA (MIN - MAX) -->
                     <div id="usiaFilterContainer" style="display: none;" class="flex-1 sm:flex-none flex items-center gap-1 sm:gap-2">
                         <select id="usiaMinFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                             <option value="all">MIN USIA</option>
@@ -302,7 +300,6 @@
                         </select>
                     </div>
 
-                    <!-- RENTANG MASA KERJA (MIN - MAX) Khusus Karyawan -->
                     <div id="masaKerjaFilterContainer" style="display: none;" class="flex-1 sm:flex-none flex items-center gap-1 sm:gap-2">
                         <select id="masaKerjaMinFilter" onchange="applyFilters()" class="w-full sm:w-auto px-2 sm:px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[10px] sm:text-xs font-black shadow-sm text-slate-600 hover:bg-slate-50 hover:border-slate-300 cursor-pointer uppercase tracking-wide truncate transition-all">
                             <option value="all">MIN MASA KERJA</option>
@@ -313,7 +310,6 @@
                         </select>
                     </div>
 
-                    <!-- Dropdown Invoice Sheet -->
                     <select id="invoiceSheetFilter" onchange="switchInvoiceSheet(this.value)" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-xs font-black shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="INVOICE_MOBIL_289536394">INVOICE MOBIL</option>
                         <option value="INVOICE_MOTOR_1495287037">INVOICE MOTOR</option>
@@ -321,7 +317,6 @@
                         <option value="INVOICE_SDM_666929758">INVOICE SDM</option>
                     </select>
 
-                    <!-- Dropdown Bulan -->
                     <select id="bulanFilter" onchange="onBulanChange(this)" style="display: none;" class="flex-1 sm:flex-none px-3 py-2.5 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none text-xs font-black shadow-sm text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer uppercase tracking-wide truncate transition-all">
                         <option value="all">Semua Bulan</option>
                         <option value="januari">Januari</option>
@@ -339,13 +334,9 @@
                     </select>
                 </div>
 
-                <!-- BAGIAN KANAN: Tombol Status, Last Sync & Live GPS -->
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto justify-start xl:justify-end flex-shrink-0">
-                    <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar">
-                        <!-- Konten filter ini akan diganti secara dinamis via JS -->
-                    </div>
+                    <div id="filter-container" class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto custom-scrollbar"></div>
 
-                    <!-- Kotak Last Sync -->
                     <div class="flex bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm items-center gap-3 sm:gap-4 flex-shrink-0 ml-auto sm:ml-0">
                         <div class="text-right">
                             <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 leading-none">Last Sync</p>
@@ -354,15 +345,14 @@
                         <i data-lucide="database" class="w-4 h-4 sm:w-5 sm:h-5 text-green-500"></i>
                     </div>
 
-                    <!-- TOMBOL LIVE GPS -->
-                    <button id="liveGpsBtn" onclick="openGPS()" class="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-200 transition-all group focus:outline-none focus:ring-2 focus:ring-red-500/20 flex-shrink-0 cursor-pointer" title="Buka Live GPS sesuai Pemilik Unit">
+                    <button id="liveGpsBtn" onclick="openGPS()" class="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-xl border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-200 transition-all group focus:outline-none focus:ring-2 focus:ring-red-500/20 flex-shrink-0 cursor-pointer" title="Buka Live GPS">
                         <i data-lucide="map-pinned" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 group-hover:scale-110 transition-transform"></i>
                         <span class="text-[10px] sm:text-xs font-black text-slate-700 group-hover:text-red-700 uppercase tracking-widest hidden sm:block">Live GPS</span>
                     </button>
                 </div>
             </div>
 
-            <!-- KOTAK STATISTIK BERSIH (Akan disembunyikan saat di Map) -->
+            <!-- KOTAK STATISTIK BERSIH UTAMA -->
             <div id="statsRow" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
                 <!-- Card 1 (Sheet Sumber) -->
                 <div id="stat-card-1" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
@@ -376,13 +366,7 @@
                     <h3 id="stat-timeline-unit-val" class="text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
                 </div>
 
-                <!-- Card Tambahan Khusus SDM (Disembunyikan secara default) -->
-                <div id="stat-sdm-extra" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden text-left">
-                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Jumlah Dedicated SDM</p>
-                    <h3 id="stat-sdm-extra-val" class="text-base sm:text-lg lg:text-xl font-black text-purple-600 tracking-tight truncate">0</h3>
-                </div>
-
-                <!-- Card 2 (Unit Terfilter / Duration / Total SDM) -->
+                <!-- Card 2 (Unit Terfilter / Duration) -->
                 <div id="stat-card-2" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
                     <p id="stat-count-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">Unit Terfilter</p>
                     <h3 id="stat-count-standard" class="text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate">0</h3>
@@ -410,6 +394,12 @@
                 <div id="stat-card-4" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left">
                     <p id="stat-periode-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">DATA UNIT</p>
                     <h3 id="stat-periode-val" class="text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate">CL</h3>
+                </div>
+
+                <!-- Card 5 (SDM & Penambahan) -->
+                <div id="stat-card-5" class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card hidden text-left">
+                    <p id="stat-extra-label" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider truncate">EXTRA</p>
+                    <h3 id="stat-extra-val" class="text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate">-</h3>
                 </div>
             </div>
 
@@ -504,6 +494,19 @@
         let mainChart = null;
         let currentDiagramType = 'mobil';
 
+        let originalData = [];
+        let currentFilteredData = [];
+        let activeCategory = 'all';
+        let leaseStatusFilter = 'all';
+        let rawCsvData = [];
+        
+        let timelineProjectName = '';
+        let timelineTotalUnit = '';
+        let timelineDuration = '';
+        let timelineStartDate = '';
+        let timelineEndDate = '';
+        let currentHeaderIndex = 1;
+
         const DIAGRAM_CONFIG = {
             'mobil': {
                 colIndex: 12, 
@@ -516,7 +519,7 @@
                 colors: { "MOTOR KONVENSIONAL": "#64748b", "MOTOR LISTRIK": "#eab308", "LAINNYA": "#94a3b8" }
             },
             'karyawan': {
-                colIndex: 5, 
+                colIndex: 9, 
                 types: ["DRIVER", "LOPER", "HELPER", "KURIR", "SDM KURIR"],
                 colors: { "DRIVER": "#3b82f6", "LOPER": "#10b981", "HELPER": "#f59e0b", "KURIR": "#8b5cf6", "SDM KURIR": "#ef4444", "LAINNYA": "#94a3b8" }
             }
@@ -533,17 +536,6 @@
 
         let isInvoiceUnlocked = false;
         let pendingInvoiceElement = null;
-
-        const standardFiltersHTML = `
-            <button onclick="setStatusFilter('all')" id="status-all" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap shadow-sm">Semua</button>
-            <button onclick="setStatusFilter('aktif')" id="status-aktif" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Aktif</button>
-            <button onclick="setStatusFilter('habis')" id="status-habis" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Sewa Habis</button>
-        `;
-
-        const detailFiltersHTML = `
-            <button onclick="switchDetailView('mobil')" id="detail-mobil" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg bg-blue-600 text-white whitespace-nowrap">Mobil</button>
-            <button onclick="switchDetailView('motor')" id="detail-motor" class="flex-1 px-4 py-2 text-xs font-black transition-all rounded-lg text-slate-500 hover:bg-slate-50 whitespace-nowrap">Motor</button>
-        `;
 
         function parseGoogleDate(str) {
             if (!str) return '';
@@ -635,8 +627,8 @@
                 { label: "CABANG", keys: ["ID Cabang", "Cabang", "CABANG"] },
                 { label: "EMPLOYEE ID", keys: ["Employee Id", "EMPLOYEE ID", "ID"] },
                 { label: "NAMA KARYAWAN", keys: ["Employee Name", "EMPLOYEE NAME", "NAMA"] },
-                { label: "JABATAN", keys: ["Jabatan", "JABATAN", "POSISI"] },
-                { label: "LAMA MASA BEKERJA", rawIdx: 9 }
+                { label: "JABATAN", keys: ["Jabatan", "JABATAN", "POSISI"], rawIdx: 5 },
+                { label: "LAMA MASA BEKERJA", keys: ["Masa Kerja", "Lama Masa Bekerja", "Lama Bekerja", "Lama Kerja", "Tahun Kerja"], rawIdx: 10 }
             ],
             'SDM': [
                 { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
@@ -717,49 +709,34 @@
                 { label: "Nilai Ppn", keys: ["Nilai Ppn", "NILAI PPN"] },
                 { label: "Nilai Invoice + Ppn", keys: ["Nilai Invoice + Ppn", "NILAI INVOICE + PPN", "Nilai Invoice + PPn"] }
             ],
-                'INVOICE_SDM': [
-                    { label: "NO", isIndex: true },
-                    { label: "CABANG AAM", rawIdx: 2 },
-                    { label: "JENIS SERVICE", rawIdx: 6 },
-                    { label: "JENIS SEWA", rawIdx: 16 },
-                    { label: "NAMA", rawIdx: 4 },
-                    { label: "JML UNIT", rawIdx: 7 },
-                    { label: "HARGA SEWA", rawIdx: 13, isCurr: true },
-                    { label: "INSENTIF", isDynamicMonthSDM: true, isCurr: true },
-                    { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
-                    { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
-                    { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
-                ],
-                'PETA': [
-                    { label: "NO", isIndex: true },
-                    { label: "CABANG", keys: ["ID Cabang", "CABANG", "City", "Kota"] },
-                    { label: "NOPOL", keys: ["No POL", "NOPOL", "No Polisi"] },
-                    { label: "ALAMAT", keys: ["Alamat", "ALAMAT"] },
-                    { label: "KODE POS", keys: ["Kode Pos", "KODE POS"] },
-                    { label: "JENIS", keys: ["Jenis Unit", "Bahan Bakar Unit", "KENDARAAN_ASAL"] },
-                    { label: "JUMLAH", keys: ["Jumlah Unit", "Jumlah"] },
-                    { label: "PROVINSI", keys: ["Provinsi"] }
-                ]
-            };
+            'INVOICE_SDM': [
+                { label: "NO", isIndex: true },
+                { label: "CABANG AAM", rawIdx: 2 },
+                { label: "JENIS SERVICE", rawIdx: 6 },
+                { label: "JENIS SEWA", rawIdx: 16 },
+                { label: "NAMA", rawIdx: 4 },
+                { label: "JML UNIT", rawIdx: 7 },
+                { label: "HARGA SEWA", rawIdx: 13, isCurr: true },
+                { label: "INSENTIF", isDynamicMonthSDM: true, isCurr: true },
+                { label: "NILAI INVOICE", isCalcInv: true, isCurr: true },
+                { label: "NILAI PPN 11%", isCalcPpn: true, isCurr: true },
+                { label: "NILAI INVOICE + PPN", isCalcTotal: true, isCurr: true }
+            ],
+            'PETA': [
+                { label: "NO", isIndex: true },
+                { label: "CABANG", keys: ["ID Cabang", "CABANG", "City", "Kota"] },
+                { label: "NOPOL", keys: ["No POL", "NOPOL", "No Polisi"] },
+                { label: "ALAMAT", keys: ["Alamat", "ALAMAT"] },
+                { label: "KODE POS", keys: ["Kode Pos", "KODE POS"] },
+                { label: "JENIS", keys: ["Jenis Unit", "Bahan Bakar Unit", "KENDARAAN_ASAL"] },
+                { label: "JUMLAH", keys: ["Jumlah Unit", "Jumlah"] },
+                { label: "PROVINSI", keys: ["Provinsi"] }
+            ]
+        };
 
         const INVOICE_GIDS = {
             '1588810041': 'INVOICE_BATTERY'
         };
-
-        let originalData = [];
-        let activeCategory = 'all';
-        let leaseStatusFilter = 'all';
-        let gpsLinksConfig = { mobil: {}, motor: {} }; 
-
-        let timelineProjectName = '';
-        let timelineTotalUnit = '';
-        let timelineDuration = '';
-        let timelineStartDate = '';
-        let timelineEndDate = '';
-        
-        let currentFilteredData = [];
-        let rawCsvData = [];
-        let currentHeaderIndex = 0;
 
         function toggleSubMenu(menuId) {
             const allSubmenus = ['submenu-mobil', 'submenu-motor', 'submenu-karyawan'];
@@ -825,7 +802,6 @@
 
         function openGPS() {
             let isMotor = (currentGid === '1495287037' || currentGid === '1107508733' || currentSheetType === 'INVOICE_MOTOR' || (isDiagramMode && currentDiagramType === 'motor'));
-            let typeContext = isMotor ? 'motor' : 'mobil';
 
             const pemilikFilter = document.getElementById('pemilikFilter');
             let selectedOwner = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value.toUpperCase() : 'ALL';
@@ -910,6 +886,16 @@
             const refreshIcon = document.getElementById('refresh-icon');
             if(refreshIcon) refreshIcon.classList.add('animate-spin');
 
+            // HARD HIDE Elements to prevent lagging or weird stacking before fetch complete
+            const tableSec = document.getElementById('tableSection');
+            const mapSec = document.getElementById('mapSection');
+            const chartSec = document.getElementById('chartSection');
+            const statsDiag = document.getElementById('statsDiagram');
+            if(tableSec) tableSec.classList.add('hidden');
+            if(mapSec) { mapSec.classList.add('hidden'); mapSec.classList.remove('flex'); }
+            if(chartSec) chartSec.classList.add('hidden');
+            if(statsDiag) statsDiag.classList.add('hidden');
+
             if (currentSheetType === 'PETA') {
                 try {
                     const mobilUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=289536394&single=true&output=csv&t=${new Date().getTime()}`;
@@ -965,11 +951,12 @@
                     if (rows.length > 0 && (String(rows[0][0]).toLowerCase().includes("<!doctype") || String(rows[0][0]).toLowerCase().includes("<html"))) {
                         const tableBody = document.getElementById('tableBody');
                         if(tableBody) {
-                            tableBody.innerHTML = `<tr><td colspan="15" class="p-10 text-center text-red-600 font-black uppercase tracking-widest text-sm">DATA SEDANG DISIAPKAN GOOGLE<br><span class="text-xs text-slate-500 tracking-normal normal-case block mt-2">Karena ini adalah link publikasi baru, Google sedang menyiapkan datanya (biasanya butuh waktu 1-3 menit pertama kali).<br>Silakan klik tombol <b>Refresh biru</b> di pojok kanan atas beberapa saat lagi.</span></td></tr>`;
+                            tableBody.innerHTML = `<tr><td colspan="15" class="p-10 text-center text-red-600 font-black uppercase tracking-widest text-sm">DATA SEDANG DISIAPKAN GOOGLE<br><span class="text-xs text-slate-500 tracking-normal normal-case block mt-2">Karena ini adalah link publikasi baru, Google sedang menyiapkan datanya.<br>Silakan klik tombol <b>Refresh biru</b> di pojok kanan atas beberapa saat lagi.</span></td></tr>`;
                         }
                         const rowCountBadge = document.getElementById('row-count-badge');
                         if(rowCountBadge) rowCountBadge.innerText = `TUNGGU`;
                         if(refreshIcon) refreshIcon.classList.remove('animate-spin');
+                        if(tableSec) tableSec.classList.remove('hidden');
                         isWaitingForGoogleSync = false;
                         return;
                     }
@@ -979,6 +966,7 @@
                         isWaitingForGoogleSync = false;
                         applyFilters();
                         if(refreshIcon) refreshIcon.classList.remove('animate-spin');
+                        if(tableSec) tableSec.classList.remove('hidden');
                         return;
                     }
 
@@ -1046,6 +1034,10 @@
                     updateSheetLabel();
                     updateDynamicFilters(); 
                     applyFilters();
+                    
+                    if(!isDiagramMode) {
+                        if(tableSec) tableSec.classList.remove('hidden');
+                    }
                     if(refreshIcon) refreshIcon.classList.remove('animate-spin');
                 },
                 error: function(err) {
@@ -1063,6 +1055,8 @@
                             </span>
                         </td></tr>`;
                     }
+                    const tableSec = document.getElementById('tableSection');
+                    if(tableSec) tableSec.classList.remove('hidden');
                     const rowCountBadge = document.getElementById('row-count-badge');
                     if(rowCountBadge) rowCountBadge.innerText = `ERROR`;
                 }
@@ -1106,23 +1100,54 @@
 
             const statsRow = document.getElementById('statsRow');
             const statTimelineExtra = document.getElementById('stat-timeline-extra');
-            const statSdmExtra = document.getElementById('stat-sdm-extra');
             const statInvoiceHarga = document.getElementById('stat-invoice-harga');
             const statInvoiceBiaya = document.getElementById('stat-invoice-biaya');
+            const statCard5 = document.getElementById('stat-card-5');
 
-            if (currentSheetType === 'TIMELINE') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
-                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
-                if (statSdmExtra) statSdmExtra.classList.add('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+            if (statCard5) statCard5.classList.add('hidden');
+
+            if(currentSheetType.startsWith('INVOICE')) {
+                const selectEl = document.getElementById('invoiceSheetFilter');
+                if (selectEl && selectEl.options.length > 0) {
+                    label = selectEl.options[selectEl.selectedIndex].text;
+                } else {
+                    label = 'INVOICES';
+                }
                 
+                periodeTitle = 'PERIODE';
+                const bulanFilter = document.getElementById('bulanFilter');
+                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
+                    periodeLabel = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
+                } else if (currentSheetMonth) {
+                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
+                    periodeLabel = mappedIndoMonth.toUpperCase() + ' 2026';
+                }
+            }
+            else if(currentGid === '1495287037') label = 'MOTOR';
+            else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
+            else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
+            else if(currentSheetType === 'SDM') label = 'SDM';
+            else if(currentSheetType === 'BATTERY') label = 'BATTERY';
+            else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
+            else if(currentSheetType === 'PETA') label = 'SUMBER PETA';
+            else if(currentSheetType === 'TIMELINE') {
                 label = timelineProjectName || 'TIMELINE';
                 sheetSumberLabel = 'PROJECT NAME';
                 unitTerfilterLabel = 'DURATION';
                 kategoriAktifLabel = 'START DATE';
                 periodeTitle = 'END DATE';
                 periodeLabel = timelineEndDate || '-';
+            }
+            else if(currentSheetType === 'DETAIL_UNIT') {
+                label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
+            }
+
+            // Atur 4/5 Cards base UI based on menu
+            if (currentSheetType === 'TIMELINE') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
+                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
 
                 const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
                 if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
@@ -1140,171 +1165,50 @@
                     c4.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                     c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                 }
-            } else if (currentSheetType === 'PENAMBAHAN') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6";
-                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statSdmExtra) statSdmExtra.classList.remove('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
-
-                label = 'PENAMBAHAN';
-
-                // Pada saat mode penambahan, atur layout agar berurutan sesuai yg diinginkan sebelumnya
-                // Card 1 = Sumber, Card 2 = Total, Card Extra = Mobil, Card 3 = Motor, Card 4 = SDM
-                const c1 = document.getElementById('stat-card-1');
-                const c2 = document.getElementById('stat-card-2');
-                const cExtra = document.getElementById('stat-sdm-extra');
-                const c3 = document.getElementById('stat-card-3');
-                const c4 = document.getElementById('stat-card-4');
-                
-                // Susun element secara fisik di DOM agar flex/grid menampilkannya berurutan
-                if (statsRow && c1 && c2 && cExtra && c3 && c4) {
-                    statsRow.appendChild(c1);
-                    statsRow.appendChild(c2);
-                    statsRow.appendChild(cExtra); // Ini yg tadinya khusus extra
-                    statsRow.appendChild(c3);
-                    statsRow.appendChild(c4);
-                }
-
-                const cards = statsRow.querySelectorAll('.stat-card');
-                cards.forEach(card => {
-                    card.style.width = "";
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
-                    }
-                });
-            } else if (currentSheetType === 'SDM') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6";
-                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statSdmExtra) statSdmExtra.classList.remove('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
-
-                label = 'SDM';
-
-                // URUTAN KARTU KHUSUS SDM:
-                // 1. Sheet Sumber (Card 1)
-                // 2. Total SDM (Card 2)
-                // 3. SDM Driver (Card Extra) -> Warna ungu nantinya
-                // 4. SDM Helper (Card 3) -> Warna biru nantinya
-                // 5. SDM Kurir (Card 4) -> Warna hijau nantinya
-                
-                const c1 = document.getElementById('stat-card-1');
-                const c2 = document.getElementById('stat-card-2');
-                const cExtra = document.getElementById('stat-sdm-extra');
-                const c3 = document.getElementById('stat-card-3');
-                const c4 = document.getElementById('stat-card-4');
-                
-                if (statsRow && c1 && c2 && cExtra && c3 && c4) {
-                    statsRow.appendChild(c1);
-                    statsRow.appendChild(c2);
-                    statsRow.appendChild(cExtra); 
-                    statsRow.appendChild(c3);
-                    statsRow.appendChild(c4);
-                }
-
-                const cards = statsRow.querySelectorAll('.stat-card');
-                cards.forEach(card => {
-                    card.style.width = "";
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
-                    }
-                });
             } else if (currentSheetType.startsWith('INVOICE')) {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; 
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statSdmExtra) statSdmExtra.classList.add('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
                 
-                const selectEl = document.getElementById('invoiceSheetFilter');
-                if (selectEl && selectEl.options.length > 0) {
-                    label = selectEl.options[selectEl.selectedIndex].text;
-                } else {
-                    label = 'INVOICES';
-                }
-                
-                periodeTitle = 'PERIODE';
-                const bulanFilter = document.getElementById('bulanFilter');
-                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
-                    periodeLabel = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
-                } else if (currentSheetMonth) {
-                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
-                    periodeLabel = mappedIndoMonth.toUpperCase() + ' 2026';
-                }
-
-                // Kembalikan urutan elemen ke default jika sebelumnya diubah oleh SDM/Penambahan
-                const c1 = document.getElementById('stat-card-1');
-                const cTime = document.getElementById('stat-timeline-extra');
-                const cSdm = document.getElementById('stat-sdm-extra');
-                const c2 = document.getElementById('stat-card-2');
-                const c3 = document.getElementById('stat-card-3');
-                const cInvH = document.getElementById('stat-invoice-harga');
-                const cInvB = document.getElementById('stat-invoice-biaya');
-                const c4 = document.getElementById('stat-card-4');
-                if (statsRow) {
-                    if (c1) statsRow.appendChild(c1);
-                    if (cTime) statsRow.appendChild(cTime);
-                    if (cSdm) statsRow.appendChild(cSdm);
-                    if (c2) statsRow.appendChild(c2);
-                    if (c3) statsRow.appendChild(c3);
-                    if (cInvH) statsRow.appendChild(cInvH);
-                    if (cInvB) statsRow.appendChild(cInvB);
-                    if (c4) statsRow.appendChild(c4);
-                }
-
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
                     card.style.width = ""; 
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-sdm-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
                         card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
             } else if (currentSheetType === 'PETA') {
-                if (statsRow) statsRow.className = "hidden"; 
+                if (statsRow) statsRow.className = "hidden";
                 label = 'SUMBER PETA';
-            } else {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+            } else if (currentSheetType === 'SDM' || currentSheetType === 'PENAMBAHAN') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6";
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statSdmExtra) statSdmExtra.classList.add('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+                if (statCard5) {
+                    statCard5.classList.remove('hidden');
+                    statCard5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0 col-span-2 lg:col-span-1";
+                }
                 
-                if(currentGid === '1495287037') label = 'MOTOR';
-                else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
-                else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
-                else if(currentSheetType === 'BATTERY') label = 'BATTERY';
-                else if(currentSheetType === 'DETAIL_UNIT') label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
-                else if(currentSheetType === 'UNIT' && currentGid === '289536394') {
-                    if (activeCategory === 'all') label = 'SEMUA UNIT MOBIL';
-                    else if (activeCategory === 'BBM') label = 'MOBIL BBM';
-                    else if (activeCategory === 'Listrik') label = 'MOBIL LISTRIK';
-                }
-
-                // Kembalikan urutan elemen ke default jika sebelumnya diubah oleh SDM/Penambahan
-                const c1 = document.getElementById('stat-card-1');
-                const cTime = document.getElementById('stat-timeline-extra');
-                const cSdm = document.getElementById('stat-sdm-extra');
-                const c2 = document.getElementById('stat-card-2');
-                const c3 = document.getElementById('stat-card-3');
-                const cInvH = document.getElementById('stat-invoice-harga');
-                const cInvB = document.getElementById('stat-invoice-biaya');
-                const c4 = document.getElementById('stat-card-4');
-                if (statsRow) {
-                    if (c1) statsRow.appendChild(c1);
-                    if (cTime) statsRow.appendChild(cTime);
-                    if (cSdm) statsRow.appendChild(cSdm);
-                    if (c2) statsRow.appendChild(c2);
-                    if (c3) statsRow.appendChild(c3);
-                    if (cInvH) statsRow.appendChild(cInvH);
-                    if (cInvB) statsRow.appendChild(cInvB);
-                    if (c4) statsRow.appendChild(c4);
-                }
-
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
                     card.style.width = "";
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-sdm-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya') {
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+            } else {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+                if (statCard5) statCard5.classList.add('hidden');
+                
+                const cards = statsRow.querySelectorAll('.stat-card');
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
                         card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                     }
                 });
@@ -1319,91 +1223,23 @@
             const statPeriodeVal = document.getElementById('stat-periode-val');
             if (statPeriodeVal) {
                 statPeriodeVal.innerText = periodeLabel;
-                statPeriodeVal.classList.remove('text-emerald-600', 'text-blue-600');
+                statPeriodeVal.classList.remove('text-emerald-600', 'text-blue-600', 'text-purple-600');
                 statPeriodeVal.classList.add('text-slate-800');
             }
 
             const statSheetLabel = document.querySelector('#stat-card-1 > p');
             if (statSheetLabel) statSheetLabel.innerText = sheetSumberLabel;
 
+            // Setting text defaults before updateStats overrides them
             const statKategoriLabel = document.getElementById('stat-kategori-label');
-            let jenisServiceText = ""; 
-
             if (statKategoriLabel) {
-                if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    statKategoriLabel.innerText = activeCategory === 'all' ? "JUMLAH MOBIL BBM" : "JENIS SERVICE"; 
-                    
-                    if (activeCategory === 'BBM') {
-                        jenisServiceText = "MOBIL BBM";
-                    } else if (activeCategory === 'Listrik') {
-                        jenisServiceText = "MOBIL LISTRIK";
-                    } else {
-                        jenisServiceText = "SEMUA UNIT MOBIL"; 
-                    }
-                } else if (currentGid === '1495287037' && currentSheetType === 'UNIT') {
-                    statKategoriLabel.innerText = activeCategory === 'all' ? "MOTOR KONVENSIONAL" : "JENIS SERVICE"; 
-                    
-                    if (activeCategory === 'Konvensional') {
-                        jenisServiceText = "MOTOR KONVENSIONAL";
-                    } else if (activeCategory === 'Listrik') {
-                        jenisServiceText = "MOTOR LISTRIK";
-                    } else {
-                        jenisServiceText = "SEMUA UNIT MOTOR"; 
-                    }
-                } else if (currentSheetType === 'KARYAWAN') {
-                    statKategoriLabel.innerText = activeCategory === 'all' ? "KARYAWAN DEDICATED MOBIL" : "JABATAN AKTIF"; 
-                    
-                    if (activeCategory === 'Mobil') {
-                        jenisServiceText = "KARYAWAN MOBIL";
-                    } else if (activeCategory === 'Motor') {
-                        jenisServiceText = "KARYAWAN MOTOR";
-                    } else {
-                        jenisServiceText = "SEMUA KARYAWAN"; 
-                    }
-                } else if (currentSheetType === 'PENAMBAHAN') {
-                    statKategoriLabel.innerText = "JUMLAH DEDICATED MOTOR";
-                } else if (currentSheetType === 'SDM') {
-                    statKategoriLabel.innerText = "SDM HELPER";
-                } else {
-                    statKategoriLabel.innerText = kategoriAktifLabel; 
-                }
+                statKategoriLabel.innerText = kategoriAktifLabel; 
             }
-
             const statCategory = document.getElementById('stat-category-val');
             if (statCategory) {
-                statCategory.classList.remove('text-blue-600', 'text-emerald-600');
+                statCategory.classList.remove('text-blue-600', 'text-emerald-600', 'text-purple-600');
                 statCategory.classList.add('text-slate-800');
-
-                if (currentSheetType === 'TIMELINE') {
-                    statCategory.innerText = timelineStartDate || '-';
-                } else if (currentSheetType === 'PETA') {
-                    statCategory.innerText = 'PETA PERSEBARAN';
-                } else if (isDiagramMode) {
-                    if (currentDiagramType === 'karyawan') statCategory.innerText = 'DIAGRAM KARYAWAN';
-                    else statCategory.innerText = currentDiagramType === 'mobil' ? 'DIAGRAM MOBIL' : 'DIAGRAM MOTOR';
-                } else if (currentSheetType.startsWith('INVOICE')) {
-                     statCategory.innerText = 'INVOICE VIEW';
-                } else if (currentSheetType === 'DETAIL_UNIT') {
-                     statCategory.innerText = 'DETAIL VIEW';
-                } else if (currentGid === '289536394' && currentSheetType === 'UNIT') {
-                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
-                } else if (currentGid === '1495287037' && currentSheetType === 'UNIT') {
-                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
-                } else if (currentSheetType === 'KARYAWAN') {
-                    if (activeCategory !== 'all') statCategory.innerText = jenisServiceText;
-                } else if (currentSheetType === 'PENAMBAHAN') {
-                     // Diupdate di updateStats
-                } else if (currentSheetType === 'SDM') {
-                     // Diupdate di updateStats
-                } else {
-                    const activeSidebarItem = document.querySelector('.sidebar-active');
-                    if (activeSidebarItem) {
-                        let rawText = activeSidebarItem.innerText.trim();
-                        statCategory.innerText = rawText.toUpperCase();
-                    } else {
-                         statCategory.innerText = label || activeCategory || 'SEMUA UNIT';
-                    }
-                }
+                statCategory.innerText = activeCategory.toUpperCase();
             }
         }
 
@@ -1498,23 +1334,19 @@
 
             container.style.display = 'flex';
 
-            const keys = Object.keys(originalData[0]);
-            const masaKerjaKey = keys.find(k => k.toUpperCase().includes("LAMA MASA BEKERJA") || k.toUpperCase().includes("MASA KERJA"));
-
             const uniqueYears = new Set();
-
             originalData.forEach(row => {
-                let valStr = "";
-                if (masaKerjaKey && row[masaKerjaKey]) {
-                    valStr = String(row[masaKerjaKey]);
-                } else if (row._rawRow && row._rawRow[9]) {
-                    valStr = String(row._rawRow[9]);
-                }
+                let valStr = row._rawRow && row._rawRow[10] !== undefined ? String(row._rawRow[10]) : "";
 
                 if (valStr && valStr.trim() !== '-' && valStr.trim() !== '') {
                     const match = valStr.match(/(\d+)\s*Tahun/i);
                     if (match) {
                         uniqueYears.add(parseInt(match[1]));
+                    } else {
+                        const num = parseInt(valStr);
+                        if (!isNaN(num) && num < 100) {
+                            uniqueYears.add(num);
+                        }
                     }
                 }
             });
@@ -1593,7 +1425,7 @@
             const gpsFilter = document.getElementById('gpsFilter');
             if (!gpsFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
+            if (currentSheetType === 'PETA' || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE') || isDiagramMode) {
                 gpsFilter.style.display = 'none';
                 gpsFilter.value = 'all';
                 return;
@@ -1678,7 +1510,7 @@
             
             if (!usiaContainer || !usiaMin || !usiaMax) return;
 
-            if (originalData.length === 0 || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
+            if (originalData.length === 0 || currentSheetType === 'PETA' || currentSheetType === 'SDM' || currentSheetType === 'KARYAWAN' || currentSheetType === 'PENAMBAHAN' || currentSheetType === 'BATTERY' || currentSheetType === 'TIMELINE' || currentSheetType.startsWith('INVOICE')) {
                 usiaContainer.style.display = 'none';
                 usiaMin.value = 'all'; 
                 usiaMax.value = 'all'; 
@@ -1734,7 +1566,7 @@
             const pemilikFilter = document.getElementById('pemilikFilter');
             if (!pemilikFilter || originalData.length === 0) return;
 
-            if (currentSheetType === 'TIMELINE' || currentSheetType === 'KARYAWAN' || currentSheetType.startsWith('INVOICE')) {
+            if (currentSheetType === 'PETA' || currentSheetType === 'TIMELINE' || currentSheetType === 'KARYAWAN' || currentSheetType.startsWith('INVOICE')) {
                 pemilikFilter.style.display = 'none';
                 pemilikFilter.value = 'all';
                 return;
@@ -1795,7 +1627,6 @@
 
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) {
-                // Sembunyikan kotak status (Semua, Aktif, Habis) untuk TIMELINE dan KARYAWAN
                 if (type === 'TIMELINE' || type === 'KARYAWAN') {
                     filterContainer.style.display = 'none';
                 } else if (type === 'PENAMBAHAN') {
@@ -1894,7 +1725,15 @@
             if(element) element.classList.add('sidebar-active');
             
             const headerTitle = document.getElementById('table-header-title');
-            if (headerTitle) headerTitle.innerText = `DATABASE ${title}`;
+            if (headerTitle) {
+                if (type === 'KARYAWAN') {
+                    if (category === 'Mobil') headerTitle.innerText = "DATABASE KARYAWAN MOBIL";
+                    else if (category === 'Motor') headerTitle.innerText = "DATABASE KARYAWAN MOTOR";
+                    else headerTitle.innerText = "DATABASE SEMUA KARYAWAN";
+                } else {
+                    headerTitle.innerText = `DATABASE ${title}`;
+                }
+            }
             
             const headerIcon = document.getElementById('table-header-icon');
             if (headerIcon) headerIcon.setAttribute('data-lucide', icon);
@@ -1975,6 +1814,17 @@
                     jenisFilter.style.display = 'none';
                 } else {
                     jenisFilter.style.display = 'block';
+                    populateJenisKendaraanDiagramFilter();
+                }
+            }
+
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+            if (karyawanCatFilter) {
+                if (diagramType === 'karyawan') {
+                    karyawanCatFilter.style.display = 'block';
+                } else {
+                    karyawanCatFilter.style.display = 'none';
+                    karyawanCatFilter.value = 'all';
                 }
             }
 
@@ -2032,22 +1882,21 @@
             const tableSec = document.getElementById('tableSection');
             const statsDiag = document.getElementById('statsDiagram');
             const filterArea = document.getElementById('filter-area');
-            const statsRow = document.getElementById('statsRow'); // Mengambil element stats utama
+            const statsRow = document.getElementById('statsRow'); 
 
             if (show) {
                 if(mapSec) { mapSec.classList.remove('hidden'); mapSec.classList.add('flex'); }
                 if(chartSec) chartSec.classList.add('hidden');
                 if(statsDiag) statsDiag.classList.add('hidden');
-                if(statsRow) statsRow.classList.add('hidden'); // Sembunyikan stats row umum agar peta meluas
+                if(statsRow) statsRow.classList.add('hidden'); 
                 if(filterArea) filterArea.classList.remove('hidden');
 
-                // Secara default sembunyikan tabel dan perbesar peta sampai Kota/Cabang dipilih
                 if(tableSec) tableSec.classList.add('hidden');
-                if(mapSec) mapSec.style.height = 'calc(100vh - 160px)'; // Memaksimalkan hingga ke bawah layar
+                if(mapSec) mapSec.style.height = 'calc(100vh - 160px)';
             } else {
                 if(mapSec) { mapSec.classList.add('hidden'); mapSec.classList.remove('flex'); }
                 if(tableSec) tableSec.classList.remove('hidden'); 
-                if(statsRow) statsRow.classList.remove('hidden'); // Munculkan kembali stats utama saat keluar dari peta
+                if(statsRow) statsRow.classList.remove('hidden'); 
             }
         }
 
@@ -2064,7 +1913,6 @@
             const headerIcon = document.getElementById('table-header-icon');
             if (headerIcon) headerIcon.setAttribute('data-lucide', 'layers');
 
-            // Sembunyikan filter yang tidak relevan
             const filterContainer = document.getElementById('filter-container');
             if (filterContainer) filterContainer.style.display = 'none';
             const usiaFilterContainer = document.getElementById('usiaFilterContainer');
@@ -2075,6 +1923,8 @@
             if (jabatanFilter) { jabatanFilter.style.display = 'none'; jabatanFilter.value = 'all'; }
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+            if (karyawanCatFilter) karyawanCatFilter.style.display = 'none';
             const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
             if (masaKerjaFilterContainer) masaKerjaFilterContainer.style.display = 'none';
             const pemilikFilter = document.getElementById('pemilikFilter');
@@ -2086,9 +1936,8 @@
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'none';
             const searchContainer = document.getElementById('searchContainer');
-            if (searchContainer) searchContainer.style.display = 'none'; // Sembunyikan search unit di peta
+            if (searchContainer) searchContainer.style.display = 'none'; 
 
-            // Munculkan filter Peta
             const provMap = document.getElementById('provinsiMapFilter');
             if (provMap) provMap.style.display = 'block';
             const cityMap = document.getElementById('cityMapFilter');
@@ -2116,7 +1965,6 @@
             const mapLoader = document.getElementById('mapLoader');
             if(mapLoader) mapLoader.classList.remove('hidden');
 
-            // Mengambil data Peta dari Spreadsheet khusus sesuai permintaan
             const csvUrl = `https://docs.google.com/spreadsheets/d/1aX6E93qqkWoPTe6SItFshsM9_kTLwTrX1bi3ccMtImY/export?format=csv&gid=1104105911&t=${new Date().getTime()}`;
 
             Papa.parse(csvUrl, {
@@ -2125,15 +1973,12 @@
                 complete: function(results) {
                     if(mapLoader) mapLoader.classList.add('hidden');
                     
-                    // Simpan data peta yang valid ke memory
                     originalMapData = results.data.filter(r => (r.City || r.Provinsi) && r.Latitude && r.Longitude);
                     
-                    // Populate originalData agar tabel dan filter berkerja
                     originalData = originalMapData.map(row => {
                         return { ...row, _rawRow: Object.values(row) };
                     });
 
-                    // Populate filter dropdown (akan otomatis call applyMapFilters)
                     populateMapFilters();
                 },
                 error: function(err) {
@@ -2160,7 +2005,6 @@
             provFilter.innerHTML = provHtml;
             provFilter.value = 'all';
 
-            // Panggil untuk mengisi kota sesuai provinsi
             onProvinsiMapChange(true); 
         }
 
@@ -2186,9 +2030,8 @@
             let cityHtml = `<option value="all">SEMUA KOTA/CABANG</option>`;
             sortedCity.forEach(c => cityHtml += `<option value="${c}">${c}</option>`);
             cityFilter.innerHTML = cityHtml;
-            cityFilter.value = 'all'; // Selalu reset city jika prov berubah
+            cityFilter.value = 'all'; 
 
-            // Selalu apply filter peta
             applyMapFilters(); 
         }
 
@@ -2213,26 +2056,22 @@
             
             applyFilters();
 
-            // Mengatur visibilitas tabel dan ukuran peta berdasarkan pilihan filter Kota/Cabang
             const tableSec = document.getElementById('tableSection');
             const mapSec = document.getElementById('mapSection');
             
             if (currentSheetType === 'PETA') {
                 if (selectedCity === 'all') {
-                    // Jika 'Semua Kota' dipilih, sembunyikan tabel dan luaskan peta
                     if (tableSec) tableSec.classList.add('hidden');
-                    if (mapSec) mapSec.style.height = 'calc(100vh - 160px)'; // Map meluas menutupi sisa layar
+                    if (mapSec) mapSec.style.height = 'calc(100vh - 160px)'; 
                     setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(true); }, 500);
                 } else {
-                    // Jika kota spesifik dipilih, tampilkan tabel database dan sesuaikan tinggi peta
                     if (tableSec) tableSec.classList.remove('hidden');
-                    if (mapSec) mapSec.style.height = '50vh'; // Kurangi tinggi peta agar tabel database bisa terlihat
+                    if (mapSec) mapSec.style.height = '50vh'; 
                     setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(true); }, 500);
                 }
             }
         }
 
-        // --- DAFTAR WARNA PROVINSI (SESUAI REFERENSI GAMBAR) ---
         function getProvinceColor(name) {
             if (name.includes("ACEH")) return "#d97706";
             if (name.includes("SUMATERA UTARA")) return "#84cc16";
@@ -2247,13 +2086,12 @@
             if (name.includes("KALIMANTAN BARAT")) return "#84cc16";
             if (name.includes("KALIMANTAN SELATAN")) return "#4d7c0f";
             if (name.includes("KALIMANTAN TIMUR")) return "#2563eb";
-            if (name.includes("PAPUA") || name.includes("IRIAN")) return "#fcd34d"; // Warna untuk Papua (Jayapura) ditambahkan di sini
+            if (name.includes("PAPUA") || name.includes("IRIAN")) return "#fcd34d"; 
             if (name.includes("SULAWESI SELATAN")) return "#0ea5e9";
             if (name.includes("BANTEN")) return "#8b5cf6";
             if (name.includes("JAKARTA")) return "#e11d48";
             if (name.includes("BALI")) return "#f97316";
 
-            // Hash Fallback (Jika nama provinsi tidak ada di daftar atas)
             let hash = 0;
             for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
             const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
@@ -2263,11 +2101,8 @@
         function renderLeafletMap(data) {
             if (!leafletMap) {
                 leafletMap = L.map('indonesiaMap', {
-                    minZoom: 4, // Mencegah peta zoom out terlalu jauh
-                    maxBounds: [
-                        [-15.0, 90.0], // Batas Selatan & Barat (Indonesia)
-                        [15.0, 145.0]  // Batas Utara & Timur
-                    ],
+                    minZoom: 4, 
+                    maxBounds: [[-15.0, 90.0], [15.0, 145.0]],
                     maxBoundsViscosity: 1.0
                 }).setView([-2.5489, 118.0149], 5);
                 
@@ -2275,7 +2110,7 @@
                     attribution: '&copy; OpenStreetMap contributors',
                     subdomains: 'abcd',
                     maxZoom: 20,
-                    noWrap: true // Mencegah gambar peta dunia berulang-ulang (repeating)
+                    noWrap: true 
                 }).addTo(leafletMap);
             } else {
                 leafletMap.eachLayer((layer) => {
@@ -2285,7 +2120,6 @@
                 });
             }
 
-            // Cek apakah Filter sedang Aktif
             const provFilterVal = document.getElementById('provinsiMapFilter') ? document.getElementById('provinsiMapFilter').value : 'all';
             const cityFilterVal = document.getElementById('cityMapFilter') ? document.getElementById('cityMapFilter').value : 'all';
             const isFilterActive = provFilterVal !== 'all' || cityFilterVal !== 'all';
@@ -2293,8 +2127,6 @@
             const validData = data.filter(r => (r.City || r.Provinsi) && r.Latitude && r.Longitude);
             const activeProvinces = new Set(validData.map(r => String(r['Provinsi'] || '').trim().toUpperCase()));
             
-            // --- AGGREGASI DATA BERDASARKAN KOTA / KOORDINAT ---
-            // Hal ini memastikan marker yang berada di kota & koordinat sama akan dijumlahkan
             const aggregatedData = {};
             const uniqueProvinces = new Set();
             const uniqueCities = new Set();
@@ -2308,14 +2140,8 @@
                 let lat = parseFloat(latStr);
                 let lng = parseFloat(lngStr);
 
-                // Koreksi Cerdas Koordinat (Jika format dari excel tanpa titik desimal)
-                if (latStr.indexOf('.') === -1 && Math.abs(lat) > 100) {
-                    lat = lat / 10000;
-                }
-                if (lngStr.indexOf('.') === -1 && Math.abs(lng) > 100) {
-                    lng = lng / 10000;
-                }
-                
+                if (latStr.indexOf('.') === -1 && Math.abs(lat) > 100) lat = lat / 10000;
+                if (lngStr.indexOf('.') === -1 && Math.abs(lng) > 100) lng = lng / 10000;
                 if(isNaN(lat) || isNaN(lng)) return;
 
                 let city = (row['City'] || row['Kota'] || '-').trim().toUpperCase();
@@ -2326,45 +2152,24 @@
                 if (prov !== '-' && prov !== '') uniqueProvinces.add(prov);
                 if (city !== '-' && city !== '') uniqueCities.add(city);
 
-                // Ekstrak Jenis Unit dan Jumlah dari spreadsheet
                 let jenis = (row['Jenis Unit'] || row['Bahan Bakar Unit'] || '').trim().toUpperCase();
-                let qty = parseInt(row['Jumlah Unit']) || 1; // Default 1 jika kosong
+                let qty = parseInt(row['Jumlah Unit']) || 1; 
 
-                if (jenis.includes('MOTOR')) {
-                    globalMotor += qty;
-                } else {
-                    globalMobil += qty;
-                }
+                if (jenis.includes('MOTOR')) globalMotor += qty;
+                else globalMobil += qty;
 
-                // Gunakan kombinasi lat, lng, dan city sebagai kunci (key) aggregasi
                 let key = `${lat}_${lng}_${city}`;
 
                 if (!aggregatedData[key]) {
-                    aggregatedData[key] = {
-                        lat: lat,
-                        lng: lng,
-                        city: city,
-                        prov: prov,
-                        alamat: alamat,
-                        kodePos: kodePos,
-                        motor: 0,
-                        mobil: 0,
-                        total: 0
-                    };
+                    aggregatedData[key] = { lat: lat, lng: lng, city: city, prov: prov, alamat: alamat, kodePos: kodePos, motor: 0, mobil: 0, total: 0 };
                 }
 
-                if (jenis.includes('MOTOR')) {
-                    aggregatedData[key].motor += qty;
-                } else {
-                    aggregatedData[key].mobil += qty;
-                }
-                
+                if (jenis.includes('MOTOR')) aggregatedData[key].motor += qty;
+                else aggregatedData[key].mobil += qty;
                 aggregatedData[key].total += qty;
             });
 
-            // FUNGSI UNTUK MERENDER SEMUA MARKER SETELAH GEOJSON TAMPIL
             function drawMarkersAndBounds() {
-                // Update UI Statistik Kartu Peta
                 const statProv = document.getElementById('stat-map-provinsi');
                 if (statProv) statProv.innerText = uniqueProvinces.size;
                 
@@ -2399,24 +2204,21 @@
                     boundsArray.push([lat, lng]);
                     hasValidPoints = true;
 
-                    // --- JIKA FILTER TIDAK AKTIF: HANYA TAMPILKAN LABEL TEKS NAMA KOTA ---
                     if (!isFilterActive) {
                         const textIcon = L.divIcon({
                             html: `<div class="map-text-label">${city}</div>`,
                             className: 'custom-text-label',
-                            iconSize: [0, 0] // Biarkan 0 agar posisi text persis di titik koordinat
+                            iconSize: [0, 0] 
                         });
                         L.marker([lat, lng], {icon: textIcon, interactive: false}).addTo(leafletMap);
-                        return; // Berhenti di sini, jangan buat marker lingkaran
+                        return; 
                     }
 
-                    // --- JIKA FILTER AKTIF: TAMPILKAN MARKER LINGKARAN BERKEDIP ---
                     let bgColor = '#3b82f6'; 
                     if (total > 15) bgColor = '#ef4444'; 
                     else if (total > 5) bgColor = '#f59e0b'; 
                     else if (total > 0) bgColor = '#10b981'; 
 
-                    // Terapkan class berkedip
                     const markerClass = "blinking-marker";
                     const markerStyle = `background-color: ${bgColor}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px; box-shadow: 0 3px 6px rgba(0,0,0,0.4);`;
                     
@@ -2461,8 +2263,6 @@
                     });
                 });
                 
-                // Mencegah error peta menyusut dengan memberikan jeda ekstra
-                // sebelum memposisikan kamera peta agar ukuran container akurat
                 setTimeout(() => { 
                     if(leafletMap) {
                         leafletMap.invalidateSize(true); 
@@ -2475,7 +2275,6 @@
                 }, 500);
             }
 
-            // --- PROSES MERENDER WARNA PROVINSI (GEOJSON) ---
             if (!window.indoGeoJSON) {
                 fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province-simple.json')
                     .then(res => res.json())
@@ -2503,40 +2302,23 @@
                             let safeAp = ap.replace(/[^A-Z]/g, '');
                             let safePName = pName.replace(/[^A-Z]/g, '');
                             
-                            // Alias khusus Papua (karena di beberapa GeoJSON tertulis Irian Jaya)
                             if ((safeAp.includes("PAPUA") && safePName.includes("IRIAN")) || (safeAp.includes("IRIAN") && safePName.includes("PAPUA"))) {
                                 isActive = true;
                                 break;
                             }
-
-                            // Mencocokkan nama provinsi (Mendukung sebagian teks seperti 'JAKARTA' = 'DKI JAKARTA')
                             if (ap !== '-' && ap !== '' && (pName.includes(ap) || ap.includes(pName) || safePName === safeAp)) {
                                 isActive = true;
                                 break;
                             }
                         }
 
-                        // Alias untuk memastikan mendapatkan warna yang benar jika GeoJSON menyebutnya Irian Jaya
                         let colorName = pName;
                         if (isActive && pName.includes("IRIAN")) colorName = "PAPUA";
 
-                        if (!isFilterActive && isActive) { // Hanya berwarna jika filter TIDAK aktif
-                            return {
-                                fillColor: getProvinceColor(colorName),
-                                weight: 1,
-                                opacity: 1,
-                                color: '#ffffff', // Garis batas provinsi
-                                fillOpacity: 0.8
-                            };
+                        if (!isFilterActive && isActive) { 
+                            return { fillColor: getProvinceColor(colorName), weight: 1, opacity: 1, color: '#ffffff', fillOpacity: 0.8 };
                         } else {
-                            // Sembunyikan dan transparan saat ada kota/provinsi spesifik dipilih
-                            return {
-                                fillColor: '#e2e8f0', 
-                                weight: isFilterActive ? 0 : 1,
-                                opacity: isFilterActive ? 0 : 1,
-                                color: '#ffffff',
-                                fillOpacity: isFilterActive ? 0 : 0.5
-                            };
+                            return { fillColor: '#e2e8f0', weight: isFilterActive ? 0 : 1, opacity: isFilterActive ? 0 : 1, color: '#ffffff', fillOpacity: isFilterActive ? 0 : 0.5 };
                         }
                     }
                 }).addTo(leafletMap);
@@ -2581,14 +2363,12 @@
             typeCounts["LAINNYA"] = 0;
 
             dataToRender.forEach(row => {
-                // Mendapatkan cabang secara dinamis
                 let cabKey = Object.keys(row).find(k => {
                     const uk = k.trim().toUpperCase();
                     return uk === "CABANG" || uk === "ID CABANG" || uk === "CABANG AAM";
                 });
                 let cab = cabKey && row[cabKey] ? String(row[cabKey]).trim() : "TIDAK DIKETAHUI";
                 
-                // Fallback jika tidak ditemukan nama header CABANG yang valid
                 if (cab === "TIDAK DIKETAHUI") {
                     cab = row._rawRow && row._rawRow[currentDiagramType === 'karyawan' ? 0 : 2] ? String(row._rawRow[currentDiagramType === 'karyawan' ? 0 : 2]).trim() : "TIDAK DIKETAHUI";
                 }
@@ -2598,10 +2378,20 @@
                 cabangSet.add(cab);
                 if (!dataMatrix[cab]) dataMatrix[cab] = {};
 
-                let rawJenis = row._rawRow && row._rawRow[config.colIndex] ? String(row._rawRow[config.colIndex]).toUpperCase() : "LAINNYA";
+                let rawJenis = "LAINNYA";
+                if (currentDiagramType === 'karyawan') {
+                    const jabatanKey = Object.keys(row).find(k => k.toUpperCase().includes("JABATAN") || k.toUpperCase().includes("POSISI"));
+                    if (jabatanKey && row[jabatanKey]) {
+                        rawJenis = String(row[jabatanKey]).toUpperCase();
+                    } else if (row._rawRow && row._rawRow[5]) {
+                         rawJenis = String(row._rawRow[5]).toUpperCase();
+                    }
+                } else {
+                    rawJenis = row._rawRow && row._rawRow[config.colIndex] ? String(row._rawRow[config.colIndex]).toUpperCase() : "LAINNYA";
+                }
+                
                 let matchedType = "LAINNYA";
                 
-                // Urutkan tipe berdasarkan kepanjangan teksnya agar "SDM KURIR" dicek sebelum "KURIR"
                 const typesToCheck = [...targetTypes].sort((a, b) => b.length - a.length);
 
                 for (const type of typesToCheck) {
@@ -3016,6 +2806,8 @@
             const masaKerjaMaxFilter = document.getElementById('masaKerjaMaxFilter');
             const masaKerjaContainer = document.getElementById('masaKerjaFilterContainer');
             
+            const karyawanCatFilter = document.getElementById('karyawanCatFilter');
+
             const selectedMinUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMinFilter) ? usiaMinFilter.value : 'all';
             const selectedMaxUsia = (usiaContainer && usiaContainer.style.display !== 'none' && usiaMaxFilter) ? usiaMaxFilter.value : 'all';
             const selectedPemilik = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value : 'all';
@@ -3025,6 +2817,7 @@
             
             const selectedMinMasaKerja = (masaKerjaContainer && masaKerjaContainer.style.display !== 'none' && masaKerjaMinFilter) ? masaKerjaMinFilter.value : 'all';
             const selectedMaxMasaKerja = (masaKerjaContainer && masaKerjaContainer.style.display !== 'none' && masaKerjaMaxFilter) ? masaKerjaMaxFilter.value : 'all';
+            const selectedKaryawanCat = (karyawanCatFilter && karyawanCatFilter.style.display !== 'none') ? karyawanCatFilter.value : 'all';
 
             if (isWaitingForGoogleSync) return;
 
@@ -3042,7 +2835,18 @@
                 
                 let matchesCategory = activeCategory === 'all';
                 if (!matchesCategory) {
-                    matchesCategory = Object.values(row).some(val => String(val).toLowerCase().includes(activeCategory.toLowerCase()));
+                    if (currentSheetType === 'KARYAWAN' && (activeCategory === 'Mobil' || activeCategory === 'Motor')) {
+                        const unitKey = keys.find(k => k.toUpperCase().trim() === "UNIT");
+                        if (unitKey) {
+                            matchesCategory = String(row[unitKey]).toUpperCase().trim() === activeCategory.toUpperCase();
+                        } else if (row._rawRow && row._rawRow[6]) { 
+                            matchesCategory = String(row._rawRow[6]).toUpperCase().trim() === activeCategory.toUpperCase();
+                        } else {
+                            matchesCategory = Object.values(row).some(val => String(val).toLowerCase().includes(activeCategory.toLowerCase()));
+                        }
+                    } else {
+                        matchesCategory = Object.values(row).some(val => String(val).toLowerCase().includes(activeCategory.toLowerCase()));
+                    }
                 }
 
                 const sisaSewaKey = keys.find(k => k.toUpperCase().includes("SISA AKHIR SEWA"));
@@ -3085,11 +2889,23 @@
                 }
 
                 let matchesJenis = true;
-                if (selectedJenis !== 'all' && isDiagramMode) {
+                if (selectedJenis !== 'all' && isDiagramMode && currentDiagramType !== 'karyawan') {
                     const config = DIAGRAM_CONFIG[currentDiagramType];
                     const colIndex = config ? config.colIndex : (currentDiagramType === 'mobil' ? 12 : 11);
                     const jenisVal = row._rawRow && row._rawRow[colIndex] ? String(row._rawRow[colIndex]).trim().toUpperCase() : "";
-                    matchesJenis = (jenisVal === selectedJenis);
+                    matchesJenis = (jenisVal === selectedJenis.toUpperCase());
+                }
+
+                let matchesKaryawanCat = true;
+                if (selectedKaryawanCat !== 'all' && isDiagramMode && currentDiagramType === 'karyawan') {
+                    const unitKey = keys.find(k => k.toUpperCase().trim() === "UNIT");
+                    if (unitKey) {
+                        matchesKaryawanCat = String(row[unitKey]).toUpperCase().trim() === selectedKaryawanCat.toUpperCase();
+                    } else if (row._rawRow && row._rawRow[6]) {
+                        matchesKaryawanCat = String(row._rawRow[6]).toUpperCase().trim() === selectedKaryawanCat.toUpperCase();
+                    } else {
+                        matchesKaryawanCat = Object.values(row).some(val => String(val).toLowerCase().includes(selectedKaryawanCat.toLowerCase()));
+                    }
                 }
 
                 let matchesGps = true;
@@ -3118,18 +2934,29 @@
 
                 let matchesMasaKerja = true;
                 if ((currentSheetType === 'KARYAWAN' || (isDiagramMode && currentDiagramType === 'karyawan')) && (selectedMinMasaKerja !== 'all' || selectedMaxMasaKerja !== 'all')) {
-                    const mkKey = keys.find(k => k.toUpperCase().includes("LAMA MASA BEKERJA") || k.toUpperCase().includes("MASA KERJA"));
+                    const mkKey = keys.find(k => k.toUpperCase().trim() === "MASA KERJA") || keys.find(k => {
+                        const up = k.toUpperCase();
+                        return up.includes("MASA KERJA") || up.includes("LAMA BEKERJA") || up.includes("LAMA KERJA") || up.includes("TAHUN KERJA");
+                    });
+                    
                     let valStr = "";
                     if (mkKey && row[mkKey]) {
                         valStr = String(row[mkKey]);
-                    } else if (row._rawRow && row._rawRow[9]) {
-                        valStr = String(row._rawRow[9]);
+                    } else if (row._rawRow && row._rawRow[10] !== undefined) {
+                        valStr = String(row._rawRow[10]);
                     }
 
                     if (valStr) {
+                        let yearNum = -1;
                         const match = valStr.match(/(\d+)\s*Tahun/i);
                         if (match) {
-                            const yearNum = parseInt(match[1]);
+                            yearNum = parseInt(match[1]);
+                        } else {
+                            const num = parseInt(valStr);
+                            if (!isNaN(num)) yearNum = num;
+                        }
+
+                        if (yearNum !== -1) {
                             if (selectedMinMasaKerja !== 'all' && yearNum < parseInt(selectedMinMasaKerja)) matchesMasaKerja = false;
                             if (selectedMaxMasaKerja !== 'all' && yearNum > parseInt(selectedMaxMasaKerja)) matchesMasaKerja = false;
                         } else {
@@ -3178,218 +3005,118 @@
 
                 const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(query));
 
-                return matchesCategory && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesJabatan && matchesMasaKerja && matchesSearch && matchesDateRange && matchesMapCity;
+                return matchesCategory && matchesKaryawanCat && matchesStatus && matchesUsia && matchesPemilik && matchesJenis && matchesGps && matchesJabatan && matchesMasaKerja && matchesSearch && matchesDateRange && matchesMapCity;
             });
 
             if (isDiagramMode) {
                 renderChart(currentFilteredData);
-                updateStats(currentFilteredData); 
+                updateStats(); 
+                
+                const tableSec = document.getElementById('tableSection');
+                if (tableSec) tableSec.classList.add('hidden');
+                
+                const chartSec = document.getElementById('chartSection');
+                const statsDiag = document.getElementById('statsDiagram');
+                if (chartSec) chartSec.classList.remove('hidden');
+                if (statsDiag) statsDiag.classList.remove('hidden');
             } else {
-                renderTable(currentFilteredData);
-                updateStats(currentFilteredData);
+                renderTable();
+                updateStats();
             }
         }
 
-        function updateStats(filtered) {
-            let displayCount = filtered.length;
-            let countLabel = "Data Terfilter";
+        function updateStats() {
+            let displayCount = currentFilteredData.length;
+            let countLabel = "UNIT TERFILTER";
             
-            if (isDiagramMode) {
-                countLabel = currentDiagramType === 'karyawan' ? "TOTAL KARYAWAN" : "TOTAL UNIT";
-                let totalUnits = 0;
-                if (filtered && filtered.length > 0) {
-                    const keys = Object.keys(filtered[0]);
-                    const unitKey = keys.find(k => {
-                        const uk = k.toUpperCase().trim();
-                        return uk === "JUMLAH UNIT" || uk === "JUMLAH" || uk === "UNIT" || uk === "JML UNIT" || uk === "JML" || uk === "JUMLAH UNIT KENDARAAN";
-                    });
+            const statsRow = document.getElementById('statsRow');
+            const statTimelineExtra = document.getElementById('stat-timeline-extra');
+            const statInvoiceHarga = document.getElementById('stat-invoice-harga');
+            const statInvoiceBiaya = document.getElementById('stat-invoice-biaya');
+            const statCard5 = document.getElementById('stat-card-5');
 
-                    // Khusus Karyawan tidak usah pakai kolom 'jumlah unit', 1 baris = 1 orang
-                    if (unitKey && currentDiagramType !== 'karyawan') {
-                        filtered.forEach(row => {
-                            const val = parseFloat(String(row[unitKey]).replace(/[^0-9\.]/g, '')) || 0;
-                            totalUnits += val;
-                        });
-                    } else {
-                        totalUnits = filtered.length;
-                    }
-                } else {
-                    totalUnits = 0;
+            if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+            if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+            if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+            if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+            if (statCard5) statCard5.classList.add('hidden');
+
+            const cards = statsRow ? statsRow.querySelectorAll('.stat-card') : [];
+            cards.forEach(card => {
+                card.style.width = "";
+                if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
+                    card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
                 }
-                displayCount = totalUnits;
-            } else if (currentSheetType === 'BATTERY') {
-                const totalJml = filtered.reduce((sum, row) => {
-                    const val = parseInt(String(row._rawRow && row._rawRow[4] !== undefined ? row._rawRow[4] : 0).replace(/[^0-9]/g, '')) || 0;
-                    return sum + val;
-                }, 0);
-                displayCount = totalJml;
-                countLabel = "JUMLAH BATTERY";
-            } else if (currentSheetType === 'SDM') {
-                countLabel = "TOTAL SDM"; // Card 2
+            });
+
+            let label = 'UNIT';
+            if(currentGid === '1495287037') label = 'MOTOR';
+            else if(currentGid === '1107508733') label = 'MOTOR BACKUP';
+            else if(currentSheetType === 'KARYAWAN') label = 'NAMA KARYAWAN';
+            else if(currentSheetType === 'SDM') label = 'SDM';
+            else if(currentSheetType === 'BATTERY') label = 'BATTERY';
+            else if(currentSheetType === 'PENAMBAHAN') label = 'PENAMBAHAN';
+            else if(currentSheetType === 'PETA') label = 'SUMBER PETA';
+            else if(currentSheetType === 'DETAIL_UNIT') label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
+            
+            if(currentSheetType === 'UNIT' && currentGid === '289536394') {
+                if (activeCategory === 'all') label = 'SEMUA UNIT MOBIL';
+                else if (activeCategory === 'BBM') label = 'MOBIL BBM';
+                else if (activeCategory === 'Listrik') label = 'MOBIL LISTRIK';
+            }
+            if(currentSheetType === 'UNIT' && currentGid === '1495287037') {
+                if (activeCategory === 'all') label = 'SEMUA UNIT MOTOR';
+                else if (activeCategory === 'Konvensional') label = 'MOTOR KONVENSIONAL';
+                else if (activeCategory === 'Listrik') label = 'MOTOR LISTRIK';
+            }
+
+            document.getElementById('stat-sheet-val').innerText = label;
+            document.querySelector('#stat-card-1 > p').innerText = "SHEET SUMBER";
+
+            document.getElementById('stat-count-standard').className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+            document.getElementById('stat-category-val').className = "text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate";
+            document.getElementById('stat-periode-val').className = "text-base sm:text-lg lg:text-xl font-black text-slate-800 uppercase tracking-tight truncate";
+
+            if (currentSheetType === 'PETA') {
+                if (statsRow) statsRow.className = "hidden";
+                return;
+            }
+
+            if (currentSheetType.startsWith('INVOICE')) {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6"; 
+                if (statInvoiceHarga) statInvoiceHarga.classList.remove('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.remove('hidden');
                 
-                let countDriver = 0;
-                let countHelper = 0;
-                let countKurir = 0;
-
-                filtered.forEach(row => {
-                    let text = Object.values(row).join(" ").toUpperCase();
-                    if (text.includes("DRIVER")) {
-                        countDriver++;
-                    } else if (text.includes("HELPER")) {
-                        countHelper++;
-                    } else if (text.includes("KURIR")) {
-                        countKurir++;
-                    }
-                });
-
-                displayCount = countDriver + countHelper + countKurir;
-
-                // Urutan secara fisik di HTML yang sudah kita atur:
-                // Card Extra (di index ke-3, karena CSS grid menyusunnya) = Driver
-                const statSdmExtraLabel = document.querySelector('#stat-sdm-extra p');
-                const statSdmExtraVal = document.getElementById('stat-sdm-extra-val');
-                if (statSdmExtraLabel) statSdmExtraLabel.innerText = "SDM DRIVER";
-                if (statSdmExtraVal) {
-                    statSdmExtraVal.innerText = countDriver + " ORANG";
+                const selectEl = document.getElementById('invoiceSheetFilter');
+                if (selectEl && selectEl.options.length > 0) {
+                    document.getElementById('stat-sheet-val').innerText = selectEl.options[selectEl.selectedIndex].text;
                 }
 
-                // Card 3 (di index ke-4) = Helper
-                const statCatLabel = document.getElementById('stat-kategori-label');
-                const statCatVal = document.getElementById('stat-category-val');
-                if (statCatLabel) statCatLabel.innerText = "SDM HELPER";
-                if (statCatVal) {
-                    statCatVal.innerText = countHelper + " ORANG";
-                    statCatVal.classList.remove('text-slate-800', 'text-emerald-600', 'text-purple-600');
-                    statCatVal.classList.add('text-blue-600');
+                document.getElementById('stat-periode-label').innerText = 'PERIODE';
+                const bulanFilter = document.getElementById('bulanFilter');
+                if (bulanFilter && bulanFilter.style.display !== 'none' && bulanFilter.value !== 'all') {
+                    document.getElementById('stat-periode-val').innerText = bulanFilter.options[bulanFilter.selectedIndex].text.toUpperCase() + ' 2026';
+                } else if (currentSheetMonth) {
+                    const mappedIndoMonth = engToIndoMonth[currentSheetMonth] || currentSheetMonth;
+                    document.getElementById('stat-periode-val').innerText = mappedIndoMonth.toUpperCase() + ' 2026';
                 }
 
-                // Card 4 (di index ke-5) = Kurir
-                const statPerLabel = document.getElementById('stat-periode-label');
-                const statPerVal = document.getElementById('stat-periode-val');
-                if (statPerLabel) statPerLabel.innerText = "SDM KURIR";
-                if (statPerVal) {
-                    statPerVal.innerText = countKurir + " ORANG";
-                    statPerVal.classList.remove('text-slate-800', 'text-blue-600', 'text-purple-600');
-                    statPerVal.classList.add('text-emerald-600');
-                }
-
-            } else if (currentSheetType === 'KARYAWAN') {
-                countLabel = "TOTAL KARYAWAN";
-                if (activeCategory === 'all') {
-                    let countMobil = 0;
-                    let countMotor = 0;
-                    filtered.forEach(row => {
-                        let text = Object.values(row).join(" ").toUpperCase();
-                        if (text.includes("DRIVER") || text.includes("LOPER") || text.includes("HELPER") || text.includes("MOBIL")) {
-                            countMobil++;
-                        } else {
-                            countMotor++;
-                        }
-                    });
-                    
-                    displayCount = countMobil + countMotor;
-                    
-                    const statCatLabel = document.getElementById('stat-kategori-label');
-                    const statCatVal = document.getElementById('stat-category-val');
-                    if (statCatLabel) statCatLabel.innerText = "DEDICATED MOBIL";
-                    if (statCatVal) {
-                        statCatVal.innerText = countMobil + " ORANG";
-                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600');
-                        statCatVal.classList.add('text-blue-600');
-                    }
-                    
-                    const statPerLabel = document.getElementById('stat-periode-label');
-                    const statPerVal = document.getElementById('stat-periode-val');
-                    if (statPerLabel) statPerLabel.innerText = "DEDICATED MOTOR";
-                    if (statPerVal) {
-                        statPerVal.innerText = countMotor + " ORANG";
-                        statPerVal.classList.remove('text-slate-800', 'text-blue-600');
-                        statPerVal.classList.add('text-emerald-600');
-                    }
-                }
-            } else if (currentSheetType === 'PENAMBAHAN') {
-                countLabel = "TOTAL PENAMBAHAN";
-                let countMobil = 0;
-                let countMotor = 0;
-                let countSdm = 0;
-
-                filtered.forEach(row => {
-                    let jenis = (row['Jenis Service'] || row['JENIS'] || '').toString().toUpperCase();
-                    // Ambil dari rawIdx jika label tidak cocok
-                    if (!jenis && row._rawRow && row._rawRow[3]) {
-                        jenis = String(row._rawRow[3]).toUpperCase();
-                    }
-
-                    let jumlah = parseInt((row['Jumlah'] || row['JUMLAH'] || row['JML'] || '').toString().replace(/[^0-9]/g, ''));
-                    // Ambil dari rawIdx 5 jika gagal
-                    if (isNaN(jumlah) && row._rawRow && row._rawRow[5]) {
-                        jumlah = parseInt(String(row._rawRow[5]).replace(/[^0-9]/g, ''));
-                    }
-                    if (isNaN(jumlah)) jumlah = 0;
-
-                    if (jenis.includes("MOBIL")) {
-                        countMobil += jumlah;
-                    } else if (jenis.includes("MOTOR")) {
-                        countMotor += jumlah;
-                    } else if (jenis.includes("SDM") || jenis.includes("KARYAWAN") || jenis.includes("PERSONEL")) {
-                        countSdm += jumlah;
-                    }
-                });
-
-                displayCount = countMobil + countMotor + countSdm;
-
-                const statCatLabel = document.getElementById('stat-kategori-label');
-                const statCatVal = document.getElementById('stat-category-val');
-                if (statCatLabel) statCatLabel.innerText = "DEDICATED MOBIL";
-                if (statCatVal) {
-                    statCatVal.innerText = countMobil + " UNIT";
-                    statCatVal.classList.remove('text-slate-800', 'text-emerald-600', 'text-purple-600');
-                    statCatVal.classList.add('text-blue-600');
-                }
-
-                const statPerLabel = document.getElementById('stat-periode-label');
-                const statPerVal = document.getElementById('stat-periode-val');
-                if (statPerLabel) statPerLabel.innerText = "DEDICATED MOTOR";
-                if (statPerVal) {
-                    statPerVal.innerText = countMotor + " UNIT";
-                    statPerVal.classList.remove('text-slate-800', 'text-blue-600', 'text-purple-600');
-                    statPerVal.classList.add('text-emerald-600');
-                }
-
-                const statSdmExtraLabel = document.querySelector('#stat-sdm-extra p');
-                const statSdmExtraVal = document.getElementById('stat-sdm-extra-val');
-                if (statSdmExtraLabel) statSdmExtraLabel.innerText = "DEDICATED SDM";
-                if (statSdmExtraVal) {
-                    statSdmExtraVal.innerText = countSdm + " ORANG";
-                }
-
-            } else if (currentSheetType === 'TIMELINE') {
-                countLabel = "DURATION"; 
-                displayCount = typeof timelineDuration !== 'undefined' ? timelineDuration : '0';
-            } else if (currentSheetType.startsWith('INVOICE')) {
                 countLabel = "ITEM INVOICE";
-                if (filtered.length > 0) {
-                    const keys = Object.keys(filtered[0] || {});
+                if (currentFilteredData.length > 0) {
+                    const keys = Object.keys(currentFilteredData[0] || {});
                     const noKey = keys.find(k => k.trim().toUpperCase() === "NO");
                     if (noKey) {
-                        displayCount = filtered.filter(row => {
-                            const val = String(row[noKey]).trim();
-                            return val !== '' && !isNaN(val);
-                        }).length;
+                        displayCount = currentFilteredData.filter(row => String(row[noKey]).trim() !== '' && !isNaN(String(row[noKey]).trim())).length;
                     } else {
-                        displayCount = filtered.filter(row => Object.values(row).join('').trim() !== '').length;
+                        displayCount = currentFilteredData.filter(row => Object.values(row).join('').trim() !== '').length;
                     }
-                } else {
-                    displayCount = 0;
-                }
+                } else displayCount = 0;
 
                 let totalHargaSewa = 0;
                 let totalBiayaLain = 0;
 
-                filtered.forEach(row => {
-                    let hargaSewa = 0;
-                    let tambahanBiaya = 0;
-
+                currentFilteredData.forEach(row => {
+                    let hargaSewa = 0, tambahanBiaya = 0;
                     if (currentSheetType === 'INVOICE_MOBIL') {
                         hargaSewa = row._rawRow && row._rawRow[20] !== undefined ? parseRpGlobal(row._rawRow[20]) : 0;
                         tambahanBiaya = row._rawRow && row._rawRow[getBulanIdxGlobal()] !== undefined ? parseRpGlobal(row._rawRow[getBulanIdxGlobal()]) : 0;
@@ -3410,174 +3137,275 @@
                 const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
                 const valHarga = document.getElementById('stat-invoice-harga-val');
                 const valBiaya = document.getElementById('stat-invoice-biaya-val');
-                
                 if (valHarga) valHarga.innerText = formatRp(totalHargaSewa);
                 if (valBiaya) valBiaya.innerText = formatRp(totalBiayaLain);
 
-            } else if (currentSheetType === 'PETA') {
-                countLabel = "TOTAL UNIT";
-                let totalMotor = 0;
-                let totalMobil = 0;
+                document.getElementById('stat-kategori-label').innerText = "INVOICE VIEW";
+                document.getElementById('stat-category-val').innerText = "INVOICE VIEW";
+            } 
+            
+            else if (currentSheetType === 'TIMELINE') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
+                if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
+
+                document.getElementById('stat-sheet-val').innerText = timelineProjectName || 'TIMELINE';
+                document.querySelector('#stat-card-1 > p').innerText = "PROJECT NAME";
                 
-                filtered.forEach(row => {
-                    let jenis = String(row['Jenis Unit'] || row['Bahan Bakar Unit'] || '').toUpperCase();
-                    let qty = parseInt(row['Jumlah Unit']) || 1;
-                    if (jenis.includes('MOTOR')) {
-                        totalMotor += qty;
-                    } else {
-                        totalMobil += qty;
-                    }
+                countLabel = "DURATION";
+                displayCount = timelineDuration || '0';
+
+                const statTimelineUnitVal = document.getElementById('stat-timeline-unit-val');
+                if (statTimelineUnitVal) statTimelineUnitVal.innerText = timelineTotalUnit || '0';
+
+                document.getElementById('stat-kategori-label').innerText = "START DATE";
+                document.getElementById('stat-category-val').innerText = timelineStartDate || '-';
+
+                document.getElementById('stat-periode-label').innerText = "END DATE";
+                document.getElementById('stat-periode-val').innerText = timelineEndDate || '-';
+
+                const c1 = document.getElementById('stat-card-1');
+                const c2 = document.getElementById('stat-timeline-extra');
+                const c3 = document.getElementById('stat-card-2');
+                const c4 = document.getElementById('stat-card-3');
+                const c5 = document.getElementById('stat-card-4');
+                if (c1 && c2 && c3 && c4 && c5) {
+                    c1.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-3 lg:px-4 lg:py-3 flex flex-col justify-center stat-card text-left shrink-0 min-w-0 col-span-2 lg:w-[40%]";
+                    c2.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c3.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c4.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                    c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
+                }
+            } 
+            
+            else if (currentSheetType === 'SDM') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6";
+                if (statCard5) {
+                    statCard5.classList.remove('hidden');
+                    statCard5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0 col-span-2 lg:col-span-1";
+                }
+                
+                countLabel = "TOTAL SDM";
+                let cDr = 0, cHe = 0, cKu = 0;
+                
+                currentFilteredData.forEach(r => {
+                    let text = Object.values(r).join(" ").toUpperCase();
+                    if (text.includes("DRIVER")) cDr++;
+                    else if (text.includes("HELPER")) cHe++;
+                    else if (text.includes("KURIR")) cKu++;
+                });
+                displayCount = cDr + cHe + cKu;
+
+                document.getElementById('stat-kategori-label').innerText = "SDM DRIVER";
+                let valDriver = document.getElementById('stat-category-val');
+                valDriver.innerText = cDr + " ORANG";
+                valDriver.className = "text-base sm:text-lg lg:text-xl font-black text-purple-600 tracking-tight truncate";
+                
+                document.getElementById('stat-periode-label').innerText = "SDM HELPER";
+                let valHelper = document.getElementById('stat-periode-val');
+                valHelper.innerText = cHe + " ORANG";
+                valHelper.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+
+                document.getElementById('stat-extra-label').innerText = "SDM KURIR";
+                let valKurir = document.getElementById('stat-extra-val');
+                if (valKurir) {
+                    valKurir.innerText = cKu + " ORANG";
+                    valKurir.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+                }
+            } 
+            
+            else if (currentSheetType === 'PENAMBAHAN') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6";
+                if (statCard5) {
+                    statCard5.classList.remove('hidden');
+                    statCard5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0 col-span-2 lg:col-span-1";
+                }
+
+                countLabel = "TOTAL PENAMBAHAN";
+                let mob = 0, mot = 0, sdm = 0;
+
+                currentFilteredData.forEach(r => {
+                    let text = Object.values(r).join(" ").toUpperCase();
+                    let qty = parseInt(String(r['Jumlah'] || r['JUMLAH'] || r._rawRow[4] || 0).replace(/[^0-9]/g, '')) || 1;
+
+                    if (text.includes("MOBIL")) mob += qty;
+                    else if (text.includes("MOTOR")) mot += qty;
+                    else if (text.includes("SDM") || text.includes("DRIVER") || text.includes("KURIR") || text.includes("HELPER")) sdm += qty;
+                });
+
+                displayCount = mob + mot + sdm;
+
+                document.getElementById('stat-kategori-label').innerText = "JUMLAH DEDICATED MOBIL";
+                let valMob = document.getElementById('stat-category-val');
+                valMob.innerText = mob;
+                valMob.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+
+                document.getElementById('stat-periode-label').innerText = "JUMLAH DEDICATED MOTOR";
+                let valMot = document.getElementById('stat-periode-val');
+                valMot.innerText = mot;
+                valMot.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+
+                document.getElementById('stat-extra-label').innerText = "JUMLAH DEDICATED SDM";
+                let valSdm = document.getElementById('stat-extra-val');
+                if (valSdm) {
+                    valSdm.innerText = sdm;
+                    valSdm.className = "text-base sm:text-lg lg:text-xl font-black text-purple-600 tracking-tight truncate";
+                }
+            } 
+            
+            else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '289536394' && activeCategory === 'all') {
+                countLabel = "TOTAL MOBIL";
+                let countBBM = 0, countListrik = 0;
+                
+                currentFilteredData.forEach(row => {
+                    let text = Object.values(row).join(" ").toUpperCase();
+                    if (text.includes("LISTRIK")) countListrik++;
+                    else countBBM++;
                 });
                 
-                displayCount = totalMotor + totalMobil;
+                displayCount = countBBM + countListrik;
                 
-                const statCatLabel = document.getElementById('stat-kategori-label');
-                const statCatVal = document.getElementById('stat-category-val');
-                const statPerLabel = document.getElementById('stat-periode-label');
-                const statPerVal = document.getElementById('stat-periode-val');
+                document.getElementById('stat-kategori-label').innerText = "MOBIL BBM";
+                let valBBM = document.getElementById('stat-category-val');
+                valBBM.innerText = countBBM + " UNIT";
+                valBBM.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
                 
-                if (statCatLabel) statCatLabel.innerText = "JUMLAH MOTOR";
-                if (statCatVal) {
-                    statCatVal.innerText = totalMotor + " UNIT";
-                    statCatVal.classList.remove('text-slate-800');
-                    statCatVal.classList.add('text-blue-600');
-                }
+                document.getElementById('stat-periode-label').innerText = "MOBIL LISTRIK";
+                let valListrik = document.getElementById('stat-periode-val');
+                valListrik.innerText = countListrik + " UNIT";
+                valListrik.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+            } 
+            
+            else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '1495287037' && activeCategory === 'all') {
+                countLabel = "TOTAL MOTOR";
+                let countKonvensional = 0, countListrik = 0;
                 
-                if (statPerLabel) statPerLabel.innerText = "JUMLAH MOBIL";
-                if (statPerVal) {
-                    statPerVal.innerText = totalMobil + " UNIT";
-                    statPerVal.classList.remove('text-slate-800');
-                    statPerVal.classList.add('text-emerald-600');
-                }
-            } else if (currentSheetType === 'MOTOR_BACKUP') {
-                countLabel = "TOTAL CABANG";
-                
-                const uniqueCabang = new Set();
-                let countMobilBBM = 0;
-                let countMobilLis = 0;
-                let countMotorKonv = 0;
-                let countMotorLis = 0;
-
-                filtered.forEach(row => {
-                    // Hitung Cabang Unik
-                    const cabKey = Object.keys(row).find(k => k.trim().toUpperCase() === "CABANG" || k.trim().toUpperCase() === "ID CABANG");
-                    if (cabKey && row[cabKey] && String(row[cabKey]).trim() !== '-') {
-                        uniqueCabang.add(String(row[cabKey]).trim().toUpperCase());
-                    }
-
-                    // Hitung Jenis Kendaraan
-                    const text = Object.values(row).join(" ").toUpperCase();
-                    if (text.includes("MOBIL") || text.includes("BLIND VAN") || text.includes("CDE") || text.includes("CDD")) {
-                        if (text.includes("LISTRIK")) countMobilLis++;
-                        else countMobilBBM++;
-                    } else {
-                        if (text.includes("LISTRIK")) countMotorLis++;
-                        else countMotorKonv++;
-                    }
+                currentFilteredData.forEach(row => {
+                    let text = Object.values(row).join(" ").toUpperCase();
+                    if (text.includes("LISTRIK")) countListrik++;
+                    else countKonvensional++;
                 });
                 
-                displayCount = uniqueCabang.size;
+                displayCount = countKonvensional + countListrik;
                 
-                const statCatLabel = document.getElementById('stat-kategori-label');
-                const statCatVal = document.getElementById('stat-category-val');
-                if (statCatLabel) statCatLabel.innerText = "MOTOR KONVENSIONAL";
-                if (statCatVal) {
-                    statCatVal.innerText = countMotorKonv + " UNIT";
-                    statCatVal.classList.remove('text-slate-800', 'text-emerald-600');
-                    statCatVal.classList.add('text-blue-600');
-                }
+                document.getElementById('stat-kategori-label').innerText = "MOTOR KONVENSIONAL";
+                let valKonv = document.getElementById('stat-category-val');
+                valKonv.innerText = countKonvensional + " UNIT";
+                valKonv.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
                 
-                const statPerLabel = document.getElementById('stat-periode-label');
-                const statPerVal = document.getElementById('stat-periode-val');
-                if (statPerLabel) statPerLabel.innerText = "MOTOR LISTRIK";
-                if (statPerVal) {
-                    statPerVal.innerText = countMotorLis + " UNIT";
-                    statPerVal.classList.remove('text-slate-800', 'text-blue-600');
-                    statPerVal.classList.add('text-emerald-600');
-                }
-
-                // Tambahan: Pastikan nilai mobil juga tersimpan walau tidak tampil di card utama
-                // (Ini berguna jika suatu saat Anda ingin menampilkan card mobil juga)
-            } else {
-                if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '289536394' && activeCategory === 'all') {
-                    countLabel = "TOTAL MOBIL";
-                    
-                    let countBBM = 0;
-                    let countListrik = 0;
-                    filtered.forEach(row => {
-                        let text = Object.values(row).join(" ").toUpperCase();
-                        if (text.includes("BBM")) {
-                            countBBM++;
-                        } else if (text.includes("LISTRIK")) {
-                            countListrik++;
-                        }
-                    });
-                    
-                    displayCount = countBBM + countListrik;
-                    
-                    const statCatLabel = document.getElementById('stat-kategori-label');
-                    const statCatVal = document.getElementById('stat-category-val');
-                    if (statCatLabel) statCatLabel.innerText = "MOBIL BBM";
-                    if (statCatVal) {
-                        statCatVal.innerText = countBBM + " UNIT";
-                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600', 'text-purple-600');
-                        statCatVal.classList.add('text-blue-600');
-                    }
-                    
-                    const statPerLabel = document.getElementById('stat-periode-label');
-                    const statPerVal = document.getElementById('stat-periode-val');
-                    if (statPerLabel) statPerLabel.innerText = "MOBIL LISTRIK";
-                    if (statPerVal) {
-                        statPerVal.innerText = countListrik + " UNIT";
-                        statPerVal.classList.remove('text-slate-800', 'text-blue-600', 'text-purple-600');
-                        statPerVal.classList.add('text-emerald-600');
-                    }
-                } else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && currentGid === '1495287037' && activeCategory === 'all') {
-                    countLabel = "TOTAL MOTOR";
-                    
-                    let countKonvensional = 0;
-                    let countListrik = 0;
-                    filtered.forEach(row => {
-                        let text = Object.values(row).join(" ").toUpperCase();
-                        if (text.includes("LISTRIK")) {
-                            countListrik++;
-                        } else {
-                            countKonvensional++;
-                        }
-                    });
-                    
-                    displayCount = countKonvensional + countListrik;
-                    
-                    const statCatLabel = document.getElementById('stat-kategori-label');
-                    const statCatVal = document.getElementById('stat-category-val');
-                    if (statCatLabel) statCatLabel.innerText = "MOTOR KONVENSIONAL";
-                    if (statCatVal) {
-                        statCatVal.innerText = countKonvensional + " UNIT";
-                        statCatVal.classList.remove('text-slate-800', 'text-emerald-600', 'text-purple-600');
-                        statCatVal.classList.add('text-blue-600');
-                    }
-                    
-                    const statPerLabel = document.getElementById('stat-periode-label');
-                    const statPerVal = document.getElementById('stat-periode-val');
-                    if (statPerLabel) statPerLabel.innerText = "MOTOR LISTRIK";
-                    if (statPerVal) {
-                        statPerVal.innerText = countListrik + " UNIT";
-                        statPerVal.classList.remove('text-slate-800', 'text-blue-600', 'text-purple-600');
-                        statPerVal.classList.add('text-emerald-600');
-                    }
-                } else {
-                    countLabel = "UNIT TERFILTER";
-                }
+                document.getElementById('stat-periode-label').innerText = "MOTOR LISTRIK";
+                let valListrik = document.getElementById('stat-periode-val');
+                valListrik.innerText = countListrik + " UNIT";
+                valListrik.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+            } 
+            
+            else if (currentSheetType === 'KARYAWAN' && activeCategory === 'all' && !isDiagramMode) {
+                countLabel = "TOTAL KARYAWAN";
+                let countMobil = 0, countMotor = 0;
+                
+                currentFilteredData.forEach(row => {
+                    let text = Object.values(row).join(" ").toUpperCase();
+                    if (text.includes("DRIVER") || text.includes("LOPER") || text.includes("HELPER") || text.includes("MOBIL")) countMobil++;
+                    else countMotor++;
+                });
+                
+                displayCount = countMobil + countMotor;
+                
+                document.getElementById('stat-kategori-label').innerText = "KARYAWAN DEDICATED MOBIL";
+                let valMobil = document.getElementById('stat-category-val');
+                valMobil.innerText = countMobil + " ORANG";
+                valMobil.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+                
+                document.getElementById('stat-periode-label').innerText = "KARYAWAN DEDICATED MOTOR";
+                let valMotor = document.getElementById('stat-periode-val');
+                valMotor.innerText = countMotor + " ORANG";
+                valMotor.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+            } 
+            
+            else if (isDiagramMode && currentDiagramType === 'karyawan') {
+                countLabel = "TOTAL KARYAWAN";
+                displayCount = currentFilteredData.length;
+                document.getElementById('stat-kategori-label').innerText = "DIAGRAM KARYAWAN";
+                document.getElementById('stat-category-val').innerText = "DIAGRAM KARYAWAN";
+                document.getElementById('stat-periode-label').innerText = "DATA UNIT";
+                document.getElementById('stat-periode-val').innerText = "CL";
             }
 
-            const labelEl = document.getElementById('stat-count-label');
-            if(labelEl) labelEl.innerText = countLabel;
-            
-            const countEl = document.getElementById('stat-count-standard');
-            if(countEl) countEl.innerText = displayCount;
+            else if (currentSheetType === 'MOTOR_BACKUP' && currentGid === '1107508733') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+                
+                countLabel = "TOTAL UNIT";
+                displayCount = currentFilteredData.length;
+                document.querySelector('#stat-card-1 > p').innerText = "JENIS SERVICE";
+                document.getElementById('stat-sheet-val').innerText = "MOTOR BACKUP";
+            }
+
+            else if ((currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && 
+                     ((currentGid === '289536394' && (activeCategory === 'BBM' || activeCategory === 'Listrik')) || 
+                      (currentGid === '1495287037' && (activeCategory === 'Konvensional' || activeCategory === 'Listrik')))) {
+                
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.add('hidden');
+                if (c4) c4.classList.add('hidden');
+
+                if (currentGid === '289536394') {
+                    label = activeCategory === 'BBM' ? "MOBIL BBM" : "MOBIL LISTRIK";
+                } else {
+                    label = activeCategory === 'Konvensional' ? "MOTOR KONVENSIONAL" : "MOTOR LISTRIK";
+                }
+                
+                document.querySelector('#stat-card-1 > p').innerText = "JENIS SERVICE";
+                document.getElementById('stat-sheet-val').innerText = label;
+                countLabel = "TOTAL UNIT";
+                displayCount = currentFilteredData.length;
+            }
+
+            else {
+                countLabel = "UNIT TERFILTER";
+                if (currentSheetType === 'BATTERY') {
+                    const totalJml = currentFilteredData.reduce((sum, row) => sum + (parseInt(String(row._rawRow && row._rawRow[4] !== undefined ? row._rawRow[4] : 0).replace(/[^0-9]/g, '')) || 0), 0);
+                    displayCount = totalJml;
+                    countLabel = "JUMLAH BATTERY";
+                }
+
+                let jenisServiceText = ""; 
+                if (currentGid === '289536394' && (currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT')) {
+                    document.getElementById('stat-kategori-label').innerText = "JENIS SERVICE"; 
+                    if (activeCategory === 'BBM') jenisServiceText = "MOBIL BBM";
+                    else if (activeCategory === 'Listrik') jenisServiceText = "MOBIL LISTRIK";
+                } else if (currentGid === '1495287037' && (currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT')) {
+                    document.getElementById('stat-kategori-label').innerText = "JENIS SERVICE"; 
+                    if (activeCategory === 'Konvensional') jenisServiceText = "MOTOR KONVENSIONAL";
+                    else if (activeCategory === 'Listrik') jenisServiceText = "MOTOR LISTRIK";
+                } else if (currentSheetType === 'KARYAWAN') {
+                    document.getElementById('stat-kategori-label').innerText = "JABATAN AKTIF"; 
+                    if (activeCategory === 'Mobil') jenisServiceText = "KARYAWAN MOBIL";
+                    else if (activeCategory === 'Motor') jenisServiceText = "KARYAWAN MOTOR";
+                }
+
+                if (jenisServiceText !== "") {
+                    document.getElementById('stat-category-val').innerText = jenisServiceText;
+                } else {
+                    const activeSidebarItem = document.querySelector('.sidebar-active');
+                    if (activeSidebarItem) {
+                        document.getElementById('stat-category-val').innerText = activeSidebarItem.innerText.trim().toUpperCase();
+                    }
+                }
+                
+                document.getElementById('stat-periode-label').innerText = "DATA UNIT";
+                document.getElementById('stat-periode-val').innerText = "CL";
+            }
+
+            document.getElementById('stat-count-label').innerText = countLabel;
+            document.getElementById('stat-count-standard').innerText = displayCount;
         }
 
-        function renderTable(data) {
+        function renderTable() {
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
             const rowCountBadge = document.getElementById('row-count-badge');
@@ -3614,7 +3442,7 @@
                 return `<th class="${thClass}" style="${inlineStyle}">${col.label}</th>`;
             }).join('');
 
-            const validData = data.filter(row => Object.values(row).join('').trim() !== '');
+            const validData = currentFilteredData.filter(row => Object.values(row).join('').trim() !== '');
 
             if (validData.length === 0) {
                 let emptyMsg = "Data Tidak Dijumpai";
@@ -3627,7 +3455,6 @@
                 const cells = config.map(col => {
                     let val = "-";
                     
-                    // Logika Dinamis untuk index. Berlaku universal (Termasuk Peta)
                     if (col.isIndex) {
                         val = idx + 1;
                     } else if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN') && (col.rawIdx !== undefined || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
