@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LJR GROUP - Checklist Dedicated Makasar</title>
+    <title>LJR GROUP - Dashbord Dedicated AAM</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -102,7 +102,7 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0f172a] text-slate-400 flex flex-col flex-shrink-0 shadow-2xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
         <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex flex-col gap-1 justify-center items-start">
             <div class="logo-text">LJR GROUP</div>
-            <span class="text-[10px] text-blue-400 tracking-widest font-bold">DEDICATED AAM</span>
+            <span class="text-[10px] text-blue-400 tracking-widest font-bold">Dashboard DEDICATED AAM</span>
             <button onclick="toggleSidebar()" class="lg:hidden absolute top-6 right-6 text-slate-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -3570,6 +3570,78 @@
             link.download = `Dedicated_AAM_${exportName}.xls`;
             link.href = url;
             link.click();
+        }
+
+        function openGPS() {
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            const selectedPemilik = pemilikFilter ? pemilikFilter.value.trim().toUpperCase() : 'ALL';
+
+            if (selectedPemilik === 'ALL') {
+                showToast('Silakan pilih spesifik Pemilik pada filter di atas terlebih dahulu untuk membuka Live GPS.', false);
+                return;
+            }
+
+            const btn = document.getElementById('liveGpsBtn');
+            const originalHtml = btn.innerHTML;
+            
+            // Tampilkan state loading pada tombol
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-spin"></i> <span class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-widest hidden sm:block">Loading...</span>';
+            lucide.createIcons();
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            // Tentukan GID Mapping GPS berdasarkan tab yang sedang aktif (Mobil atau Motor)
+            let gpsMappingGid = '73478022'; // Default GID untuk GPS Mobil
+            if (currentGid === '1495287037') {
+                gpsMappingGid = '503672149'; // GID untuk GPS Motor
+            }
+
+            // URL CSV dari Google Sheet Mapping GPS
+            const gpsSheetUrl = `https://docs.google.com/spreadsheets/d/1aX6E93qqkWoPTe6SItFshsM9_kTLwTrX1bi3ccMtImY/export?format=csv&gid=${gpsMappingGid}&t=${new Date().getTime()}`;
+
+            Papa.parse(gpsSheetUrl, {
+                download: true,
+                header: false, // Menggunakan array 2D karena kita membaca berdasar indeks kolom
+                complete: function(results) {
+                    // Kembalikan tombol ke state semula
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+
+                    const data = results.data;
+                    let foundLink = null;
+
+                    // Lewati baris 0 (Header), mulai pencarian dari baris 1
+                    for (let i = 1; i < data.length; i++) {
+                        const row = data[i];
+                        // Pastikan baris memiliki minimal 3 kolom (A, B, C)
+                        if (row && row.length >= 3) {
+                            // Kolom A (Index 0) = Nama Pemilik, Kolom C (Index 2) = Link URL
+                            const ownerName = String(row[0]).trim().toUpperCase();
+                            if (ownerName === selectedPemilik) {
+                                foundLink = String(row[2]).trim();
+                                break;
+                            }
+                        }
+                    }
+
+                    // Validasi link ditemukan dan diawali dengan http
+                    if (foundLink && foundLink.toLowerCase().startsWith('http')) {
+                        window.open(foundLink, '_blank');
+                    } else {
+                        showToast(`Link Live GPS belum tersedia untuk pemilik: ${selectedPemilik}`, true);
+                    }
+                },
+                error: function(err) {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    showToast('Gagal memuat database Link GPS dari Google Sheet.', true);
+                    console.error("PapaParse error pada Live GPS:", err);
+                }
+            });
         }
 
         function startTimer() {
