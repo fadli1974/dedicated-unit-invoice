@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LJR GROUP - Dashbord Dedicated AAM</title>
+    <title>LJR GROUP - Checklist Dedicated Makasar</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,9 +100,9 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0f172a] text-slate-400 flex flex-col flex-shrink-0 shadow-2xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
-        <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex flex-col gap-1 justify-center items-start">
+        <div class="p-6 text-white font-black text-xl tracking-tight uppercase border-b border-slate-800 mb-4 flex flex-col gap-1 justify-center items-start relative">
             <div class="logo-text">LJR GROUP</div>
-            <span class="text-[10px] text-blue-400 tracking-widest font-bold">Dashboard DEDICATED AAM</span>
+            <span class="text-[10px] text-blue-400 tracking-widest font-bold">DEDICATED AAM</span>
             <button onclick="toggleSidebar()" class="lg:hidden absolute top-6 right-6 text-slate-400 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -601,6 +601,107 @@
             }, 4000);
         }
 
+        function openGPS() {
+            let isMotor = (currentGid === '1495287037' || currentGid === '1107508733' || currentSheetType === 'INVOICE_MOTOR' || (isDiagramMode && currentDiagramType === 'motor'));
+
+            const pemilikFilter = document.getElementById('pemilikFilter');
+            let selectedOwner = (pemilikFilter && pemilikFilter.style.display !== 'none') ? pemilikFilter.value.toUpperCase().trim() : 'ALL';
+            
+            if (isMotor && selectedOwner === 'ALL') {
+                selectedOwner = 'MOTOR_FALLBACK';
+            }
+
+            if (!isMotor && selectedOwner === 'ALL') {
+                showToast('Silakan pilih salah satu PEMILIK di menu dropdown filter terlebih dahulu.', true);
+                return;
+            }
+
+            const btn = document.getElementById('liveGpsBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-spin"></i><span class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-widest hidden sm:block">Loading...</span>`;
+            lucide.createIcons();
+
+            const gpsSheetId = '1aX6E93qqkWoPTe6SItFshsM9_kTLwTrX1bi3ccMtImY';
+            let targetGid = isMotor ? '503672149' : '73478022';
+            const url = `https://docs.google.com/spreadsheets/d/${gpsSheetId}/export?format=csv&gid=${targetGid}&t=${new Date().getTime()}`;
+            
+            Papa.parse(url, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+
+                    const rows = results.data;
+                    if(!rows || rows.length < 2 || String(rows[0][0]).toLowerCase().includes("<!doctype") || String(rows[0][0]).toLowerCase().includes("<html")) {
+                        showToast('Gagal memuat data GPS. Pastikan Share Google Sheet GPS di-set "Anyone with link".', true);
+                        return;
+                    }
+
+                    let targetLink = null;
+                    let ownerFound = false;
+
+                    for(let i=1; i<rows.length; i++) {
+                        const row = rows[i];
+                        if(!row || row.length < 2) continue; 
+                        
+                        let candidateLink = "";
+                        for (let j = 1; j < row.length; j++) {
+                            if (String(row[j]).toLowerCase().includes("http")) {
+                                candidateLink = String(row[j]).trim();
+                                break;
+                            }
+                        }
+                        
+                        if (!candidateLink && row.length > 2 && String(row[2]).trim() !== '') {
+                            candidateLink = String(row[2]).trim();
+                        } else if (!candidateLink && row.length > 1 && String(row[1]).trim() !== '') {
+                            candidateLink = String(row[1]).trim();
+                        }
+
+                        const rowOwner = String(row[0]).trim().toUpperCase();
+
+                        if (isMotor && selectedOwner === 'MOTOR_FALLBACK') {
+                             if (rowOwner !== '') {
+                                ownerFound = true; 
+                                if (candidateLink && candidateLink.toUpperCase() !== 'BELUM ADA LINK' && candidateLink !== '-') {
+                                    targetLink = candidateLink;
+                                    selectedOwner = rowOwner; 
+                                    break;
+                                }
+                            }
+                        } else {
+                            if(rowOwner === selectedOwner) {
+                                ownerFound = true;
+                                if (candidateLink && candidateLink.toUpperCase() !== 'BELUM ADA LINK' && candidateLink !== '-') {
+                                    targetLink = candidateLink;
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    if (targetLink && targetLink.toUpperCase() !== 'BELUM ADA LINK' && targetLink !== '-' && targetLink !== '') {
+                        if (!targetLink.startsWith('http://') && !targetLink.startsWith('https://')) {
+                            targetLink = 'https://' + targetLink;
+                        }
+                        window.open(targetLink, '_blank');
+                    } else {
+                        if (isMotor || ownerFound) {
+                            showToast('Link GPS belum Tersedia / Kosong.', true);
+                        } else {
+                            showToast(`Data GPS untuk Pemilik "${selectedOwner}" tidak ditemukan.`, true);
+                        }
+                    }
+                },
+                error: function() {
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                    showToast('Terjadi kesalahan jaringan saat mengambil link GPS.', true);
+                }
+            });
+        }
+
         function parseGoogleDate(str) {
             if (!str) return '';
             str = String(str).trim().toLowerCase();
@@ -660,6 +761,7 @@
                 { label: "CABANG", keys: ["ID CABANG", "CABANG"] },
                 { label: "NOPOL", keys: ["NO POL", "NOPOL", "No POL"] },
                 { label: "GPS", keys: ["GPS"] },
+                { label: "THN PEMBUATAN", keys: ["THN PEMBUATAN", "TAHUN PEMBUATAN"], rawIdx: 5 },
                 { label: "JENIS KENDARAAN", keys: ["JENIS KENDARAAN", "MERK TIPE", "TIPE"] }, 
                 { label: "NO. SPK", keys: ["NO. SPK", "NO.SPK", "SPK"] },
                 { label: "PEMILIK", keys: ["PEMILIK", "OWNER"] },
@@ -1374,7 +1476,7 @@
             
             const bulanFilter = document.getElementById('bulanFilter');
             if (bulanFilter) bulanFilter.style.display = 'none';
-
+            
             const isDifferentSheet = (currentGid !== gid);
             currentGid = gid;
             currentSheetType = type; 
@@ -1420,7 +1522,13 @@
             isDiagramMode = true;
             currentDiagramType = diagramType;
             currentGid = gid;
-            currentSheetType = diagramType === 'karyawan' ? 'KARYAWAN' : 'UNIT';
+
+            if (diagramType === 'karyawan') {
+                currentSheetType = 'KARYAWAN';
+            } else {
+                currentSheetType = 'UNIT';
+            }
+            
             activeCategory = 'all';
             leaseStatusFilter = 'all';
 
@@ -1654,7 +1762,7 @@
         function showDetail(element) {
             isDiagramMode = false;
             toggleChart(false);
-            if (typeof toggleMap === 'function') toggleMap(false);
+            toggleMap(false);
 
             activeCategory = 'all';
             leaseStatusFilter = 'all';
@@ -1674,6 +1782,19 @@
             
             const jenisFilter = document.getElementById('jenisFilter');
             if (jenisFilter) jenisFilter.style.display = 'none';
+
+            const jabatanFilter = document.getElementById('jabatanFilter');
+            if (jabatanFilter) {
+                jabatanFilter.style.display = 'none';
+                jabatanFilter.value = 'all';
+            }
+
+            const masaKerjaFilterContainer = document.getElementById('masaKerjaFilterContainer');
+            if (masaKerjaFilterContainer) {
+                masaKerjaFilterContainer.style.display = 'none';
+                document.getElementById('masaKerjaMinFilter').value = 'all';
+                document.getElementById('masaKerjaMaxFilter').value = 'all';
+            }
 
             const liveGpsBtn = document.getElementById('liveGpsBtn');
             if (liveGpsBtn) liveGpsBtn.style.display = 'flex';
@@ -1829,7 +1950,7 @@
         function showInvoiceView(element) {
             isDiagramMode = false;
             toggleChart(false);
-            if (typeof toggleMap === 'function') toggleMap(false);
+            toggleMap(false);
             activeCategory = 'all';
             leaseStatusFilter = 'all';
             
@@ -2124,6 +2245,10 @@
 
             if (statCard5) statCard5.classList.add('hidden');
 
+            if (isDiagramMode && currentDiagramType === 'karyawan') {
+                return;
+            }
+
             if(currentSheetType.startsWith('INVOICE')) {
                 const selectEl = document.getElementById('invoiceSheetFilter');
                 if (selectEl && selectEl.options.length > 0) {
@@ -2160,26 +2285,7 @@
                 label = currentGid === '289536394' ? 'MOBIL' : 'MOTOR';
             }
 
-            if (isDiagramMode && currentDiagramType === 'karyawan') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
-                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
-                if (statCard5) statCard5.classList.add('hidden');
-
-                const c3 = document.getElementById('stat-card-3');
-                const c4 = document.getElementById('stat-card-4');
-                if (c3) c3.classList.remove('hidden');
-                if (c4) c4.classList.remove('hidden');
-
-                const cards = statsRow ? statsRow.querySelectorAll('.stat-card') : [];
-                cards.forEach(card => {
-                    card.style.width = "";
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
-                    }
-                });
-            } else if (currentSheetType === 'TIMELINE') {
+            if (currentSheetType === 'TIMELINE') {
                 if (statsRow) statsRow.className = "grid grid-cols-2 lg:flex w-full mb-6 gap-3 sm:gap-4 lg:gap-0 lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:overflow-hidden lg:divide-x lg:divide-slate-200";
                 if (statTimelineExtra) statTimelineExtra.classList.remove('hidden');
                 if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
@@ -2201,24 +2307,6 @@
                     c4.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                     c5.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm lg:bg-transparent lg:border-none lg:shadow-none lg:rounded-none lg:p-2 lg:px-3 lg:py-3 flex flex-col justify-center stat-card text-center items-center shrink-0 min-w-0 lg:w-[15%]";
                 }
-            } else if (currentSheetType === 'BATTERY') {
-                if (statsRow) statsRow.className = "grid grid-cols-2 gap-3 sm:gap-4 mb-6";
-                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
-                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
-                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
-                
-                const c3 = document.getElementById('stat-card-3');
-                const c4 = document.getElementById('stat-card-4');
-                if (c3) c3.classList.add('hidden');
-                if (c4) c4.classList.add('hidden');
-
-                const cards = statsRow.querySelectorAll('.stat-card');
-                cards.forEach(card => {
-                    card.style.width = "";
-                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5' && card.id !== 'stat-card-3' && card.id !== 'stat-card-4') {
-                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
-                    }
-                });
             } else if (currentSheetType.startsWith('INVOICE')) {
                 if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6"; 
                 if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
@@ -2261,11 +2349,6 @@
                 if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
                 if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
                 if (statCard5) statCard5.classList.add('hidden');
-                
-                const c3 = document.getElementById('stat-card-3');
-                const c4 = document.getElementById('stat-card-4');
-                if (c3) c3.classList.remove('hidden');
-                if (c4) c4.classList.remove('hidden');
                 
                 const cards = statsRow.querySelectorAll('.stat-card');
                 cards.forEach(card => {
@@ -2969,6 +3052,58 @@
             const statInvoiceBiaya = document.getElementById('stat-invoice-biaya');
             const statCard5 = document.getElementById('stat-card-5');
 
+            if (isDiagramMode && currentDiagramType === 'karyawan') {
+                if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
+                if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
+                if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
+                if (statInvoiceBiaya) statInvoiceBiaya.classList.add('hidden');
+                if (statCard5) statCard5.classList.add('hidden');
+
+                const cards = statsRow ? statsRow.querySelectorAll('.stat-card') : [];
+                cards.forEach(card => {
+                    card.style.width = "";
+                    if(card.id !== 'stat-timeline-extra' && card.id !== 'stat-invoice-harga' && card.id !== 'stat-invoice-biaya' && card.id !== 'stat-card-5') {
+                        card.className = "bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center stat-card text-left min-w-0";
+                    }
+                });
+
+                let countMobil = 0, countMotor = 0;
+                currentFilteredData.forEach(row => {
+                    let unitCol = row._rawRow && row._rawRow[6] ? String(row._rawRow[6]).trim().toUpperCase() : "";
+                    if (unitCol.includes("MOBIL")) {
+                        countMobil++;
+                    } else if (unitCol.includes("MOTOR")) {
+                        countMotor++;
+                    }
+                });
+
+                let totalKaryawan = countMobil + countMotor;
+
+                document.getElementById('stat-sheet-val').innerText = "SEMUA KARYAWAN";
+                document.querySelector('#stat-card-1 > p').innerText = "SHEET SUMBER";
+
+                document.getElementById('stat-count-label').innerText = "TOTAL KARYAWAN";
+                document.getElementById('stat-count-standard').innerText = totalKaryawan;
+                document.getElementById('stat-count-standard').className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+
+                document.getElementById('stat-kategori-label').innerText = "DEDICATED MOBIL";
+                let valMobil = document.getElementById('stat-category-val');
+                valMobil.innerText = countMobil + " ORANG";
+                valMobil.className = "text-base sm:text-lg lg:text-xl font-black text-blue-600 tracking-tight truncate";
+                
+                document.getElementById('stat-periode-label').innerText = "DEDICATED MOTOR";
+                let valMotor = document.getElementById('stat-periode-val');
+                valMotor.innerText = countMotor + " ORANG";
+                valMotor.className = "text-base sm:text-lg lg:text-xl font-black text-emerald-600 tracking-tight truncate";
+
+                const c3 = document.getElementById('stat-card-3');
+                const c4 = document.getElementById('stat-card-4');
+                if (c3) c3.classList.remove('hidden');
+                if (c4) c4.classList.remove('hidden');
+
+                return;
+            }
+
             if (statsRow) statsRow.className = "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6";
             if (statTimelineExtra) statTimelineExtra.classList.add('hidden');
             if (statInvoiceHarga) statInvoiceHarga.classList.add('hidden');
@@ -3289,34 +3424,6 @@
                 document.getElementById('stat-sheet-val').innerText = activeCategory === 'Mobil' ? "DEDICATED MOBIL" : "DEDICATED MOTOR";
             }
 
-            else if (isDiagramMode && currentDiagramType === 'karyawan') {
-                let countMobil = 0, countMotor = 0;
-                
-                currentFilteredData.forEach(row => {
-                    let unitCol = row._rawRow && row._rawRow[6] ? String(row._rawRow[6]).trim().toUpperCase() : "";
-                    
-                    if (unitCol.includes("MOBIL")) {
-                        countMobil++;
-                    } else if (unitCol.includes("MOTOR")) {
-                        countMotor++;
-                    }
-                });
-
-                countLabel = "TOTAL KARYAWAN";
-                displayCount = countMobil + countMotor;
-
-                document.getElementById('stat-sheet-val').innerText = "SEMUA KARYAWAN";
-                document.querySelector('#stat-card-1 > p').innerText = "SHEET SUMBER";
-
-                document.getElementById('stat-kategori-label').innerText = "DEDICATED MOBIL";
-                document.getElementById('stat-category-val').innerText = countMobil;
-                document.getElementById('stat-category-val').classList.add('text-blue-600');
-                
-                document.getElementById('stat-periode-label').innerText = "DEDICATED MOTOR";
-                document.getElementById('stat-periode-val').innerText = countMotor;
-                document.getElementById('stat-periode-val').classList.add('text-emerald-600');
-            }
-
             else if ((currentSheetType === 'MOTOR_BACKUP' && currentGid === '1107508733') || 
                      (currentSheetType === 'UNIT' || currentSheetType === 'DETAIL_UNIT') && 
                      ((currentGid === '289536394' && (activeCategory === 'BBM' || activeCategory === 'Listrik')) || 
@@ -3427,7 +3534,7 @@
                     
                     if (col.isIndex) {
                         val = idx + 1;
-                    } else if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN') && (col.rawIdx !== undefined || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
+                    } else if ((isInvoiceMobil || isInvoiceMotor || isInvoiceSDM || isBattery || currentSheetType === 'KARYAWAN' || currentSheetType === 'UNIT') && (col.rawIdx !== undefined || col.isDynamicMonth || col.isDynamicMonthMotor || col.isDynamicMonthSDM || col.isCalcInv || col.isCalcPpn || col.isCalcTotal)) {
                         if (col.rawIdx !== undefined) {
                             val = row._rawRow && row._rawRow[col.rawIdx] !== undefined && String(row._rawRow[col.rawIdx]).trim() !== "" ? row._rawRow[col.rawIdx] : "-";
                         } else if (col.isDynamicMonth) {
@@ -3572,78 +3679,6 @@
             link.click();
         }
 
-        function openGPS() {
-            const pemilikFilter = document.getElementById('pemilikFilter');
-            const selectedPemilik = pemilikFilter ? pemilikFilter.value.trim().toUpperCase() : 'ALL';
-
-            if (selectedPemilik === 'ALL') {
-                showToast('Silakan pilih spesifik Pemilik pada filter di atas terlebih dahulu untuk membuka Live GPS.', false);
-                return;
-            }
-
-            const btn = document.getElementById('liveGpsBtn');
-            const originalHtml = btn.innerHTML;
-            
-            // Tampilkan state loading pada tombol
-            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-spin"></i> <span class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-widest hidden sm:block">Loading...</span>';
-            lucide.createIcons();
-            btn.disabled = true;
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            // Tentukan GID Mapping GPS berdasarkan tab yang sedang aktif (Mobil atau Motor)
-            let gpsMappingGid = '73478022'; // Default GID untuk GPS Mobil
-            if (currentGid === '1495287037') {
-                gpsMappingGid = '503672149'; // GID untuk GPS Motor
-            }
-
-            // URL CSV dari Google Sheet Mapping GPS
-            const gpsSheetUrl = `https://docs.google.com/spreadsheets/d/1aX6E93qqkWoPTe6SItFshsM9_kTLwTrX1bi3ccMtImY/export?format=csv&gid=${gpsMappingGid}&t=${new Date().getTime()}`;
-
-            Papa.parse(gpsSheetUrl, {
-                download: true,
-                header: false, // Menggunakan array 2D karena kita membaca berdasar indeks kolom
-                complete: function(results) {
-                    // Kembalikan tombol ke state semula
-                    btn.innerHTML = originalHtml;
-                    lucide.createIcons();
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-
-                    const data = results.data;
-                    let foundLink = null;
-
-                    // Lewati baris 0 (Header), mulai pencarian dari baris 1
-                    for (let i = 1; i < data.length; i++) {
-                        const row = data[i];
-                        // Pastikan baris memiliki minimal 3 kolom (A, B, C)
-                        if (row && row.length >= 3) {
-                            // Kolom A (Index 0) = Nama Pemilik, Kolom C (Index 2) = Link URL
-                            const ownerName = String(row[0]).trim().toUpperCase();
-                            if (ownerName === selectedPemilik) {
-                                foundLink = String(row[2]).trim();
-                                break;
-                            }
-                        }
-                    }
-
-                    // Validasi link ditemukan dan diawali dengan http
-                    if (foundLink && foundLink.toLowerCase().startsWith('http')) {
-                        window.open(foundLink, '_blank');
-                    } else {
-                        showToast(`Link Live GPS belum tersedia untuk pemilik: ${selectedPemilik}`, true);
-                    }
-                },
-                error: function(err) {
-                    btn.innerHTML = originalHtml;
-                    lucide.createIcons();
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                    showToast('Gagal memuat database Link GPS dari Google Sheet.', true);
-                    console.error("PapaParse error pada Live GPS:", err);
-                }
-            });
-        }
-
         function startTimer() {
             let seconds = 0;
             setInterval(() => {
@@ -3689,6 +3724,23 @@
             startTimer();
             setInterval(fetchData, 300000);
         };
+        
+        const userInputEl = document.getElementById('invoice-user-input');
+        if (userInputEl) {
+            userInputEl.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    const pwdInput = document.getElementById('invoice-password-input');
+                    if (pwdInput) pwdInput.focus();
+                }
+            });
+        }
+
+        const pwdInputEl = document.getElementById('invoice-password-input');
+        if (pwdInputEl) {
+            pwdInputEl.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') verifyPassword();
+            });
+        }
     </script>
 </body>
 </html>
